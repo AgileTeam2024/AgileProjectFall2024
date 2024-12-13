@@ -1,4 +1,5 @@
 import 'package:chabok_front/pages/home.dart';
+import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,6 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        appBar: MainAppBar(),
         body: const HomePage(),
       ),
     );
