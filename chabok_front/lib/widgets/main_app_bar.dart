@@ -15,8 +15,7 @@ class MainAppBar extends AppBar {
   bool get centerTitle => false;
 
   @override
-  List<Widget>? get actions =>
-      [
+  List<Widget>? get actions => [
         Padding(
           padding: const EdgeInsets.only(right: 10),
           child: FutureBuilder<bool>(
@@ -32,4 +31,24 @@ class MainAppBar extends AppBar {
           ),
         )
       ];
+
+  @override
+  Widget? get flexibleSpace => Padding(
+        padding: const EdgeInsets.only(
+          left: 200,
+          right: 300,
+          top: 10,
+          bottom: 10,
+        ),
+        child: SearchBar(
+          leading: const Icon(Icons.search),
+          hintText: 'Search Products...',
+          backgroundColor: WidgetStateProperty.all(Colors.white),
+          onSubmitted: _submitSearch,
+        ),
+      );
+
+  void _submitSearch(String search) {
+    // todo
+  }
 }
