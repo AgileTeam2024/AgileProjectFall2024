@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 
-import app.initializers.settings
+import backend.initializers.settings
 
 
 class DatabaseConfig:
@@ -10,9 +10,9 @@ class DatabaseConfig:
 
     SQLALCHEMY_DATABASE_URI = (
         f"postgresql://"
-        f"{app.initializers.settings.db_username.value}:{app.initializers.settings.db_password.value}"
-        f"@{app.initializers.settings.db_host.value}:{app.initializers.settings.db_port.value}"
-        f"/{app.initializers.settings.db_name.value}"
+        f"{backend.initializers.settings.db_username.value}:{backend.initializers.settings.db_password.value}"
+        f"@{backend.initializers.settings.db_host.value}:{backend.initializers.settings.db_port.value}"
+        f"/{backend.initializers.settings.db_name.value}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
