@@ -1,1 +1,1 @@
-const String APP_NAME = 'ReVibe';
+const String APP_NAME = 'PreLoved';

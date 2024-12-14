@@ -9,7 +9,15 @@ class MainAppBar extends AppBar {
   MainAppBar({super.key});
 
   @override
-  Widget get title => const Text(APP_NAME);
+  double? get elevation => 2;
+
+  @override
+  Widget get title => Row(
+    children: [
+      Icon(Icons.heart_broken),
+      const Text(APP_NAME),
+    ],
+  );
 
   @override
   bool get centerTitle => false;
