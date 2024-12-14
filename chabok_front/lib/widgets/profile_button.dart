@@ -1,5 +1,7 @@
+import 'package:chabok_front/pages/login_register_page.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ProfileButton extends StatelessWidget {
   final bool isLogged;
@@ -24,6 +26,6 @@ class ProfileButton extends StatelessWidget {
   }
 
   void _goToAuthPage() {
-    // todo
+    Get.to(() => LoginPage());
   }
 }

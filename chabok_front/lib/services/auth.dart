@@ -8,6 +8,6 @@ class AuthService {
 
   Future<bool> get isLoggedIn {
     // todo
-    return Future.value(true);
+    return Future.value(false);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class Button extends StatelessWidget {
   final String text;
@@ -39,12 +40,13 @@ class Button extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final child = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (icon != null) Padding(
           padding: const EdgeInsets.only(right: 3),
           child: Icon(icon),
         ),
-        Text(text),
+        Text(text, style: TextStyle(fontWeight: FontWeight.bold)),
       ],
     );
     switch (type) {
