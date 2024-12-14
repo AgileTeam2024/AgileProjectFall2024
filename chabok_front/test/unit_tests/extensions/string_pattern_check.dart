@@ -17,10 +17,34 @@ void main() {
       test('if contains numeric character in middle',
           () => expect(true, 'a1b'.containsNumeric));
     });
+
     group('should return false', () {
       test('for empty string', () => expect(false, ''.containsNumeric));
       test('if doesn\'t contain numbers',
           () => expect(false, 'abc'.containsNumeric));
+    });
+  });
+
+  group('Testing containsAlphabet', () {
+    group('should return true', () {
+      test('if single alphabet character',
+          () => expect(true, 'a'.containsAlphabet));
+      test('if multiple alphabet characters',
+          () => expect(true, 'aaa'.containsAlphabet));
+      test('if starts with alphabet character',
+          () => expect(true, 'a11'.containsAlphabet));
+      test('if ends with alphabet character',
+          () => expect(true, '11a'.containsAlphabet));
+      test('if starts and ends with alphabet character',
+          () => expect(true, 'a11a'.containsAlphabet));
+      test('if contains alphabet character in middle',
+          () => expect(true, '1a1'.containsAlphabet));
+    });
+
+    group('should return false', () {
+      test('for empty string', () => expect(false, ''.containsAlphabet));
+      test('if doesn\'t contain numbers',
+          () => expect(false, '123'.containsAlphabet));
     });
   });
 }
