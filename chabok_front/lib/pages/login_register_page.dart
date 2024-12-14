@@ -1,9 +1,9 @@
 import 'package:chabok_front/view_models/text_field.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card_widget.dart';
-import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:chabok_front/widgets/text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class LoginRegisterPage extends StatefulWidget {
   const LoginRegisterPage({super.key});
@@ -11,6 +11,9 @@ class LoginRegisterPage extends StatefulWidget {
   String get title => throw UnimplementedError('Should be overridden!');
 
   List<TextFieldViewModel> get fields =>
+      throw UnimplementedError('Should be overridden!');
+
+  List<Widget> get navigateToOtherForm =>
       throw UnimplementedError('Should be overridden!');
 
   @override
@@ -30,7 +33,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     return Scaffold(
       body: Center(
         child: SizedBox(
-          width: 600,
+          width: 500,
           child: CardWidget(
             child: Form(
               key: _formKey,
@@ -43,18 +46,27 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                   SizedBox(height: 20),
                   ...widget.fields.map(
                     (vm) => Padding(
-                      padding:
-                          const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 7.5,
+                        horizontal: 10,
+                      ),
                       child: CustomTextField(vm),
                     ),
                   ),
                   SizedBox(height: 20),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
                     child: Button.filled(
                       text: widget.title,
                       onPressed: () => widget.submit(_formKey),
                     ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: widget.navigateToOtherForm,
                   )
                 ],
               ),
@@ -85,6 +97,15 @@ class LoginPage extends LoginRegisterPage {
       ];
 
   @override
+  List<Widget> get navigateToOtherForm => [
+        Text('Don\'t have an account?'),
+        Button.text(
+          text: 'Register',
+          onPressed: () => Get.to(() => RegisterPage()),
+        )
+      ];
+
+  @override
   void submit(GlobalKey<FormState> _formKey) {
     if (_formKey.currentState?.validate() ?? false) {
       // todo send to backend
@@ -95,4 +116,44 @@ class LoginPage extends LoginRegisterPage {
 class RegisterPage extends LoginRegisterPage {
   @override
   String get title => 'Register';
+
+  @override
+  List<TextFieldViewModel> get fields => [
+        TextFieldViewModel(
+          label: 'Username',
+          icon: Icons.abc,
+          required: true,
+        ),
+        PasswordTextFieldViewModel(
+          label: 'Password',
+          icon: Icons.password,
+          required: true,
+        ),
+        PasswordTextFieldViewModel(
+          label: 'Repeat Password',
+          icon: Icons.password,
+          required: true,
+        ),
+        EmailTextFieldViewModel(
+          label: 'Email',
+          icon: Icons.email,
+          required: false,
+        ),
+      ];
+
+  @override
+  List<Widget> get navigateToOtherForm => [
+        Text('Already have an account?'),
+        Button.text(
+          text: 'Login',
+          onPressed: () => Get.back(),
+        )
+      ];
+
+  @override
+  void submit(GlobalKey<FormState> _formKey) {
+    if (_formKey.currentState?.validate() ?? false) {
+      // todo send to backend
+    }
+  }
 }
