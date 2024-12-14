@@ -1,6 +1,6 @@
 import 'package:chabok_front/view_models/text_field.dart';
 import 'package:chabok_front/widgets/button.dart';
-import 'package:chabok_front/widgets/card_widget.dart';
+import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

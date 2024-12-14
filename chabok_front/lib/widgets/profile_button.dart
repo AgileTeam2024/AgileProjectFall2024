@@ -1,4 +1,4 @@
-import 'package:chabok_front/pages/login_register_page.dart';
+import 'package:chabok_front/pages/login_register.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
