@@ -38,6 +38,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
             child: Form(
               key: _formKey,
               child: Column(
+                // crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(widget.title, style: textTheme.headlineLarge),
@@ -66,7 +67,12 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: widget.navigateToOtherForm,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Flexible(child: widget.navigateToOtherForm[0]),
+                      SizedBox(width: 5),
+                      widget.navigateToOtherForm[1]
+                    ],
                   )
                 ],
               ),
