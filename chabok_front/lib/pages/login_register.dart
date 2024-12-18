@@ -1,3 +1,5 @@
+import 'package:chabok_front/pages/home.dart';
+import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/view_models/text_field.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
@@ -6,12 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LoginRegisterPage extends StatefulWidget {
-  const LoginRegisterPage({super.key});
+  const LoginRegisterPage({super.key, required this.fields});
 
   String get title => throw UnimplementedError('Should be overridden!');
 
-  List<TextFieldViewModel> get fields =>
-      throw UnimplementedError('Should be overridden!');
+  final Map<String, TextFieldViewModel> fields;
+
+  Map<String, String> get fieldValues =>
+      fields.map((k, vm) => MapEntry(k, vm.controller.text));
 
   List<Widget> get navigateToOtherForm =>
       throw UnimplementedError('Should be overridden!');
@@ -45,7 +49,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                   SizedBox(height: 10),
                   Divider(height: 1),
                   SizedBox(height: 20),
-                  ...widget.fields.map(
+                  ...widget.fields.values.map(
                     (vm) => Padding(
                       padding: const EdgeInsets.symmetric(
                         vertical: 7.5,
@@ -85,24 +89,22 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
 }
 
 class LoginPage extends LoginRegisterPage {
-  const LoginPage({super.key});
+  LoginPage({super.key})
+      : super(fields: {
+          'username': TextFieldViewModel(
+            label: 'Username',
+            icon: Icons.abc,
+            required: true,
+          ),
+          'password': PasswordTextFieldViewModel(
+            label: 'Password',
+            icon: Icons.password,
+            required: true,
+          ),
+        });
 
   @override
   String get title => 'Login';
-
-  @override
-  List<TextFieldViewModel> get fields => [
-        TextFieldViewModel(
-          label: 'Username',
-          icon: Icons.abc,
-          required: true,
-        ),
-        PasswordTextFieldViewModel(
-          label: 'Password',
-          icon: Icons.password,
-          required: true,
-        ),
-      ];
 
   @override
   List<Widget> get navigateToOtherForm => [
@@ -114,42 +116,42 @@ class LoginPage extends LoginRegisterPage {
       ];
 
   @override
-  void submit(GlobalKey<FormState> formKey) {
+  Future<void> submit(GlobalKey<FormState> formKey) async {
+    AuthService authService = AuthService.instance;
     if (formKey.currentState?.validate() ?? false) {
-      // todo send to backend
+      final response = await authService.login(fieldValues);
+      if (response.isOk) Get.offAll(() => HomePage());
     }
   }
 }
 
 class RegisterPage extends LoginRegisterPage {
-  const RegisterPage({super.key});
+  RegisterPage({super.key})
+      : super(fields: {
+          'username': TextFieldViewModel(
+            label: 'Username',
+            icon: Icons.abc,
+            required: true,
+          ),
+          'password': PasswordTextFieldViewModel(
+            label: 'Password',
+            icon: Icons.password,
+            required: true,
+          ),
+          'repeat_password': PasswordTextFieldViewModel(
+            label: 'Repeat Password',
+            icon: Icons.password,
+            required: true,
+          ),
+          'email': EmailTextFieldViewModel(
+            label: 'Email',
+            icon: Icons.email,
+            required: false,
+          ),
+        });
 
   @override
   String get title => 'Register';
-
-  @override
-  List<TextFieldViewModel> get fields => [
-        TextFieldViewModel(
-          label: 'Username',
-          icon: Icons.abc,
-          required: true,
-        ),
-        PasswordTextFieldViewModel(
-          label: 'Password',
-          icon: Icons.password,
-          required: true,
-        ),
-        PasswordTextFieldViewModel(
-          label: 'Repeat Password',
-          icon: Icons.password,
-          required: true,
-        ),
-        EmailTextFieldViewModel(
-          label: 'Email',
-          icon: Icons.email,
-          required: false,
-        ),
-      ];
 
   @override
   List<Widget> get navigateToOtherForm => [
@@ -161,9 +163,11 @@ class RegisterPage extends LoginRegisterPage {
       ];
 
   @override
-  void submit(GlobalKey<FormState> formKey) {
+  Future<void> submit(GlobalKey<FormState> formKey) async {
+    AuthService authService = AuthService.instance;
     if (formKey.currentState?.validate() ?? false) {
-      // todo send to backend
+      final response = await authService.register(fieldValues);
+      if (response.isOk) Get.back();
     }
   }
 }

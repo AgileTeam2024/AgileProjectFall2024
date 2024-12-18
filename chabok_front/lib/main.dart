@@ -14,10 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: MainAppBar(),
-        body: const HomePage(),
-      ),
+      home: const HomePage(),
     );
   }
 }
