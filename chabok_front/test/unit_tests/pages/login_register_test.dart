@@ -13,8 +13,8 @@ void main() {
     test('fields should contain username and password fields', () {
       final loginPage = LoginPage();
       expect(loginPage.fields.length, 2);
-      expect(loginPage.fields[0].label, 'Username');
-      expect(loginPage.fields[1].label, 'Password');
+      expect(loginPage.fields['username']?.label, 'Username');
+      expect(loginPage.fields['password']?.label, 'Password');
     });
 
     test('navigateToOtherForm should contain "Register" button', () {
@@ -57,10 +57,10 @@ void main() {
         () {
       final registerPage = RegisterPage();
       expect(registerPage.fields.length, 4);
-      expect(registerPage.fields[0].label, 'Username');
-      expect(registerPage.fields[1].label, 'Password');
-      expect(registerPage.fields[2].label, 'Repeat Password');
-      expect(registerPage.fields[3].label, 'Email');
+      expect(registerPage.fields['username']?.label, 'Username');
+      expect(registerPage.fields['password']?.label, 'Password');
+      expect(registerPage.fields['repeat_password']?.label, 'Repeat Password');
+      expect(registerPage.fields['email']?.label, 'Email');
     });
 
     test('RegisterPage navigateToOtherForm should contain "Login" button', () {
