@@ -55,3 +55,6 @@ analysis_options.yaml
 /linux/
 /windows/
 /macos/
+
+/coverage/
+*.g.dart
