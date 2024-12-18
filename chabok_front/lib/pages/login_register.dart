@@ -19,13 +19,13 @@ class LoginRegisterPage extends StatefulWidget {
   @override
   State<LoginRegisterPage> createState() => _LoginRegisterPageState();
 
-  void submit(GlobalKey<FormState> _formKey) {
-    throw new UnimplementedError('Should be overridden!');
+  void submit(GlobalKey<FormState> formKey) {
+    throw UnimplementedError('Should be overridden!');
   }
 }
 
 class _LoginRegisterPageState extends State<LoginRegisterPage> {
-  final _formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
           width: 500,
           child: CardWidget(
             child: Form(
-              key: _formKey,
+              key: formKey,
               child: Column(
                 // crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
@@ -62,7 +62,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                     ),
                     child: Button.filled(
                       text: widget.title,
-                      onPressed: () => widget.submit(_formKey),
+                      onPressed: () => widget.submit(formKey),
                     ),
                   ),
                   Row(
@@ -85,6 +85,8 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
 }
 
 class LoginPage extends LoginRegisterPage {
+  const LoginPage({super.key});
+
   @override
   String get title => 'Login';
 
@@ -112,14 +114,16 @@ class LoginPage extends LoginRegisterPage {
       ];
 
   @override
-  void submit(GlobalKey<FormState> _formKey) {
-    if (_formKey.currentState?.validate() ?? false) {
+  void submit(GlobalKey<FormState> formKey) {
+    if (formKey.currentState?.validate() ?? false) {
       // todo send to backend
     }
   }
 }
 
 class RegisterPage extends LoginRegisterPage {
+  const RegisterPage({super.key});
+
   @override
   String get title => 'Register';
 
@@ -157,8 +161,8 @@ class RegisterPage extends LoginRegisterPage {
       ];
 
   @override
-  void submit(GlobalKey<FormState> _formKey) {
-    if (_formKey.currentState?.validate() ?? false) {
+  void submit(GlobalKey<FormState> formKey) {
+    if (formKey.currentState?.validate() ?? false) {
       // todo send to backend
     }
   }
