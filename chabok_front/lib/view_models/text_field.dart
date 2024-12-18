@@ -54,10 +54,6 @@ class PasswordTextFieldViewModel extends TextFieldViewModel {
 
     return null;
   }
-
-  void hidePassword() => super.obscureText = true;
-
-  void showPassword() => super.obscureText = false;
 }
 
 class EmailTextFieldViewModel extends TextFieldViewModel {
