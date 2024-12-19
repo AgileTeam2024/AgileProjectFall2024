@@ -5,18 +5,18 @@ part 'user.g.dart';
 @JsonSerializable()
 class User {
   final int id;
-  final String username, firstName, lastName;
-  final String? email;
-  final double averageRating;
+  final String username;
+  final String? firstName, lastName, email;
+  final double? averageRating;
   final String? profilePicture;
 
   User({
     required this.id,
     required this.username,
-    required this.firstName,
-    required this.lastName,
+    this.firstName,
+    this.lastName,
     this.email,
-    this.averageRating = 0,
+    this.averageRating,
     this.profilePicture,
   });
 

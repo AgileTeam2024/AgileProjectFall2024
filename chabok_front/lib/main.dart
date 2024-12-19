@@ -13,10 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: MainAppBar(),
-        body: const HomePage(),
-      ),
+      home: HomePage(),
     );
   }
 }
