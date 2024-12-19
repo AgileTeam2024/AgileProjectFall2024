@@ -4,6 +4,7 @@ import 'package:chabok_front/view_models/text_field.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/text_field.dart';
+import 'package:chabok_front/widgets/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -23,7 +24,7 @@ class LoginRegisterPage extends StatefulWidget {
   @override
   State<LoginRegisterPage> createState() => _LoginRegisterPageState();
 
-  void submit(GlobalKey<FormState> formKey) {
+  void submit(BuildContext context, GlobalKey<FormState> formKey) {
     throw UnimplementedError('Should be overridden!');
   }
 }
@@ -66,7 +67,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                     ),
                     child: Button.filled(
                       text: widget.title,
-                      onPressed: () => widget.submit(formKey),
+                      onPressed: () => widget.submit(context, formKey),
                     ),
                   ),
                   Row(
@@ -116,11 +117,18 @@ class LoginPage extends LoginRegisterPage {
       ];
 
   @override
-  Future<void> submit(GlobalKey<FormState> formKey) async {
+  Future<void> submit(
+    BuildContext context,
+    GlobalKey<FormState> formKey,
+  ) async {
     AuthService authService = AuthService.instance;
     if (formKey.currentState?.validate() ?? false) {
       final response = await authService.login(fieldValues);
-      if (response.isOk) Get.offAll(() => HomePage());
+      if (response.isOk) {
+        Get.offAll(() => HomePage());
+      } else if (context.mounted) {
+        CustomToast.showToast(context, response);
+      }
     }
   }
 }
@@ -163,11 +171,18 @@ class RegisterPage extends LoginRegisterPage {
       ];
 
   @override
-  Future<void> submit(GlobalKey<FormState> formKey) async {
+  Future<void> submit(
+    BuildContext context,
+    GlobalKey<FormState> formKey,
+  ) async {
     AuthService authService = AuthService.instance;
     if (formKey.currentState?.validate() ?? false) {
       final response = await authService.register(fieldValues);
-      if (response.isOk) Get.back();
+      if (response.isOk) {
+        Get.back();
+      } else if (context.mounted) {
+        CustomToast.showToast(context, response);
+      }
     }
   }
 }

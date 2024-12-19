@@ -1,3 +1,4 @@
+import 'package:chabok_front/models/server_response.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -29,13 +30,13 @@ class CustomToast extends StatelessWidget {
     );
   }
 
-  static void showToast(BuildContext context, String message, ToastType type) {
+  static void showToast(BuildContext context, ServerResponse response) {
     final toast = FToast();
     toast.init(context);
     toast.showToast(
       child: CustomToast(
-        text: message,
-        toastType: type,
+        text: response.message!,
+        toastType: response.isOk ? ToastType.success : ToastType.error,
       ),
       gravity: ToastGravity.BOTTOM_LEFT,
     );
