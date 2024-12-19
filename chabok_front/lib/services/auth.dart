@@ -1,4 +1,5 @@
 import 'package:chabok_front/models/server_response.dart';
+import 'package:chabok_front/services/network.dart';
 
 class AuthService {
   static AuthService? _instance;
@@ -8,18 +9,16 @@ class AuthService {
     return _instance!;
   }
 
+  final _networkService = NetworkService.instance;
+
   Future<bool> get isLoggedIn {
     // todo
     return Future.value(false);
   }
 
-  Future<ServerResponse> login(Map<String, String> body) {
-    // todo send to backend
-    return Future.value(ServerResponse('{}', 200));
-  }
+  Future<ServerResponse> login(Map<String, String> body) =>
+      _networkService.post('/user/login', body);
 
-  Future<ServerResponse> register(Map<String, String> body) {
-    // todo send to backend
-    return Future.value(ServerResponse('{}', 201));
-  }
+  Future<ServerResponse> register(Map<String, String> body) =>
+      _networkService.post('/user/register', body);
 }
