@@ -21,8 +21,9 @@ class _HomePageState extends State<HomePage> {
       body: FutureBuilder<List<Product>>(
         future: _productService.suggestions,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
+          }
           final data = snapshot.data ?? [];
           return ProductsWidget(data);
         },
