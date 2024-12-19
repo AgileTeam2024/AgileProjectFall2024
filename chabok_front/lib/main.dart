@@ -2,6 +2,7 @@ import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +15,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
+      builder: FToastBuilder(),
+      home: HomePage(),
     );
   }
 }
