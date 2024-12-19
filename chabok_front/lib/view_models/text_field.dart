@@ -73,6 +73,7 @@ class EmailTextFieldViewModel extends TextFieldViewModel {
   String? validator(String? text) {
     final message = super.validator(text);
     if (message != null) return message;
+    if (!this.required && this.text.isEmpty) return null;
     if (!text!.isEmail) return 'Incorrect email format.';
     return null;
   }

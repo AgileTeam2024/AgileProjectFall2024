@@ -17,6 +17,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
     final viewModel = widget.viewModel;
 
     return TextFormField(
+      controller: viewModel.controller,
       readOnly: viewModel.readOnly,
       keyboardType: viewModel.type,
       validator: viewModel.validator,
