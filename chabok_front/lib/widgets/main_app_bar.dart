@@ -13,11 +13,11 @@ class MainAppBar extends AppBar {
 
   @override
   Widget get title => Row(
-    children: [
-      Icon(Icons.heart_broken),
-      const Text(APP_NAME),
-    ],
-  );
+        children: [
+          Icon(Icons.heart_broken),
+          const Text(APP_NAME),
+        ],
+      );
 
   @override
   bool get centerTitle => false;
@@ -55,6 +55,12 @@ class MainAppBar extends AppBar {
           onSubmitted: _submitSearch,
         ),
       );
+
+  @override
+  Widget? get leading => Container();
+
+  @override
+  double? get leadingWidth => 0;
 
   void _submitSearch(String search) {
     // todo

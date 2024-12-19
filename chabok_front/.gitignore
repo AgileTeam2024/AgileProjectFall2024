@@ -55,6 +55,6 @@ analysis_options.yaml
 /linux/
 /windows/
 /macos/
-
+deploy_front.sh
 /coverage/
 *.g.dart
