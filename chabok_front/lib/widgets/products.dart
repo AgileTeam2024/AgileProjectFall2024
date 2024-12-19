@@ -1,5 +1,6 @@
 import 'package:chabok_front/extensions/num.dart';
 import 'package:chabok_front/models/product.dart';
+import 'package:chabok_front/models/user.dart';
 import 'package:flutter/material.dart';
 
 class ProductsWidget extends StatelessWidget {
@@ -9,8 +10,6 @@ class ProductsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Padding(
       padding: const EdgeInsets.only(top: 25, left: 50, right: 50),
       child: GridView.builder(
@@ -37,79 +36,150 @@ class ProductsWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.max,
               children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: displayImage == null
-                        ? Container()
-                        : Image(image: AssetImage(displayImage)),
-                  ),
-                ),
-                Text(
-                  product.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodyMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 5),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2.5),
-                  child: Text(
-                    product.price != null
-                        ? '${product.price!.compact} ᴵᴿᴿ'
-                        : 'Negotiated Price',
-                    style: textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                    textAlign: TextAlign.end,
-                  ),
-                ),
-                Row(
-                  children: [
-                    CircleAvatar(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: seller.profilePicture == null
-                            ? Container()
-                            : Image(
-                                image: AssetImage(seller.profilePicture!),
-                              ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            seller.username,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: textTheme.bodySmall
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 1.5),
-                          Text(
-                            seller.averageRating != null
-                                ? '${seller.averageRating} ⭐️'
-                                : '',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: textTheme.labelSmall,
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                _ProductImageWidget(displayImage),
+                _ProductNameWidget(product.name),
+                SizedBox(height: 7.5),
+                _PriceWidget(product.price),
+                SizedBox(height: 2.5),
+                _SellerWidget(seller),
               ],
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class _ProductImageWidget extends StatelessWidget {
+  final String? image;
+
+  const _ProductImageWidget(this.image);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(5),
+        child: image == null ? Container() : Image(image: AssetImage(image!)),
+      ),
+    );
+  }
+}
+
+class _ProductNameWidget extends StatelessWidget {
+  final String name;
+
+  const _ProductNameWidget(this.name);
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Text(
+      name,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+    );
+  }
+}
+
+class _PriceWidget extends StatelessWidget {
+  final double? price;
+
+  const _PriceWidget(this.price);
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Text(
+      price != null ? '${price!.compact} ᴵᴿᴿ' : 'Negotiated Price',
+      style: textTheme.labelMedium?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Colors.black87,
+      ),
+      textAlign: TextAlign.end,
+    );
+  }
+}
+
+class _SellerWidget extends StatelessWidget {
+  final User seller;
+
+  const _SellerWidget(this.seller);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _SellerPfpWidget(seller.profilePicture),
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SellerUsernameWidget(seller.username),
+              SizedBox(height: 1.5),
+              _SellerRatingWidget(seller.averageRating)
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SellerPfpWidget extends StatelessWidget {
+  final String? pfp;
+
+  const _SellerPfpWidget(this.pfp);
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(100),
+        child: pfp == null
+            ? Container()
+            : Image(
+                image: AssetImage(pfp!),
+              ),
+      ),
+    );
+  }
+}
+
+class _SellerUsernameWidget extends StatelessWidget {
+  final String username;
+
+  const _SellerUsernameWidget(this.username);
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Text(
+      username,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
+    );
+  }
+}
+
+class _SellerRatingWidget extends StatelessWidget {
+  final double? rating;
+
+  const _SellerRatingWidget(this.rating);
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Text(
+      rating != null ? '${rating} ⭐️' : '',
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: textTheme.labelSmall,
     );
   }
 }
