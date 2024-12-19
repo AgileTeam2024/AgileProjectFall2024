@@ -1,3 +1,5 @@
+import enum
+
 from absl import flags
 
 # Database configs.
@@ -31,3 +33,30 @@ db_password = flags.DEFINE_string(
     help='Database password.',
     required=True,
 )
+
+# App configs.
+app_host = flags.DEFINE_string(
+    name='app_host',
+    default='127.0.0.1',
+    help='The host address on which the application will run.',
+)
+app_port = flags.DEFINE_integer(
+    name='app_port',
+    default=8000,
+    help='The port on which the application will run.',
+)
+app_secret_key = flags.DEFINE_string(
+    name='app_secret_key',
+    default=None,
+    help='The secret key for the application used for generating token.',
+    required=True,
+)
+
+
+class HTTPStatus(enum.Enum):
+    """
+    Represents an HTTP status code.
+    """
+    OK = 200
+    CREATED = 201
+    BAD_REQUEST = 400
