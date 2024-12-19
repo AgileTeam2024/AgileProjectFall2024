@@ -30,9 +30,8 @@ class Product(backend.initializers.database.DB.Model):
     )
 
     picture = backend.initializers.database.DB.Column(
-        #the file path or the url of the picture should be passed
-        backend.initializers.database.DB.String(255),  # URL or file path to the picture
-        nullable=True  # Optional field
+        backend.initializers.database.DB.String(255),
+        nullable=True 
     )
 
     city_name = backend.initializers.database.DB.Column(
@@ -42,7 +41,7 @@ class Product(backend.initializers.database.DB.Model):
 
     description = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(DESCRIPTION_MAX_LENGTH),
-        nullable=True  # Optional field
+        nullable=True 
     )
 
     status = backend.initializers.database.DB.Column(
@@ -51,9 +50,11 @@ class Product(backend.initializers.database.DB.Model):
         nullable=False
     )
 
-    #can be defined as a class
+    # can be defined as a class
     category = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.Enum(*CATEGORY_OPTIONS),
         default='Other',
         nullable=False
     )
+
+    # TODO : add username as foreign key
