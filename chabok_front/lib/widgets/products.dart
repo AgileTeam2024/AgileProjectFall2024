@@ -11,7 +11,8 @@ class ProductsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 25, left: 50, right: 50),
+      padding: const EdgeInsets.only(top: 25) +
+          EdgeInsets.symmetric(horizontal: 250),
       child: GridView.builder(
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 225,
@@ -39,7 +40,7 @@ class ProductsWidget extends StatelessWidget {
                 _ProductImageWidget(displayImage),
                 _ProductNameWidget(product.name),
                 SizedBox(height: 7.5),
-                _PriceWidget(product.price),
+                _ProductPriceWidget(product.price),
                 SizedBox(height: 2.5),
                 _SellerWidget(seller),
               ],
@@ -84,10 +85,10 @@ class _ProductNameWidget extends StatelessWidget {
   }
 }
 
-class _PriceWidget extends StatelessWidget {
+class _ProductPriceWidget extends StatelessWidget {
   final double? price;
 
-  const _PriceWidget(this.price);
+  const _ProductPriceWidget(this.price);
 
   @override
   Widget build(BuildContext context) {
