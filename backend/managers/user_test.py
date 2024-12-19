@@ -1,6 +1,7 @@
 from unittest import mock
 
 import flask
+import flask_jwt_extended
 from absl import flags
 from absl.testing import absltest
 
@@ -13,7 +14,8 @@ class UserManagerTest(absltest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.flask_app = flask.Flask(__name__)
-        self.flask_app.config['JWT_SECRET_KEY'] = 'your_secret_key'
+        self.flask_app.config['JWT_SECRET_KEY'] = 'app_secret_key'
+        self.jwt_manager = flask_jwt_extended.JWTManager(self.flask_app)
         self.flask_app.app_context().push()
         self.user_manager = backend.managers.user.UserManager(flask_app=self.flask_app)
         # Mock database session.
