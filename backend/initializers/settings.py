@@ -37,12 +37,12 @@ db_password = flags.DEFINE_string(
 # App configs.
 app_host = flags.DEFINE_string(
     name='app_host',
-    default='127.0.0.1',
+    default='0.0.0.0',
     help='The host address on which the application will run.',
 )
 app_port = flags.DEFINE_integer(
     name='app_port',
-    default=8000,
+    default=5000,
     help='The port on which the application will run.',
 )
 app_secret_key = flags.DEFINE_string(

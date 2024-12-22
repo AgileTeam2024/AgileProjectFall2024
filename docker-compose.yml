@@ -1,0 +1,30 @@
+version: "3.9"
+
+
+services:
+  flask_app:
+    container_name: flask_app
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - flask_db
+    command: >
+      python -m backend.app --db_username=postgres --db_host=flask_db --db_port=5432 --db_name=postgres --db_password=${DB_PASSWORD} --app_secret_key=${APP_SECRET_KEY}
+      
+
+  flask_db:
+    container_name: flask_db
+    image: postgres:12
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=postgres
