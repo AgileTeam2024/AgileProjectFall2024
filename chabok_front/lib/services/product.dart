@@ -21,10 +21,10 @@ class ProductService {
               "seller": {
                 "id": 2,
                 "username": "CraftsByAden",
-                "profilePicture": "sample_images/seller_pfp.jpg",
+                "profilePicture": "assets/sample_images/seller_pfp.jpg",
                 "averageRating": 4.5
               },
-              "imageUrls": ["sample_images/product_img1.jpg"],
+              "imageUrls": ["assets/sample_images/product_img1.jpg"],
               "category":
                   "Books, Movies & Music > Music > Picks & Slides > Picks",
               "location": "Manchester, United Kingdom",
