@@ -1,6 +1,9 @@
 #FROM nginx
 FROM ghcr.io/cirruslabs/flutter:3.27.0
 
+RUN apt update
+RUN apt install nginx -y
+
 # Configure CWD
 WORKDIR /app/
 
@@ -18,9 +21,6 @@ RUN dart run build_runner build --delete-conflicting-outputs
 RUN flutter config --enable-web
 RUN flutter create .
 RUN flutter build web --release --base-href '/'
-
-RUN apt update
-RUN apt install nginx -y
 
 RUN rm -rf /var/www/html
 RUN cp -r /app/build/web /var/www/html

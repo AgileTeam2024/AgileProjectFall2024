@@ -13,7 +13,7 @@ class NetworkService {
 
   Uri _buildUrl(String path, Map<String, dynamic>? query) {
     const scheme = String.fromEnvironment('base_scheme', defaultValue: 'http');
-    const url = String.fromEnvironment('base_url', defaultValue: '127.0.0.1');
+    const url = String.fromEnvironment('base_url', defaultValue: '185.231.59.87');
     return Uri(
       scheme: scheme,
       host: url,
