@@ -12,12 +12,12 @@ class NetworkService {
   }
 
   Uri _buildUrl(String path, Map<String, dynamic>? query) {
-    const scheme = String.fromEnvironment('base_scheme', defaultValue: 'http');
-    const url = String.fromEnvironment('base_url', defaultValue: '185.231.59.87');
+    const host = String.fromEnvironment('FLASK_HOST');
+    const port = int.fromEnvironment('FLASK_PORT');
     return Uri(
-      scheme: scheme,
-      host: url,
-      port: const int.fromEnvironment('base_port', defaultValue: 8000),
+      scheme: 'http',
+      host: host,
+      port: port,
       path: path.substring(1),
       queryParameters: query,
     );
@@ -29,6 +29,7 @@ class NetworkService {
     Map<String, String>? headers,
     Map<String, dynamic>? query,
   }) async {
+    print(_buildUrl(path, query));
     final response = await http.post(
       _buildUrl(path, query),
       headers: {
