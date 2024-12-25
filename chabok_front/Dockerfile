@@ -1,5 +1,5 @@
 # Build Stage
-FROM ghcr.io/cirruslabs/flutter:3.27.0 AS build
+FROM ghcr.io/cirruslabs/flutter:3.27.0
 
 WORKDIR /app/
 
@@ -15,14 +15,9 @@ RUN flutter pub get
 COPY assets ./assets
 COPY lib ./lib
 
-# Create .env file dynamically during build
-# ENV FLASK_HOST=127.0.0.1
-ENV FLASK_HOST=185.231.59.87
-ENV FLASK_PORT=8000
-
 # Build the Flutter web application
 RUN flutter create --platforms=web .
-RUN flutter build web --base-href '/' --web-renderer canvaskit  --dart-define=FLASK_HOST=${FLASK_HOST} --dart-define=FLASK_PORT=${FLASK_PORT}
+# RUN flutter build web --base-href '/' --web-renderer canvaskit
 
 # # Production Stage
 # FROM nginx:alpine

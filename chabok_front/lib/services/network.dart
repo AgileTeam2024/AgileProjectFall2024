@@ -12,13 +12,11 @@ class NetworkService {
   }
 
   Uri _buildUrl(String path, Map<String, dynamic>? query) {
-    const host = String.fromEnvironment('FLASK_HOST');
-    const port = int.fromEnvironment('FLASK_PORT');
     return Uri(
       scheme: 'http',
-      host: host,
-      port: port,
-      path: path.substring(1),
+      host: 'localhost',
+      port: 3000,
+      path: '/api/${path.substring(1)}',
       queryParameters: query,
     );
   }

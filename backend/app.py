@@ -65,7 +65,7 @@ def register_routes(flask_app: flask.Flask) -> None:
     """
     import backend.routes.user
 
-    flask_app.register_blueprint(backend.routes.user.user_bp, url_prefix='/user')
+    flask_app.register_blueprint(backend.routes.user.user_bp, url_prefix='/api/user')
     # Create Swagger documentation for APIs.
     flasgger.Swagger(flask_app)
 
