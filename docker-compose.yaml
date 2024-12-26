@@ -1,0 +1,62 @@
+services:
+  flask_app:
+    container_name: flask_app
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      .env
+    depends_on:
+      flask_db:
+        condition: service_healthy
+    networks:
+      - shared_network
+    command: python -m backend.app --db_username=postgres --db_host=flask_db --db_port=5432 --db_name=postgres --db_password=${DB_PASSWORD} --app_secret_key=${APP_SECRET_KEY} --app_host=${FLASK_HOST} --app_port=${FLASK_PORT}
+
+  flask_db:
+    container_name: flask_db
+    image: postgres:12
+    env_file:
+      .env
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: postgres
+    networks:
+      - shared_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+
+  flutter_app:
+    container_name: flutter_app
+    build:
+      context: chabok_front
+      dockerfile: Dockerfile
+    networks:
+      - shared_network
+    volumes:
+      - flutter_build:/app/build/web
+    command: flutter build web --base-href '/' --web-renderer canvaskit
+
+  nginx_container:
+    image: nginx:alpine
+    container_name: nginx_container
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - flutter_build:/usr/share/nginx/html
+    networks:
+      - shared_network
+    depends_on:
+      flutter_app:
+        condition: service_completed_successfully
+      flask_app:
+        condition: service_started
+
+networks:
+  shared_network:
+    driver: bridge
+
+volumes:
+  flutter_build:
