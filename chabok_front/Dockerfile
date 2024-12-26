@@ -11,25 +11,14 @@ RUN flutter config --no-cli-animations
 COPY pubspec.yaml ./pubspec.yaml
 RUN flutter pub get
 
+# Copy model files
+COPY lib/models ./lib/models
+RUN dart run build_runner build --delete-conflicting-outputs
+
 # Copy project files
 COPY assets ./assets
 COPY lib ./lib
 
 # Build the Flutter web application
 RUN flutter create --platforms=web .
-# RUN flutter build web --base-href '/' --web-renderer canvaskit
-
-# # Production Stage
-# FROM nginx:alpine
-
-# # Copy built web application to Nginx
-# COPY --from=build /app/build/web /usr/share/nginx/html
-
-# # Copy Nginx configuration
-# COPY nginx.conf /etc/nginx/nginx.conf
-
-# # Expose port 80
-# EXPOSE 80
-
-# # Start Nginx
-# CMD ["nginx", "-g", "daemon off;"]
+# RUN dart run build_runner build --delete-conflicting-outputs

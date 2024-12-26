@@ -15,7 +15,7 @@ class NetworkService {
     return Uri(
       scheme: 'http',
       host: 'localhost',
-      port: 3000,
+      port: 80,
       path: '/api/${path.substring(1)}',
       queryParameters: query,
     );
