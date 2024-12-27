@@ -28,4 +28,4 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m unittest backend/**/*_test.py --disable-warnings -v 
+          python -m unittest backend/**/*_test.py
