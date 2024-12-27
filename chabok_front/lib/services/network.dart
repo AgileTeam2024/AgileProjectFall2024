@@ -14,7 +14,7 @@ class NetworkService {
   Uri _buildUrl(String path, Map<String, dynamic>? query) {
     return Uri(
       scheme: 'http',
-      host: 'localhost',
+      host: '185.231.59.87',
       port: 80,
       path: '/api/${path.substring(1)}',
       queryParameters: query,
