@@ -1,0 +1,50 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create .env file from secrets
+        run: |
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "APP_SECRET_KEY=${{ secrets.APP_SECRET_KEY }}" >> .env
+          echo "FLASK_HOST=0.0.0.0" >> .env
+          echo "FLASK_PORT=8000" >> .env
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Remove all existing containers and images using Docker Compose
+        run: |
+          ssh root@185.231.59.87 "
+            cd /AgileProjectFall2024 &&
+            docker-compose down --rmi all -v --remove-orphans
+          "
+
+      - name: Remove previous codes
+        run: |
+          ssh root@185.231.59.87 "
+            rm -rf /AgileProjectFall2024/*
+            rm -rf /AgileProjectFall2024/.*
+          "
+
+      - name: Copy code and .env file to server
+        run: |
+          rsync -avz --delete ./ root@185.231.59.87:/AgileProjectFall2024
+        env:
+          RSYNC_RSH: "ssh -o StrictHostKeyChecking=no"
+
+      - name: Deploy to server
+        run: |
+          ssh root@185.231.59.87 "cd /AgileProjectFall2024 && docker-compose up -d --build"
