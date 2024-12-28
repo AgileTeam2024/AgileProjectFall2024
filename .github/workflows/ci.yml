@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  backend_ci:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,3 +26,33 @@ jobs:
       - name: Run tests
         run: |
           python -m unittest backend/**/*_test.py
+          
+  front_ci:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: chabok_front
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.27.0
+
+      - name: Install dependencies
+        run: flutter pub get
+          
+      - name: Build project
+        run: |
+          dart run build_runner build --delete-conflicting-outputs
+          flutter create --platforms=web .
+          flutter build web --base-href '/' --web-renderer canvaskit
+
+      - name: Run tests
+        run: |
+          flutter test test
