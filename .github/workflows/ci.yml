@@ -52,6 +52,7 @@ jobs:
           dart run build_runner build --delete-conflicting-outputs
           flutter create --platforms=web .
           flutter build web --base-href '/' --web-renderer canvaskit
+          rm test/widget_test.dart
 
       - name: Run tests
         run: |
