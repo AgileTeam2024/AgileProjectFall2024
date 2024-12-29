@@ -6,16 +6,20 @@ import datetime
 
 import backend.models.user
 import backend.initializers.database
-import backend.initializers.settings
-
 
 class UserManager:
     instance = None
+
+    COOKIE_MAX_AGE = datetime.timedelta(days=1).seconds
 
     def __init__(self, flask_app: flask.Flask):
         if not UserManager.instance:
             self.flask_app = flask_app
             self.jwt_manager = flask_jwt_extended.JWTManager(flask_app)
+            flask_app.config["JWT_COOKIE_SECURE"] = False
+            flask_app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+            flask_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(seconds=UserManager.COOKIE_MAX_AGE)
+            flask_app.config["JWT_SESSION_COOKIE"] = UserManager.COOKIE_MAX_AGE
             UserManager.instance = self
 
     def register(self, username: str, password: str, email: Optional[str] = None) -> (flask.Flask, int):
@@ -102,22 +106,29 @@ class UserManager:
         response = flask.make_response(flask.jsonify({'message': 'Login successful!'}))
 
         # Generate new access token for the user to access protected APIs.
-        access_token = flask_jwt_extended.create_access_token(identity=username, expires_delta=datetime.timedelta(days=1))
+        self.set_cookie(response, username)
 
-        # Set Cookie for user
-        response.set_cookie(
-            'access-token',
-            access_token,
-            httponly=True,  
-            secure=False,
-            max_age=86400,
-            samesite='Lax'
-        )
         return (
             response,
             backend.initializers.settings.HTTPStatus.OK.value
         )
 
+    def set_cookie(self, response, username):
+        access_token = flask_jwt_extended.create_access_token(username)
+        flask_jwt_extended.set_access_cookies(response, access_token)
+
+    def reset_cookie(self, response):
+        username = flask_jwt_extended.get_jwt_identity()
+        self.set_cookie(response, username)
+
+    def remove_cookie(self, response):
+        flask_jwt_extended.unset_access_cookies(response)
+
+    def check_cookie(self) -> (flask.Flask, int):
+        return (
+            flask.jsonify({"message": "Token is valid."}),
+            backend.initializers.settings.HTTPStatus.OK.value
+        )
 
 
 def is_valid_email_regex(email):

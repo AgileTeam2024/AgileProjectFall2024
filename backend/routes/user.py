@@ -119,4 +119,15 @@ def login() -> (flask.Flask, int):
 @user_bp.route('/check_cookie', methods=['GET'])
 @flask_jwt_extended.jwt_required()
 def check_cookie():
-   pass
+    """
+    Check Cookie API.
+    ---
+    tags:
+      - User
+    responses:
+      200:
+        description: Token is valid.
+      401:
+        description: Token is invalid or expired.
+    """
+    return backend.managers.user.UserManager.instance.check_cookie()
