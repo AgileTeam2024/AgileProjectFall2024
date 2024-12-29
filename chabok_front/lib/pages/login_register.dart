@@ -1,12 +1,12 @@
 import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/services/auth.dart';
+import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/view_models/text_field.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/text_field.dart';
 import 'package:chabok_front/widgets/toast.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class LoginRegisterPage extends StatefulWidget {
   const LoginRegisterPage({super.key, required this.fields});
@@ -112,7 +112,7 @@ class LoginPage extends LoginRegisterPage {
         Text('Don\'t have an account?'),
         Button.text(
           text: 'Register',
-          onPressed: () => Get.to(() => RegisterPage()),
+          onPressed: () => RouterService.go('/register'),
         )
       ];
 
@@ -125,7 +125,7 @@ class LoginPage extends LoginRegisterPage {
     if (formKey.currentState?.validate() ?? false) {
       final response = await authService.login(fieldValues);
       if (response.isOk) {
-        Get.offAll(() => HomePage());
+        RouterService.go('/');
       } else if (context.mounted) {
         CustomToast.showToast(context, response);
       }
@@ -166,7 +166,7 @@ class RegisterPage extends LoginRegisterPage {
         Text('Already have an account?'),
         Button.text(
           text: 'Login',
-          onPressed: () => Get.back(),
+          onPressed: () => RouterService.go('/login'),
         )
       ];
 
@@ -179,7 +179,7 @@ class RegisterPage extends LoginRegisterPage {
     if (formKey.currentState?.validate() ?? false) {
       final response = await authService.register(fieldValues);
       if (response.isOk) {
-        Get.back();
+        RouterService.go('/login');
       } else if (context.mounted) {
         CustomToast.showToast(context, response);
       }
