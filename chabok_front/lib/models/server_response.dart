@@ -9,5 +9,6 @@ class ServerResponse extends http.Response {
 
   Map<String, dynamic> get bodyJson => jsonDecode(super.body);
 
-  String? get message => isOk ? null : bodyJson['message'];
+  String? get message => bodyJson['message'];
+// bodyJson.containsKey('message') ? bodyJson['message'] : null;
 }
