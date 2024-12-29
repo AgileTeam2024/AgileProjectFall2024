@@ -9,6 +9,7 @@ class User(backend.initializers.database.DB.Model):
     __tablename__ = 'users'
     USERNAME_MAX_LENGTH = 50
     PASSWORD_MAX_LENGTH = 128
+    EMAIL_MAX_LENGTH = 128
 
     username = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(USERNAME_MAX_LENGTH),
@@ -24,6 +25,11 @@ class User(backend.initializers.database.DB.Model):
         backend.initializers.database.DB.Boolean,
         default=False
     )
+    email = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String(EMAIL_MAX_LENGTH),
+        unique=True
+    )
+
 
     def __repr__(self) -> str:
         """
