@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:chabok_front/pages/login_register.dart';
 
+import '../tests_setup_teardown.dart';
+
 void main() {
   group('LoginPage Tests', () {
     test('title should be "Login"', () {
@@ -25,8 +27,7 @@ void main() {
 
     testWidgets('Form validates correctly on submission',
             (WidgetTester tester) async {
-          tester.view.physicalSize = Size(1000, 1000);
-          tester.view.devicePixelRatio = 1.0;
+          setUpWidgetTest(tester);
 
           await tester.pumpWidget(MaterialApp(home: LoginPage()));
 
@@ -41,8 +42,7 @@ void main() {
           // Verify that the validation errors are shown
           expect(find.text('This field is Required!'), findsNWidgets(2));
 
-          tester.view.resetPhysicalSize();
-          tester.view.resetDevicePixelRatio();
+          tearDownWidgetTest(tester);
         });
   });
 
