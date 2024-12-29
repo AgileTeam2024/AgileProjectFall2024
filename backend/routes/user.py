@@ -62,7 +62,7 @@ def register() -> (flask.Flask, int):
             flask.jsonify({'message': 'Email is missing.'}),
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
       )
-    else if not is_valid_email_regex(email):
+    elif not is_valid_email_regex(email):
         return (
             flask.jsonify({'message': 'Email must be the correct format.'}),
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
