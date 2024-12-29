@@ -1,7 +1,5 @@
-import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/services/product.dart';
-import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:chabok_front/widgets/products.dart';
 import 'package:flutter/material.dart';
 
@@ -17,18 +15,15 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MainAppBar(),
-      body: FutureBuilder<List<Product>>(
-        future: _productService.suggestions,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          final data = snapshot.data ?? [];
-          return ProductsWidget(data);
-        },
-      ),
+    return FutureBuilder<List<Product>>(
+      future: _productService.suggestions,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        final data = snapshot.data ?? [];
+        return ProductsWidget(data);
+      },
     );
   }
 }

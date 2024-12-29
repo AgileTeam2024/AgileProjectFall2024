@@ -1,5 +1,6 @@
 import 'package:chabok_front/constants.dart';
 import 'package:chabok_front/services/auth.dart';
+import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/profile_button.dart';
 import 'package:flutter/material.dart';
 
@@ -12,11 +13,17 @@ class MainAppBar extends AppBar {
   double? get elevation => 2;
 
   @override
-  Widget get title => Row(
-        children: [
-          Icon(Icons.heart_broken),
-          const Text(APP_NAME),
-        ],
+  Widget get title => MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () => RouterService.go('/'),
+          child: Row(
+            children: [
+              Icon(Icons.heart_broken),
+              const Text(APP_NAME),
+            ],
+          ),
+        ),
       );
 
   @override
