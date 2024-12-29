@@ -57,4 +57,10 @@ class Product(backend.initializers.database.DB.Model):
         nullable=False
     )
 
+        def __repr__(self) -> str:
+        """
+        Return a string representation of the Product instance.
+        """
+        return f"<Product(id={self.id}, name={self.product_name}, price={self.price}, status={self.status})>"
+
     # TODO : add username as foreign key
