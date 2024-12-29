@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 
 import flask
 import flask_jwt_extended
+import werkzeug.datastructures.headers
 from absl import flags
 from absl.testing import absltest
 
@@ -103,12 +104,12 @@ class UserManagerTest(absltest.TestCase):
         )
         response, status_code = self.user_manager.login("user", "password123")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
-        # Check if the response contains an access token.
-        data = response.get_json()
-        self.assertIn('access_token', data)
-        # Verify that the token is not empty.
-        token = data['access_token']
-        self.assertTrue(token)
+        # Check if the response contains the correct message.
+        self.assertEqual(response.json, {'message': 'Login successful!'})
+        # Verify that the token cookie is in headers.
+        headers = dict(response.headers.items())
+        self.assertIn('Set-Cookie', headers)
+        self.assertNotEmpty(headers['Set-Cookie'].split(';')[0])
 
 
 if __name__ == "__main__":
