@@ -97,13 +97,26 @@ class UserManager:
                 flask.jsonify({'message': 'Username and password do not match.'}),
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
+        
+        response = flask.make_response(flask.jsonify({'message': 'Login successful!'}))
 
         # Generate new access token for the user to access protected APIs.
         access_token = flask_jwt_extended.create_access_token(identity=username)
+
+        # Set Cookie for user
+        response.set_cookie(
+            'access-token',
+            access_token,
+            httponly=True,  
+            secure=False,
+            max_age=86400,
+            samesite='Lax'
+        )
         return (
-            flask.jsonify({'access_token': access_token}),
+            response,
             backend.initializers.settings.HTTPStatus.OK.value
         )
+
 
 
 def is_valid_email_regex(email):
