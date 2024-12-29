@@ -42,7 +42,7 @@ def register() -> (flask.Flask, int):
 
     # Get JSON data from the request body.
     data = flask.request.get_json()
-
+    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     # Check existence of username and password.
     username = data.get('username', '')
     if not username:
@@ -56,8 +56,20 @@ def register() -> (flask.Flask, int):
             flask.jsonify({'message': 'Password is missing.'}),
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
+    email = data.get('email', '')
+    if not email:
+        return (
+            flask.jsonify({'message': 'Email is missing.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+      )
+    else if not is_valid_email_regex(email):
+        return (
+            flask.jsonify({'message': 'Email must be the correct format.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+      )
+    
 
-    return backend.managers.user.UserManager.instance.register(username, password)
+    return backend.managers.user.UserManager.instance.register(username, password, email)
 
 
 @user_bp.route('/login', methods=['POST'])  # Changed to POST
@@ -107,3 +119,9 @@ def login() -> (flask.Flask, int):
         )
 
     return backend.managers.user.UserManager.instance.login(username, password)
+
+def is_valid_email_regex(email):
+    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if re.fullmatch(regex, email):
+        return True
+    return False
