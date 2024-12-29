@@ -2,6 +2,7 @@ import flask
 import flask_jwt_extended
 from typing import Optional
 import re
+import datetime
 
 import backend.models.user
 import backend.initializers.database
@@ -101,7 +102,7 @@ class UserManager:
         response = flask.make_response(flask.jsonify({'message': 'Login successful!'}))
 
         # Generate new access token for the user to access protected APIs.
-        access_token = flask_jwt_extended.create_access_token(identity=username)
+        access_token = flask_jwt_extended.create_access_token(identity=username, expires_delta=datetime.timedelta(days=1))
 
         # Set Cookie for user
         response.set_cookie(

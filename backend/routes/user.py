@@ -3,6 +3,7 @@ import re
 import flask
 import flask_wtf
 import wtforms
+import flask_jwt_extended
 
 import backend.managers.user
 import backend.models.user
@@ -113,3 +114,9 @@ def login() -> (flask.Flask, int):
         )
 
     return backend.managers.user.UserManager.instance.login(username, password)
+
+
+@user_bp.route('/check_cookie', methods=['GET'])
+@flask_jwt_extended.jwt_required()
+def check_cookie():
+   pass
