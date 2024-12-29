@@ -1,6 +1,7 @@
 import flask
 import flask_jwt_extended
 from typing import Optional
+import re
 
 import backend.models.user
 import backend.initializers.database
@@ -16,7 +17,7 @@ class UserManager:
             self.jwt_manager = flask_jwt_extended.JWTManager(flask_app)
             UserManager.instance = self
 
-    def register(self, username: str, password: str, email: Optional[str]) -> (flask.Flask, int):
+    def register(self, username: str, password: str, email: Optional[str] = None) -> (flask.Flask, int):
         """
         Registers a new user with the provided username and password.
 
@@ -41,11 +42,17 @@ class UserManager:
                 flask.jsonify({'message': 'Username already exists'}),
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
-        if email and backend.models.user.User.query.filter_by(email=email).first():
-            return (
-                flask.jsonify({'message': 'Email already exists'}),
-                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-            )
+        if email:
+            if backend.models.user.User.query.filter_by(email=email).first():
+                return (
+                    flask.jsonify({'message': 'Email already exists'}),
+                    backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+                )
+            if not is_valid_email_regex(email):
+                return (
+                    flask.jsonify({'message': 'Email must be the correct format.'}),
+                    backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+                )
 
         # Create a new user instance.
         # TODO: Store password as hashed-value.
@@ -97,3 +104,10 @@ class UserManager:
             flask.jsonify({'access_token': access_token}),
             backend.initializers.settings.HTTPStatus.OK.value
         )
+
+
+def is_valid_email_regex(email):
+    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if re.fullmatch(regex, email):
+        return True
+    return False

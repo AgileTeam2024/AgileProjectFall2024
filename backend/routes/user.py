@@ -62,12 +62,6 @@ def register() -> (flask.Flask, int):
             flask.jsonify({'message': 'Email is missing.'}),
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
       )
-    elif not is_valid_email_regex(email):
-        return (
-            flask.jsonify({'message': 'Email must be the correct format.'}),
-            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-      )
-    
 
     return backend.managers.user.UserManager.instance.register(username, password, email)
 
@@ -119,9 +113,3 @@ def login() -> (flask.Flask, int):
         )
 
     return backend.managers.user.UserManager.instance.login(username, password)
-
-def is_valid_email_regex(email):
-    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    if re.fullmatch(regex, email):
-        return True
-    return False

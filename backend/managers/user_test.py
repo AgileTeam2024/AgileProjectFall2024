@@ -1,4 +1,5 @@
 from unittest import mock
+from unittest.mock import MagicMock
 
 import flask
 import flask_jwt_extended
@@ -37,12 +38,45 @@ class UserManagerTest(absltest.TestCase):
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
         self.assertEqual(response.json, {'message': 'Username already exists'})
 
+    def test_register_email_exist(self) -> None:
+        """Test that registration fails when the email already exists."""
+
+        def mock_filter_by(**kwargs):
+            if 'username' in kwargs and kwargs['username'] == "nonexisting_user":
+                return MagicMock(first=lambda: None)  # No user with this username
+            if 'email' in kwargs and kwargs['email'] == "existing_email@email.com":
+                return MagicMock(first=lambda: backend.models.user.User(
+                    username="existing_user",
+                    email="existing_email@email.com"
+                ))  # Simulate an existing email
+        self.mock_user_query.filter_by.side_effect = mock_filter_by
+
+        response, status_code = self.user_manager.register("nonexisting_user", "password123", "existing_email@email.com")
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
+        self.assertEqual(response.json, {'message': 'Email already exists'})
+
+    def test_register_email_incorrect_format(self) -> None:
+        """Test that registration fails when the format is wrong."""
+        for email in ["abc", "abc@", "abc@email", "abc@email.", "@", "@email", "@email.com", "email.com", ".com", "com"]:
+            with self.subTest(msg=f"Checking for invalid email {email}", email=email):
+                self.mock_user_query.filter_by.return_value.first.return_value = None
+                response, status_code = self.user_manager.register("nonexisting_user", "password123", email)
+                self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
+                self.assertEqual(response.json, {'message': 'Email must be the correct format.'})
+
     def test_register_successful(self) -> None:
         """Test that a new user can register successfully with a unique username."""
         self.mock_user_query.filter_by.return_value.first.return_value = None
         response, status_code = self.user_manager.register("new_user", "password123")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.CREATED.value)
         self.assertEqual(response.json, {"message": "User registered successfully."})
+
+    def test_register_email_successful(self) -> None:
+        """Test that registration is succcessful if everything is good."""
+        self.mock_user_query.filter_by.return_value.first.return_value = None
+        response, status_code = self.user_manager.register("nonexisting_user", "password123", "nonexisting_user@email.com")
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.CREATED.value)
+        self.assertEqual(response.json, {'message': 'User registered successfully.'})
 
     def test_login_username_does_not_exist(self) -> None:
         """Test that login fails when the username does not exist."""
