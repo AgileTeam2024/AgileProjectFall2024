@@ -1,4 +1,7 @@
+import sqlalchemy
+
 import backend.initializers.database
+
 
 class Product(backend.initializers.database.DB.Model):
     """
@@ -10,13 +13,18 @@ class Product(backend.initializers.database.DB.Model):
     CITY_NAME_MAX_LENGTH = 50
     DESCRIPTION_MAX_LENGTH = 500
     STATUS_OPTIONS = ['for sale', 'sold', 'reserved']
-    CATEGORY_OPTIONS = ['Other' , 'Electronics' , 'Clothing' , 'Home & Garden' , 'Sports & Outdoors' , 'Toys & Games' , 'Automative' , 'Books & Media']
-
+    CATEGORY_OPTIONS = ['Other', 'Electronics', 'Clothing', 'Home & Garden', 'Sports & Outdoors', 'Toys & Games',
+                        'Automative', 'Books & Media']
 
     id = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.Integer,
         primary_key=True,
         autoincrement=True
+    )
+
+    created_at = backend.initializers.database.DB.Column(
+        sqlalchemy.DateTime,
+        server_default=sqlalchemy.func.now()
     )
 
     product_name = backend.initializers.database.DB.Column(
@@ -32,7 +40,7 @@ class Product(backend.initializers.database.DB.Model):
     # TODO : 1 to 10 images, at least must have one
     picture = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(255),
-        nullable=True 
+        nullable=True
     )
 
     city_name = backend.initializers.database.DB.Column(
@@ -42,11 +50,11 @@ class Product(backend.initializers.database.DB.Model):
 
     description = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(DESCRIPTION_MAX_LENGTH),
-        nullable=True 
+        nullable=True
     )
 
     status = backend.initializers.database.DB.Column(
-        backend.initializers.database.DB.Enum(*STATUS_OPTIONS),
+        backend.initializers.database.DB.Enum(*STATUS_OPTIONS, name='status'),
         default='for sale',
         nullable=False
     )
@@ -54,16 +62,12 @@ class Product(backend.initializers.database.DB.Model):
     # can be defined as a class
     # TODO : check doc
     category = backend.initializers.database.DB.Column(
-        backend.initializers.database.DB.Enum(*CATEGORY_OPTIONS),
+        backend.initializers.database.DB.Enum(*CATEGORY_OPTIONS, name='category'),
         default='Other',
         nullable=False
     )
 
-
-
-
-
-        def __repr__(self) -> str:
+    def __repr__(self) -> str:
         """
         Return a string representation of the Product instance.
         """
