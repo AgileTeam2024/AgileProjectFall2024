@@ -62,6 +62,7 @@ def create() -> (flask.Flask, int):
             flask.jsonify({'message': 'Please enter price value correctly.'}),
             HTTPStatus.BAD_REQUEST.value
         )
+    # TODO : city name can be optional
     city_name = query_params.get('city_name')
     if not city_name:
         return (
