@@ -30,6 +30,7 @@ class ProductManager:
                 - An integer representing the HTTP status code (e.g., 201 for created, 400 for bad request).
 
         """
+        # TODO : Check cookie
         # Check for empty fields
         if not product_name or price <= 0 or not city_name:
             return (

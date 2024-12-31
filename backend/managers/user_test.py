@@ -24,10 +24,16 @@ class UserManagerTest(absltest.TestCase):
         self.mock_db_session = mock.patch("backend.initializers.database.DB.session").start()
         # Mock query on user model.
         self.mock_user_query = mock.patch("backend.models.user.User.query").start()
+        # Mock query on cookie model
+        self.mock_cookie_query = mock.patch("backend.models.cookie.Cookie.query").start()
+        # Mock request
+        self.mock_request = mock.patch("flask.request").start()
 
     def tearDown(self) -> None:
         self.mock_db_session.stop()
         self.mock_user_query.stop()
+        self.mock_cookie_query.stop()
+        self.mock_request.stop()
         super().tearDown()
 
     def test_register_username_exist(self) -> None:
@@ -110,7 +116,22 @@ class UserManagerTest(absltest.TestCase):
         headers = dict(response.headers.items())
         self.assertIn('Set-Cookie', headers)
         self.assertNotEmpty(headers['Set-Cookie'].split(';')[0])
-
+        self.mock_db_session.add.assert_called()
+        # Verify that a new Cookie was added to the database.
+        args, _ = self.mock_db_session.add.call_args
+        added_cookie = args[0]
+        # self.assertIsInstance(added_cookie, backend.models.cookie.Cookie)
+        # self.assertEqual(added_cookie.username, "user")
+        # self.assertNotEmpty(added_cookie.cookie)
+    
+    # def test_check_cookie_non_existence(self) -> None:
+    #     """Test that checks cookie fails if cookie doesn't exist in database"""
+    #     # Simulate a cookie in the request.
+    #     self.mock_request.cookies = {"access_token_cookie": "fake_access_token"}
+    #     self.mock_cookie_query.filter_by.return_value.first.return_value = None
+    #     response, status_code = self.user_manager.check_cookie()
+    #     self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value)
+    #     self.assertEqual(response.json, {'msg': 'Token is invalid.'})
 
 if __name__ == "__main__":
     # Set required flags to suppress unit-test's flag parse error.

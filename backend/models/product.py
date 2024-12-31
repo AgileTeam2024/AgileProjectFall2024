@@ -29,6 +29,7 @@ class Product(backend.initializers.database.DB.Model):
         nullable=False
     )
 
+    # TODO : 1 to 10 images, at least must have one
     picture = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(255),
         nullable=True 
@@ -36,7 +37,7 @@ class Product(backend.initializers.database.DB.Model):
 
     city_name = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(CITY_NAME_MAX_LENGTH),
-        nullable=False
+        nullable=True
     )
 
     description = backend.initializers.database.DB.Column(
@@ -51,6 +52,7 @@ class Product(backend.initializers.database.DB.Model):
     )
 
     # can be defined as a class
+    # TODO : check doc
     category = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.Enum(*CATEGORY_OPTIONS),
         default='Other',
