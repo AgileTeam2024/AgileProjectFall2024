@@ -122,10 +122,10 @@ class UserManager:
         access_token = flask_jwt_extended.create_access_token(username)
         print(len(access_token))
         flask_jwt_extended.set_access_cookies(response, access_token)
-        new_cookie = backend.models.cookie.Cookie(username=username, cookie=access_token)
-
+        user = backend.models.user.User.query.filter_by(username=username).first()
+        user.cookie = access_token
         # Add the new cookie to the database.
-        backend.initializers.database.DB.session.add(new_cookie)
+        backend.initializers.database.DB.session.add(user)
         backend.initializers.database.DB.session.commit()
 
     def reset_cookie(self, response):
@@ -139,8 +139,8 @@ class UserManager:
 
     def check_cookie(self) -> (flask.Flask, int):
         cookie = request.cookies.get("access_token_cookie")
-        cookie = backend.models.cookie.Cookie.query.filter_by(cookie=cookie).first()
-        if not cookie:
+        user = backend.models.user.User.query.filter_by(username=username).first()
+        if user.cookie != cookie:
             return (
                 flask.jsonify({"msg": "Token is invalid."}),
                 backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
@@ -151,10 +151,10 @@ class UserManager:
         )
 
     def delete_cookie_if_exists(self, username):
-        cookie = backend.models.cookie.Cookie.query.filter_by(username=username).first()
-        if cookie:
-            backend.initializers.database.DB.session.delete(cookie)
-            backend.initializers.database.DB.session.commit()
+        user = backend.models.user.User.query.filter_by(username=username).first()
+        user.cookie = None
+        backend.initializers.database.DB.session.add(user)
+        backend.initializers.database.DB.session.commit()
 
 
 def is_valid_email_regex(email):

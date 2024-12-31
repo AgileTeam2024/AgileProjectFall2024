@@ -10,6 +10,7 @@ class User(backend.initializers.database.DB.Model):
     USERNAME_MAX_LENGTH = 50
     PASSWORD_MAX_LENGTH = 128
     EMAIL_MAX_LENGTH = 128
+    COOKIE_MAX_LENGTH = 356
 
     username = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(USERNAME_MAX_LENGTH),
@@ -28,6 +29,12 @@ class User(backend.initializers.database.DB.Model):
     email = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(EMAIL_MAX_LENGTH),
         unique=True
+    )
+
+    
+    cookie = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String(COOKIE_MAX_LENGTH),  # TODO: Store it as hashed-value.
+        nullable=False
     )
 
 

@@ -59,6 +59,10 @@ class Product(backend.initializers.database.DB.Model):
         nullable=False
     )
 
+
+
+
+
         def __repr__(self) -> str:
         """
         Return a string representation of the Product instance.
