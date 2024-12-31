@@ -1,5 +1,6 @@
 import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
+import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -48,6 +49,12 @@ class RouterService {
             },
             pageBuilder: (context, state) => NoTransitionPage(
               child: RegisterPage(),
+            ),
+          ),
+          GoRoute(
+            path: '/product/:id',
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: ProductViewPage(int.parse(state.pathParameters['id']!)),
             ),
           )
         ],

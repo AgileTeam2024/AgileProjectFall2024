@@ -1,6 +1,7 @@
 import 'package:chabok_front/extensions/num.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/services/router.dart';
 import 'package:flutter/material.dart';
 
 class ProductsWidget extends StatelessWidget {
@@ -28,7 +29,7 @@ class ProductsWidget extends StatelessWidget {
           final displayImage = product.imageUrls.firstOrNull;
 
           return MaterialButton(
-            onPressed: () {},
+            onPressed: () => RouterService.go('/product/${product.id}'),
             color: Colors.white,
             hoverElevation: 2,
             focusElevation: 2,
@@ -121,8 +122,6 @@ class _SellerWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _SellerUsernameWidget(seller.username),
-              SizedBox(height: 1.5),
-              _SellerRatingWidget(seller.averageRating)
             ],
           ),
         ),

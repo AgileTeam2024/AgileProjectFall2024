@@ -8,22 +8,22 @@ part 'product.g.dart';
 class Product {
   final int id;
   final String name;
-  final String? description;
+  final String description;
   final User seller;
   final List<String> imageUrls;
   final String category;
-  final double? price;
-  final String location;
+  final double price;
+  final String? location;
   final String status;
 
   Product({
     required this.id,
     required this.name,
-    this.description,
+    required this.description,
     required this.seller,
     required this.imageUrls,
     required this.category,
-    this.price,
+    required this.price,
     required this.location,
     required this.status,
   });
