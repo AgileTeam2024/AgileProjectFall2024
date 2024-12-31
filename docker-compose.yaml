@@ -23,6 +23,8 @@ services:
       POSTGRES_DB: postgres
     networks:
       - shared_network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
   flutter_app:
     container_name: flutter_app
@@ -51,4 +53,5 @@ networks:
     driver: bridge
 
 volumes:
+  pgdata: {}
   flutter_build:

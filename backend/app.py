@@ -26,6 +26,7 @@ def connect_to_db(flask_app: flask.Flask) -> None:
     import backend.initializers.database
     # Load database models to ensure their tables existence.
     import backend.models.user
+    import backend.models.product
 
     # Configure the Flask app for setting up the SQLAlchemy database connection.
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -52,8 +53,10 @@ def create_managers(flask_app: flask.Flask) -> None:
         flask_app (flask.Flask): The Flask application instance used for initializing managers.
     """
     import backend.managers.user
+    import backend.managers.product
 
     backend.managers.user.UserManager(flask_app)
+    backend.managers.product.ProductManager(flask_app)
 
 
 def register_routes(flask_app: flask.Flask) -> None:
@@ -64,8 +67,10 @@ def register_routes(flask_app: flask.Flask) -> None:
         flask_app (flask.Flask): The Flask application instance to which the routes will be registered.
     """
     import backend.routes.user
+    import backend.routes.product
 
     flask_app.register_blueprint(backend.routes.user.user_bp, url_prefix='/api/user')
+    flask_app.register_blueprint(backend.routes.product.product_bp, url_prefix='/api/product')
     # Create Swagger documentation for APIs.
     flasgger.Swagger(flask_app)
 
