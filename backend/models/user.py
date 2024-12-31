@@ -30,11 +30,9 @@ class User(backend.initializers.database.DB.Model):
         backend.initializers.database.DB.String(EMAIL_MAX_LENGTH),
         unique=True
     )
-
-    
     cookie = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(COOKIE_MAX_LENGTH),  # TODO: Store it as hashed-value.
-        nullable=False
+        nullable=True
     )
 
 
