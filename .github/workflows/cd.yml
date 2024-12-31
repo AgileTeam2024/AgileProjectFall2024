@@ -26,23 +26,23 @@ jobs:
       - name: Remove all existing containers and images using Docker Compose
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "
-            cd /AgileProjectFall2024 &&
+            cd AgileProjectFall2024 &&
             docker-compose down --rmi all -v --remove-orphans
           "
 
       - name: Remove previous codes
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "
-            rm -rf /AgileProjectFall2024/*
-            rm -rf /AgileProjectFall2024/.*
+            rm -rf AgileProjectFall2024/*
+            rm -rf AgileProjectFall2024/.*
           "
 
       - name: Copy code and .env file to server
         run: |
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" rsync -avz --delete ./ ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}:/AgileProjectFall2024
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" rsync -avz --delete ./ ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}:AgileProjectFall2024
         env:
           RSYNC_RSH: "sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh -o StrictHostKeyChecking=no"
 
       - name: Deploy to server
         run: |
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "cd /AgileProjectFall2024 && docker-compose up -d --build"
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "cd AgileProjectFall2024 && docker-compose up -d --build"
