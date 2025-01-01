@@ -61,5 +61,24 @@ void main() {
       final buttonText = find.text('Click Me');
       expect(buttonText, findsOneWidget);
     });
+
+    testWidgets('should render IconButton for icon type', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Button.icon(
+              icon: Icons.add,
+              onPressed: () {},
+            ),
+          ),
+        ),
+      );
+
+      final iconButton = find.byType(IconButton);
+      expect(iconButton, findsOneWidget);
+
+      final icon = find.byIcon(Icons.add);
+      expect(icon, findsOneWidget);
+    });
   });
 }
