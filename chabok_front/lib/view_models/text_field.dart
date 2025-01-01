@@ -47,6 +47,7 @@ class PasswordTextFieldViewModel extends TextFieldViewModel {
     required super.required,
     super.readOnly,
     super.obscureText = true,
+    super.maxLines = 1,
   }) {
     type = TextInputType.visiblePassword;
   }

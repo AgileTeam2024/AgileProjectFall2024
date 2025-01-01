@@ -24,15 +24,17 @@ class RouterService {
         builder: (context, state, child) {
           return Scaffold(
             appBar: MainAppBar(),
-            floatingActionButton: MainFAB(),
             body: child,
           );
         },
         routes: [
           GoRoute(
             path: '/',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: HomePage(),
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: Scaffold(
+                floatingActionButton: MainFAB(),
+                body: HomePage(),
+              ),
             ),
           ),
           GoRoute(
