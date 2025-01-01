@@ -1,6 +1,8 @@
+import 'package:chabok_front/extensions/num.dart';
 import 'package:chabok_front/view_models/text_field.dart';
 import 'package:chabok_front/widgets/show_hide_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextFieldViewModel viewModel;
@@ -20,7 +22,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
       controller: viewModel.controller,
       readOnly: viewModel.readOnly,
       keyboardType: viewModel.type,
+      maxLines: viewModel.maxLines,
       validator: viewModel.validator,
+      inputFormatters: viewModel.inputFormatters,
       obscureText: viewModel.obscureText,
       decoration: InputDecoration(
         helperText: viewModel.helper,
@@ -42,7 +46,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   ),
                 ],
               )
-            : null,
+            : (viewModel is MoneyTextFieldViewModel ? Text('IRR') : null),
         border: OutlineInputBorder(),
       ),
     );

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:chabok_front/extensions/list.dart';
 import 'package:chabok_front/view_models/text_field.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/text_field.dart';
@@ -31,8 +32,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
       required: false,
       label: 'Location',
     ),
-    TextFieldViewModel(
-      icon: Icons.money,
+    MoneyTextFieldViewModel(
       required: true,
       label: 'Price',
     ),
@@ -40,6 +40,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
       icon: Icons.description,
       required: true,
       label: 'Description',
+      maxLines: 4,
     ),
   ];
 
@@ -66,78 +67,44 @@ class _CreateProductPageState extends State<CreateProductPage> {
               child: isBigScreen ? VerticalDivider() : Divider(),
             ),
             Expanded(
-                child: isBigScreen
-                    ? Column(
-                        children: fieldViewModels
-                            .map(
-                              (vm) => Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 7.5,
-                                  horizontal: 10,
-                                ),
-                                child: CustomTextField(vm),
+              child: isBigScreen
+                  ? Column(
+                      children: fieldViewModels
+                          .map(
+                            (vm) => Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 7.5,
+                                horizontal: 10,
                               ),
-                            )
-                            .toList())
-                    : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 15,
-                        children: fieldViewModels
-                            .fixedGrouped(groupSize: 2)
-                            .map(
-                              (vmList) => Row(
-                                mainAxisSize: MainAxisSize.min,
-                                spacing: 20,
-                                children: vmList
-                                    .map(
-                                      (vm) => Expanded(
-                                        child: CustomTextField(vm),
-                                      ),
-                                    )
-                                    .toList(),
-                              ),
-                            )
-                            .toList(),
-                      )
-                // GridView(
-                //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                //     crossAxisCount: isBigScreen ? 1 : 2,
-                //     mainAxisSpacing: 10,
-                //     crossAxisSpacing: 10,
-                //     childAspectRatio: null,
-                //   ),
-                //   children: fieldViewModels
-                //       .map(
-                //         (vm) => Padding(
-                //           padding: const EdgeInsets.symmetric(
-                //             vertical: 7.5,
-                //             horizontal: 10,
-                //           ),
-                //           child: CustomTextField(vm),
-                //         ),
-                //       )
-                //       .toList(),
-                // ),
-                ),
+                              child: CustomTextField(vm),
+                            ),
+                          )
+                          .toList(),
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 15,
+                      children: fieldViewModels
+                          .fixedGrouped(groupSize: 2)
+                          .map(
+                            (vmList) => Row(
+                              mainAxisSize: MainAxisSize.min,
+                              spacing: 20,
+                              children: vmList
+                                  .map(
+                                    (vm) => Expanded(
+                                      child: CustomTextField(vm),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          )
+                          .toList(),
+                    ),
+            ),
           ],
         ),
       ),
     );
-  }
-}
-
-extension ListExt<T> on List<T> {
-  List<List<T>> fixedGrouped<T>({required int groupSize}) {
-    if (isEmpty) return [];
-    final lists = <List<T>>[[]];
-    for (var value in this) {
-      final lastList = lists.last;
-      if (lastList.length == groupSize) {
-        lists.add([value as T]);
-      } else {
-        lastList.add(value as T);
-      }
-    }
-    return lists;
   }
 }
