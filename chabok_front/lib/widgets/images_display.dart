@@ -56,15 +56,15 @@ class _SelectedImageDisplay extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         Image.network(image),
-        Align(
-          alignment: Alignment.centerRight,
+        Positioned(
+          right: 0,
           child: Button.icon(
             icon: Icons.navigate_next,
             onPressed: onNext,
           ),
         ),
-        Align(
-          alignment: Alignment.centerLeft,
+        Positioned(
+          left: 0,
           child: Button.icon(
             icon: Icons.navigate_before,
             onPressed: onPrev,
