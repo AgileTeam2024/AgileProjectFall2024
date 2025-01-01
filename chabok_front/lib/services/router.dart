@@ -1,6 +1,8 @@
+import 'package:chabok_front/pages/create_product.dart';
 import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
+import 'package:chabok_front/widgets/main_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,6 +24,7 @@ class RouterService {
         builder: (context, state, child) {
           return Scaffold(
             appBar: MainAppBar(),
+            floatingActionButton: MainFAB(),
             body: child,
           );
         },
@@ -49,7 +52,16 @@ class RouterService {
             pageBuilder: (context, state) => NoTransitionPage(
               child: RegisterPage(),
             ),
-          )
+          ),
+          GoRoute(
+            path: '/create-product',
+            redirect: (context, state) {
+              // todo redirect to login page if not logged in
+            },
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: CreateProductPage(),
+            ),
+          ),
         ],
       )
     ],
