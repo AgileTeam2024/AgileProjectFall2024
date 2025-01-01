@@ -22,6 +22,7 @@ class UserManager:
             flask_app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
             flask_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(seconds=UserManager.COOKIE_MAX_AGE)
             flask_app.config["JWT_SESSION_COOKIE"] = UserManager.COOKIE_MAX_AGE
+            flask_app.config["JWT_COOKIE_SAMESITE"] = 'None'
             UserManager.instance = self
 
     def register(self, username: str, password: str, email: Optional[str] = None) -> (flask.Flask, int):
