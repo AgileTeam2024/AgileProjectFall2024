@@ -21,11 +21,29 @@ class _ImagesDisplayWidgetState extends State<ImagesDisplayWidget> {
 
     return Flex(
       direction: isBigScreen ? Axis.vertical : Axis.horizontal,
+      spacing: 15,
       children: [
         _SelectedImageDisplay(
           imageUrls[selected],
           onNext: imageCount == 1 ? null : () => _select(selected + 1),
           onPrev: imageCount == 1 ? null : () => _select(selected - 1),
+        ),
+        Expanded(
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 100,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemCount: imageCount,
+            itemBuilder: (context, index) {
+              return _SmallImageWidget(
+                imageUrl: imageUrls[index],
+                isSelected: index == selected,
+                select: () => _select(index),
+              );
+            },
+          ),
         ),
       ],
     );
@@ -71,6 +89,45 @@ class _SelectedImageDisplay extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SmallImageWidget extends StatelessWidget {
+  final String imageUrl;
+  final bool isSelected;
+  final void Function() select;
+
+  const _SmallImageWidget({
+    required this.imageUrl,
+    required this.isSelected,
+    required this.select,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: select,
+        child: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              if (isSelected)
+                BoxShadow(
+                  color: Theme.of(context).primaryColor,
+                  blurRadius: 5,
+                  spreadRadius: 1,
+                ),
+            ],
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(5),
+            child: Image.network(imageUrl, fit: BoxFit.cover),
+          ),
+        ),
+      ),
     );
   }
 }
