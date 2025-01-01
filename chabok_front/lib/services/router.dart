@@ -1,10 +1,13 @@
 import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
+import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class RouterService {
+  static final _authService = AuthService.instance;
+
   static final _rootNavKey = GlobalKey<NavigatorState>(debugLabel: 'root');
   static final _shellNavKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
 
@@ -34,8 +37,9 @@ class RouterService {
           ),
           GoRoute(
             path: '/login',
-            redirect: (context, state) {
-              // todo check if is logged in, it navigates to '/'
+            redirect: (context, state) async {
+              if (await _authService.isLoggedIn) return '/';
+              return null;
             },
             pageBuilder: (context, state) => NoTransitionPage(
               child: LoginPage(),
@@ -43,8 +47,9 @@ class RouterService {
           ),
           GoRoute(
             path: '/register',
-            redirect: (context, state) {
-              // todo check if is logged in, it navigates to '/'
+            redirect: (context, state) async {
+              if (await _authService.isLoggedIn) return '/';
+              return null;
             },
             pageBuilder: (context, state) => NoTransitionPage(
               child: RegisterPage(),
