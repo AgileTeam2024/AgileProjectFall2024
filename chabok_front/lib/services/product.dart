@@ -23,7 +23,10 @@ class ProductService {
                 "email": "CraftsByAden@gmail.com",
                 "phoneNumber": "09121234567",
               },
-              "imageUrls": ["assets/sample_images/product_img1.jpg"],
+              "imageUrls": List.generate(
+                10,
+                (_) => "assets/sample_images/product_img1.jpg",
+              ),
               "category":
                   "Books, Movies & Music > Music > Picks & Slides > Picks",
               "location": "Manchester, United Kingdom",

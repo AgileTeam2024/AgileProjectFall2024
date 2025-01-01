@@ -3,6 +3,8 @@ import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/button.dart';
+import 'package:chabok_front/widgets/card.dart';
+import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 
 class ProductViewPage extends StatefulWidget {
@@ -19,110 +21,112 @@ class _ProductViewPageState extends State<ProductViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Product>(
-        future: _productService.getProductById(widget.id),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            // todo error page
-            return Container();
-          }
-          if (!snapshot.hasData) return CircularProgressIndicator();
+    final textTheme = Theme.of(context).textTheme;
+    final textStyle = textTheme.bodyMedium;
+    final textStyleBold = textStyle?.copyWith(fontWeight: FontWeight.bold);
 
-          final product = snapshot.data!;
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Display product images
-                SizedBox(
-                  height: 200,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: product.imageUrls.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Image.network(
-                          product.imageUrls[index],
-                          width: 200,
-                          fit: BoxFit.cover,
-                        ),
-                      );
-                    },
-                  ),
-                ),
+    return CardWidget(
+      child: FutureBuilder<Product>(
+          future: _productService.getProductById(widget.id),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              // todo error page
+              return Container();
+            }
+            if (!snapshot.hasData) return CircularProgressIndicator();
 
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Description: ${product.description}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Category: ${product.category}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Price: ${formatPrice(product.price)} ᴵᴿᴿ',
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Location: ${product.location}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Status: ${product.status}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-
-                      const Divider(height: 32),
-
-                      // Display seller info
-                      const SizedBox(height: 16),
-                      Button.filled(
-                        onPressed: () =>
-                            goToSellerPage(product.seller.username),
-                        text: 'View Seller Info',
-                      ),
-
-                      const Divider(height: 32),
-
-                      if (isSeller) ...[
-                        Button.filled(
-                          onPressed: onEditProduct,
-                          text: 'Edit Product',
-                        ),
-                      ] else ...[
-                        if (isFavorite)
-                          Button.filled(
-                            onPressed: removeFromFavorite,
-                            text: 'Remove from Favourite',
-                          )
-                        else
-                          Button.filled(
-                            onPressed: addToFavorite,
-                            text: 'Add to Favourite',
+            final product = snapshot.data!;
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 200,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: product.imageUrls.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Image.network(
+                            product.imageUrls[index],
+                            width: 200,
+                            fit: BoxFit.cover,
                           ),
-                        Button.filled(
-                          onPressed: onReport,
-                          text: 'Report Product',
-                        ),
-                      ],
-                    ],
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        });
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      spacing: 8,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Description', style: textStyleBold),
+                        ExpandableText(
+                          product.description,
+                          maxLines: 5,
+                          expandText: 'Show more...',
+                          collapseText: 'Show less...',
+                          linkColor: Colors.blue,
+                          linkEllipsis: false,
+                          style: textStyle,
+                        ),
+                        Button.text(
+                          text: product.category,
+                          onPressed: () =>
+                              _goToCategorySearchPage(product.category),
+                        ),
+                        Text(
+                          'Price: ${formatPrice(product.price)} ᴵᴿᴿ',
+                          style: textStyleBold,
+                        ),
+                        Text(
+                          product.status,
+                          style: textStyle?.copyWith(
+                            // todo set color for status
+                          ),
+                        ),
+                        Text(
+                          'Location: ${product.location}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const Divider(),
+                        Button.filled(
+                          onPressed: () =>
+                              goToSellerPage(product.seller.username),
+                          text: 'View Seller Info',
+                        ),
+                        if (isSeller) ...[
+                          Button.filled(
+                            onPressed: onEditProduct,
+                            text: 'Edit Product',
+                          ),
+                        ] else ...[
+                          if (isFavorite)
+                            Button.filled(
+                              onPressed: removeFromFavorite,
+                              text: 'Remove from Favourite',
+                            )
+                          else
+                            Button.filled(
+                              onPressed: addToFavorite,
+                              text: 'Add to Favourite',
+                            ),
+                          Button.filled(
+                            onPressed: onReport,
+                            text: 'Report Product',
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+    );
   }
 
   bool get isFavorite => false;
@@ -159,6 +163,10 @@ class _ProductViewPageState extends State<ProductViewPage> {
       RegExp(r'^(\d{3})(\d{3})(\d{4})\$'),
       (Match m) => "${m[1]}-${m[2]}-${m[3]}",
     );
+  }
+
+  void _goToCategorySearchPage(String category) {
+    // todo
   }
 }
 
