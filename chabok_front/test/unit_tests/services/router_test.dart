@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../tests_setup_teardown.dart';
 
 void main() {
-  testWidgets('Navigates to home page', (WidgetTester tester) async {
+  testWidgets('Navigates to home page', (tester) async {
     setUpWidgetTest(tester);
     final router = RouterService.router;
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
@@ -16,7 +16,7 @@ void main() {
     tearDownWidgetTest(tester);
   });
 
-  testWidgets('Navigates to login page', (WidgetTester tester) async {
+  testWidgets('Navigates to login page', (tester) async {
     setUpWidgetTest(tester);
     final router = RouterService.router;
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
@@ -28,7 +28,7 @@ void main() {
     tearDownWidgetTest(tester);
   });
 
-  testWidgets('Navigates to register page', (WidgetTester tester) async {
+  testWidgets('Navigates to register page', (tester) async {
     setUpWidgetTest(tester);
     final router = RouterService.router;
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
@@ -41,7 +41,7 @@ void main() {
   });
 
   testWidgets('Redirects to home if already logged in on login page',
-      (WidgetTester tester) async {
+      (tester) async {
     setUpWidgetTest(tester);
     final router = RouterService.router;
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));
@@ -56,7 +56,7 @@ void main() {
   }, skip: true);
 
   testWidgets('Redirects to home if already logged in on register page',
-      (WidgetTester tester) async {
+      (tester) async {
     setUpWidgetTest(tester);
     final router = RouterService.router;
     await tester.pumpWidget(MaterialApp.router(routerConfig: router));

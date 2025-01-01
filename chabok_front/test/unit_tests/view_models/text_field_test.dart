@@ -1,6 +1,6 @@
+import 'package:chabok_front/view_models/text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:chabok_front/view_models/text_field.dart';
 
 void main() {
   group('TextFieldViewModel Tests', () {
@@ -17,16 +17,20 @@ void main() {
 
   group('PasswordTextFieldViewModel Tests', () {
     test('Password should contain numbers and alphabets', () {
-      final viewModel = PasswordTextFieldViewModel(icon: Icons.password, required: true);
-      expect(viewModel.validator('password'), 'Password must contain numbers too.');
-      expect(viewModel.validator('123456'), 'Password must contain alphabet too.');
+      final viewModel =
+          PasswordTextFieldViewModel(icon: Icons.password, required: true);
+      expect(viewModel.validator('password'),
+          'Password must contain numbers too.');
+      expect(
+          viewModel.validator('123456'), 'Password must contain alphabet too.');
       expect(viewModel.validator('Password123'), null);
     });
   });
 
   group('EmailTextFieldViewModel Tests', () {
     test('Email should be in correct format', () {
-      final viewModel = EmailTextFieldViewModel(icon: Icons.email, required: true);
+      final viewModel =
+          EmailTextFieldViewModel(icon: Icons.email, required: true);
       expect(viewModel.validator('invalidemail'), 'Incorrect email format.');
       expect(viewModel.validator('valid@email.com'), null);
     });
