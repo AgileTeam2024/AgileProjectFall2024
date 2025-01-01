@@ -1,8 +1,6 @@
-import 'package:chabok_front/extensions/num.dart';
 import 'package:chabok_front/view_models/text_field.dart';
 import 'package:chabok_front/widgets/show_hide_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextFieldViewModel viewModel;
@@ -17,6 +15,24 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     final viewModel = widget.viewModel;
+
+    if (viewModel is OptionsTextFieldViewModel) {
+      return DropdownButtonFormField(
+        onChanged: (selected) => viewModel.controller.text = selected ?? '',
+        items: viewModel.options
+            .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
+            .toList(),
+        decoration: InputDecoration(
+          helperText: viewModel.helper,
+          hintText: viewModel.hint,
+          errorText: viewModel.error,
+          icon: Icon(viewModel.icon),
+          labelText:
+              viewModel.required ? viewModel.label?.required : viewModel.label,
+          border: OutlineInputBorder(),
+        ),
+      );
+    }
 
     return TextFormField(
       controller: viewModel.controller,

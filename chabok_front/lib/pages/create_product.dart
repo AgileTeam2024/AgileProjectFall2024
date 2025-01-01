@@ -22,10 +22,18 @@ class _CreateProductPageState extends State<CreateProductPage> {
       required: true,
       label: 'Product Name',
     ),
-    TextFieldViewModel(
+    OptionsTextFieldViewModel(
       icon: Icons.category,
       required: true,
       label: 'Category',
+      options: [
+        'Real-Estate',
+        'Automobile',
+        'Digital & Electronics',
+        'Kitchenware',
+        'Personal Items',
+        'Others'
+      ],
     ),
     TextFieldViewModel(
       icon: Icons.pin_drop,

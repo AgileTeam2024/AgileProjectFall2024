@@ -116,3 +116,18 @@ class MoneyTextFieldViewModel extends TextFieldViewModel {
     type = TextInputType.numberWithOptions();
   }
 }
+
+class OptionsTextFieldViewModel extends TextFieldViewModel {
+  final List<String> options;
+
+  OptionsTextFieldViewModel({
+    required this.options,
+    required super.icon,
+    super.helper,
+    super.hint,
+    super.error,
+    super.label,
+    required super.required,
+    super.readOnly,
+  });
+}
