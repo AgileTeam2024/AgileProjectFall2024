@@ -1,5 +1,4 @@
 import 'package:chabok_front/models/product.dart';
-import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/button.dart';
@@ -40,6 +39,9 @@ class _ProductViewPageState extends State<ProductViewPage> {
 
             final product = snapshot.data!;
             return Flex(
+              crossAxisAlignment: isBigScreen
+                  ? CrossAxisAlignment.stretch
+                  : CrossAxisAlignment.center,
               direction: isBigScreen ? Axis.horizontal : Axis.vertical,
               children: [
                 Expanded(
@@ -53,6 +55,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
                   child: SingleChildScrollView(
                     child: Column(
                       spacing: 8,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -64,7 +67,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Button.text(
-                              text: product.category,
+                              text: '${product.category} Category',
                               onPressed: () =>
                                   _goToCategorySearchPage(product.category),
                             ),
@@ -74,22 +77,13 @@ class _ProductViewPageState extends State<ProductViewPage> {
                           product.seller,
                           showContactInfo: true,
                         ),
-                        Text('Description', style: textStyleBold),
-                        ExpandableText(
-                          product.description,
-                          maxLines: 5,
-                          expandText: 'Show more...',
-                          collapseText: 'Show less...',
-                          linkColor: Colors.blue,
-                          linkEllipsis: false,
-                          style: textStyle,
-                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Price: ${formatPrice(product.price)} ᴵᴿᴿ',
-                              style: textStyleBold,
+                              '${formatPrice(product.price)} ᴵᴿᴿ',
+                              style: textStyleBold?.copyWith(
+                                  fontSize: textStyleBold.fontSize! * 2),
                             ),
                             Text(
                               product.status,
@@ -103,13 +97,19 @@ class _ProductViewPageState extends State<ProductViewPage> {
                           Row(
                             children: [
                               Icon(Icons.pin_drop),
-                              Text(
-                                product.location!,
-                                style: const TextStyle(fontSize: 16),
-                              ),
+                              Text(product.location!, style: textStyle),
                             ],
                           ),
-                        const Divider(),
+                        Text('Description', style: textStyleBold),
+                        ExpandableText(
+                          product.description,
+                          maxLines: 5,
+                          expandText: 'Show more...',
+                          collapseText: 'Show less...',
+                          linkColor: Colors.blue,
+                          linkEllipsis: false,
+                          style: textStyle,
+                        ),
                         Button.filled(
                           onPressed: () =>
                               goToSellerPage(product.seller.username),
@@ -175,38 +175,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
         );
   }
 
-
   void _goToCategorySearchPage(String category) {
     // todo
-  }
-}
-
-class SellerPage extends StatelessWidget {
-  final User seller;
-
-  const SellerPage({super.key, required this.seller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Seller Info'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Seller Name: ${seller.username}',
-                style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 8),
-            Text(
-              'Phone: ${seller.phoneNumber}',
-              style: const TextStyle(fontSize: 18),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
