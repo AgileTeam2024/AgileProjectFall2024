@@ -64,8 +64,29 @@ class _ProductViewPageState extends State<ProductViewPage> {
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Row(
+                          spacing: 5,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
+                            if (isSeller)
+                              Button.icon(
+                                onPressed: onEditProduct,
+                                icon: Icons.edit,
+                              )
+                            else
+                              Button.icon(
+                                onPressed: onReport,
+                                icon: Icons.report,
+                              ),
+                            if (isFavorite)
+                              Button.icon(
+                                onPressed: removeFromFavorite,
+                                icon: Icons.favorite,
+                              )
+                            else
+                              Button.icon(
+                                onPressed: addToFavorite,
+                                icon: Icons.favorite_border,
+                              ),
                             Button.text(
                               text: '${product.category} Category',
                               onPressed: () =>
@@ -110,32 +131,6 @@ class _ProductViewPageState extends State<ProductViewPage> {
                           linkEllipsis: false,
                           style: textStyle,
                         ),
-                        Button.filled(
-                          onPressed: () =>
-                              goToSellerPage(product.seller.username),
-                          text: 'View Seller Info',
-                        ),
-                        if (isSeller) ...[
-                          Button.filled(
-                            onPressed: onEditProduct,
-                            text: 'Edit Product',
-                          ),
-                        ] else ...[
-                          if (isFavorite)
-                            Button.filled(
-                              onPressed: removeFromFavorite,
-                              text: 'Remove from Favourite',
-                            )
-                          else
-                            Button.filled(
-                              onPressed: addToFavorite,
-                              text: 'Add to Favourite',
-                            ),
-                          Button.filled(
-                            onPressed: onReport,
-                            text: 'Report Product',
-                          ),
-                        ],
                       ],
                     ),
                   ),
@@ -148,7 +143,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
 
   bool get isFavorite => false;
 
-  bool get isSeller => false;
+  bool get isSeller => true;
 
   void addToFavorite() {
     // todo send request to backend
