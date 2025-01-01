@@ -23,7 +23,7 @@ class _ImagesDisplayWidgetState extends State<ImagesDisplayWidget> {
       direction: isBigScreen ? Axis.vertical : Axis.horizontal,
       spacing: 15,
       children: [
-        _SelectedImageDisplay(
+        SelectedImageDisplay(
           imageUrls[selected],
           onNext: imageCount == 1 ? null : () => _select(selected + 1),
           onPrev: imageCount == 1 ? null : () => _select(selected - 1),
@@ -37,7 +37,7 @@ class _ImagesDisplayWidgetState extends State<ImagesDisplayWidget> {
             ),
             itemCount: imageCount,
             itemBuilder: (context, index) {
-              return _SmallImageWidget(
+              return SmallImageWidget(
                 imageUrl: imageUrls[index],
                 isSelected: index == selected,
                 select: () => _select(index),
@@ -57,13 +57,15 @@ class _ImagesDisplayWidgetState extends State<ImagesDisplayWidget> {
   }
 }
 
-class _SelectedImageDisplay extends StatelessWidget {
+@visibleForTesting
+class SelectedImageDisplay extends StatelessWidget {
   final String image;
 
   final void Function()? onNext, onPrev;
 
-  const _SelectedImageDisplay(
+  const SelectedImageDisplay(
     this.image, {
+    super.key,
     this.onNext,
     this.onPrev,
   });
@@ -93,12 +95,14 @@ class _SelectedImageDisplay extends StatelessWidget {
   }
 }
 
-class _SmallImageWidget extends StatelessWidget {
+@visibleForTesting
+class SmallImageWidget extends StatelessWidget {
   final String imageUrl;
   final bool isSelected;
   final void Function() select;
 
-  const _SmallImageWidget({
+  const SmallImageWidget({
+    super.key,
     required this.imageUrl,
     required this.isSelected,
     required this.select,

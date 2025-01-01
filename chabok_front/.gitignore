@@ -58,3 +58,4 @@ analysis_options.yaml
 deploy_front.sh
 /coverage/
 *.g.dart
+*.mocks.dart

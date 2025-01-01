@@ -25,7 +25,7 @@ class ProductService {
               },
               "imageUrls": List.generate(
                 10,
-                (_) => "assets/sample_images/product_img1.jpg",
+                (i) => "assets/sample_images/product_img$i.jpg",
               ),
               "category": "Entertainment",
               "location": "Manchester, United Kingdom",
