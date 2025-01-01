@@ -177,7 +177,7 @@ class _SellerRatingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return Text(
-      rating != null ? '${rating} ⭐️' : '',
+      rating != null ? '$rating ⭐️' : '',
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: textTheme.labelSmall,

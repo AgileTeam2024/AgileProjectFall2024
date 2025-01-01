@@ -24,12 +24,15 @@ class UploadFileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isBigScreen = MediaQuery.sizeOf(context).width > 1000;
     final textTheme = Theme.of(context).textTheme;
-    return Column(
+    return Flex(
+      direction: isBigScreen ? Axis.vertical : Axis.horizontal,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
         Expanded(
+          flex: isBigScreen ? 1 : 2,
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -51,12 +54,14 @@ class UploadFileWidget extends StatelessWidget {
                     SizedBox(height: 20),
                     Text(
                       'Upload your product images...',
+                      textAlign: TextAlign.center,
                       style: textTheme.bodyLarge?.copyWith(
                         color: Colors.black45,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
+                      textAlign: TextAlign.center,
                       'You can drag and drop up to $maximumFiles files or '
                       'click to open file browse.',
                       style:
@@ -85,62 +90,67 @@ class UploadFileWidget extends StatelessWidget {
             ],
           ),
         ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 100,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+        if (files.isNotEmpty)
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isBigScreen ? 10 : 20,
+                vertical: isBigScreen ? 20 : 10,
+
               ),
-              itemCount: files.length,
-              itemBuilder: (context, index) {
-                final file = files.entries.toList()[index];
-                return Stack(
-                  children: [
-                    Center(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 5,
-                              spreadRadius: 1,
-                            ),
-                          ],
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(5),
-                          child: Image.memory(file.value),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: Container(
-                        width: 25,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black),
-                        ),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          iconSize: 15,
-                          icon: Icon(Icons.delete),
-                          onPressed: () => _removeFile(file.key),
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 100,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                ),
+                itemCount: files.length,
+                itemBuilder: (context, index) {
+                  final file = files.entries.toList()[index];
+                  return Stack(
+                    children: [
+                      Center(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 5,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.memory(file.value),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: Container(
+                          width: 25,
+                          height: 25,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.black),
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            iconSize: 15,
+                            icon: Icon(Icons.delete),
+                            onPressed: () => _removeFile(file.key),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
-        ),
       ],
     );
   }

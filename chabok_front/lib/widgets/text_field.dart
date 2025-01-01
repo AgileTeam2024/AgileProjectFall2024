@@ -50,5 +50,5 @@ class _CustomTextFieldState extends State<CustomTextField> {
 }
 
 extension _StringRequired on String {
-  String? get required => '${this} *';
+  String? get required => '$this *';
 }

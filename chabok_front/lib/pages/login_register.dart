@@ -1,4 +1,3 @@
-import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/view_models/text_field.dart';

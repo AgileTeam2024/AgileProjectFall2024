@@ -1,4 +1,3 @@
-import 'package:chabok_front/extensions/num.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:json_annotation/json_annotation.dart';
 
