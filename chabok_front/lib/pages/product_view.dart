@@ -4,6 +4,7 @@ import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
+import 'package:chabok_front/widgets/images_display.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 
@@ -24,6 +25,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
     final textTheme = Theme.of(context).textTheme;
     final textStyle = textTheme.bodyMedium;
     final textStyleBold = textStyle?.copyWith(fontWeight: FontWeight.bold);
+    final isBigScreen = MediaQuery.sizeOf(context).width > 1000;
 
     return CardWidget(
       child: FutureBuilder<Product>(
@@ -36,28 +38,18 @@ class _ProductViewPageState extends State<ProductViewPage> {
             if (!snapshot.hasData) return CircularProgressIndicator();
 
             final product = snapshot.data!;
-            return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 200,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: product.imageUrls.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Image.network(
-                            product.imageUrls[index],
-                            width: 200,
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Padding(
+            return Flex(
+              direction: isBigScreen ? Axis.horizontal : Axis.vertical,
+              children: [
+                Expanded(
+                  child: ImagesDisplayWidget(product.imageUrls),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(15),
+                  child: isBigScreen ? VerticalDivider() : Divider(),
+                ),
+                Expanded(
+                  child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       spacing: 8,
@@ -85,8 +77,8 @@ class _ProductViewPageState extends State<ProductViewPage> {
                         Text(
                           product.status,
                           style: textStyle?.copyWith(
-                            // todo set color for status
-                          ),
+                              // todo set color for status
+                              ),
                         ),
                         Text(
                           'Location: ${product.location}',
@@ -122,8 +114,8 @@ class _ProductViewPageState extends State<ProductViewPage> {
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           }),
     );
