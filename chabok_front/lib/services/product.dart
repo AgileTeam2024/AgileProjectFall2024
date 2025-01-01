@@ -15,7 +15,7 @@ class ProductService {
         (i) => {
               "id": i,
               "name":
-                  "Custom Wooden Guitar Picks Box,Personalized Guitar Pick Holder Storage,Wood Guitar Plectrum Organizer Case,Music Gift for Guitarist Musician\n",
+                  "Custom Wooden Guitar Picks Box,Personalized Guitar Pick Holder Storage,Wood Guitar Plectrum Organizer Case,Music Gift for Guitarist Musician",
               "seller": {
                 "id": 2,
                 "username": "CraftsByAden",
@@ -27,8 +27,7 @@ class ProductService {
                 10,
                 (_) => "assets/sample_images/product_img1.jpg",
               ),
-              "category":
-                  "Books, Movies & Music > Music > Picks & Slides > Picks",
+              "category": "Entertainment",
               "location": "Manchester, United Kingdom",
               "status": "Available for sale",
               "description":

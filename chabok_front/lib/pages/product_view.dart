@@ -5,6 +5,7 @@ import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/images_display.dart';
+import 'package:chabok_front/widgets/seller.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 
@@ -49,12 +50,30 @@ class _ProductViewPageState extends State<ProductViewPage> {
                   child: isBigScreen ? VerticalDivider() : Divider(),
                 ),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                  child: SingleChildScrollView(
                     child: Column(
                       spacing: 8,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          product.name,
+                          style: textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Button.text(
+                              text: product.category,
+                              onPressed: () =>
+                                  _goToCategorySearchPage(product.category),
+                            ),
+                          ],
+                        ),
+                        SellerWidget(
+                          product.seller,
+                          showContactInfo: true,
+                        ),
                         Text('Description', style: textStyleBold),
                         ExpandableText(
                           product.description,
@@ -65,25 +84,31 @@ class _ProductViewPageState extends State<ProductViewPage> {
                           linkEllipsis: false,
                           style: textStyle,
                         ),
-                        Button.text(
-                          text: product.category,
-                          onPressed: () =>
-                              _goToCategorySearchPage(product.category),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Price: ${formatPrice(product.price)} ᴵᴿᴿ',
+                              style: textStyleBold,
+                            ),
+                            Text(
+                              product.status,
+                              style: textStyle?.copyWith(
+                                  // todo set color for status
+                                  ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'Price: ${formatPrice(product.price)} ᴵᴿᴿ',
-                          style: textStyleBold,
-                        ),
-                        Text(
-                          product.status,
-                          style: textStyle?.copyWith(
-                              // todo set color for status
+                        if (product.location != null)
+                          Row(
+                            children: [
+                              Icon(Icons.pin_drop),
+                              Text(
+                                product.location!,
+                                style: const TextStyle(fontSize: 16),
                               ),
-                        ),
-                        Text(
-                          'Location: ${product.location}',
-                          style: const TextStyle(fontSize: 16),
-                        ),
+                            ],
+                          ),
                         const Divider(),
                         Button.filled(
                           onPressed: () =>
@@ -150,12 +175,6 @@ class _ProductViewPageState extends State<ProductViewPage> {
         );
   }
 
-  String formatPhoneNumber(String phoneNumber) {
-    return phoneNumber.replaceAllMapped(
-      RegExp(r'^(\d{3})(\d{3})(\d{4})\$'),
-      (Match m) => "${m[1]}-${m[2]}-${m[3]}",
-    );
-  }
 
   void _goToCategorySearchPage(String category) {
     // todo

@@ -64,7 +64,7 @@ class Button extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white54
+            color: Colors.white54,
           ),
           child: IconButton(onPressed: onPressed, icon: Icon(icon)),
         );
