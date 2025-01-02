@@ -4,8 +4,6 @@ import 'package:chabok_front/services/router.dart';
 import 'package:http/http.dart' as http;
 
 class ServerResponse extends http.Response {
-  ServerResponse(super.body, super.statusCode);
-
   ServerResponse.visualize(super.body, super.statusCode) {
     if (isOk || isUnauthorized) return;
     RouterService.go('/error/$statusCode');
