@@ -24,9 +24,9 @@ class Product(backend.initializers.database.DB.Model):
         primary_key=True,
         autoincrement=True
     )
-    user_id = backend.initializers.database.DB.Column(
-        backend.initializers.database.DB.Integer,
-        backend.initializers.database.DB.ForeignKey('users.id'),
+    user_username = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String,
+        backend.initializers.database.DB.ForeignKey('users.username'),
         nullable=False
     )
     created_at = backend.initializers.database.DB.Column(

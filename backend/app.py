@@ -1,4 +1,6 @@
+import os
 import flask
+import flask_migrate
 import flask_cors
 import flasgger
 from absl import app as absl_app
@@ -42,6 +44,18 @@ def connect_to_db(flask_app: flask.Flask) -> None:
         # Create corresponding tables of models in database, If they don't already exist.
         with flask_app.app_context():
             backend.initializers.database.DB.create_all()
+
+        # Applying migration to previous models to update them.
+        migrate = flask_migrate.Migrate(flask_app, backend.initializers.database.DB, command='migrate')
+        with flask_app.app_context():
+            if not os.path.exists(backend.initializers.settings.MIGRATIONS_DIRECTORY):
+                flask_migrate.init(backend.initializers.settings.MIGRATIONS_DIRECTORY)
+        with flask_app.app_context():
+            # Generate a migration script if there are changes.
+            flask_migrate.migrate(directory=backend.initializers.settings.MIGRATIONS_DIRECTORY,
+                                  message="Auto-generated migration")
+            # Apply any pending migrations.
+            flask_migrate.upgrade(directory=backend.initializers.settings.MIGRATIONS_DIRECTORY)
     except Exception as e:
         raise Exception("Failed to initialize database: " + str(e))
 
