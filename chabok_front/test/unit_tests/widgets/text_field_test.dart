@@ -168,4 +168,31 @@ void main() {
       expect(viewModel.controller.text, 'Option1');
     });
   });
+
+  group('MoneyTextFormField', () {
+    testWidgets('Formats input correctly with commas', (tester) async {
+      final viewModel = MoneyTextFieldViewModel(required: true);
+      await tester.pumpWidget(generateWidget(viewModel));
+      await tester.enterText(find.byType(TextFormField), '1000');
+      await tester.pumpAndSettle();
+      expect(viewModel.controller.text, '1,000');
+    });
+
+    testWidgets('Retains correct cursor position after formatting',
+        (tester) async {
+      final viewModel = MoneyTextFieldViewModel(required: true);
+      await tester.pumpWidget(generateWidget(viewModel));
+      await tester.enterText(find.byType(TextFormField), '1000');
+      await tester.pumpAndSettle();
+      expect(viewModel.controller.selection.baseOffset, 5);
+    });
+
+    testWidgets('Ignores non-numeric input', (tester) async {
+      final viewModel = MoneyTextFieldViewModel(required: true);
+      await tester.pumpWidget(generateWidget(viewModel));
+      await tester.enterText(find.byType(TextFormField), 'abc');
+      await tester.pumpAndSettle();
+      expect(viewModel.controller.text, '');
+    });
+  });
 }
