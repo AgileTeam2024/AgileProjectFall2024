@@ -18,7 +18,7 @@ class SellerWidget extends StatelessWidget {
     return Row(
       children: [
         _SellerPfpWidget(seller.profilePicture),
-        _SellerUsernameWidget(seller.username),
+        Expanded(child: _SellerUsernameWidget(seller.username)),
         if (showContactInfo) ...[
           Spacer(),
           Button.icon(

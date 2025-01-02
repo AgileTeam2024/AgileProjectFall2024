@@ -38,14 +38,18 @@ class RouterService {
             redirect: (context, state) => '/home',
           ),
           GoRoute(
+            path: '/home',
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: HomePage()),
+          ),
+          GoRoute(
             path: '/login',
             redirect: (context, state) async {
               if (await _authService.isLoggedIn) return '/';
               return null;
             },
-            pageBuilder: (context, state) => NoTransitionPage(
-              child: LoginPage(),
-            ),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: LoginPage()),
           ),
           GoRoute(
             path: '/register',
@@ -53,9 +57,8 @@ class RouterService {
               if (await _authService.isLoggedIn) return '/';
               return null;
             },
-            pageBuilder: (context, state) => NoTransitionPage(
-              child: RegisterPage(),
-            ),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: RegisterPage()),
           ),
           GoRoute(
             path: '/product/:id',
@@ -64,11 +67,6 @@ class RouterService {
                 int.parse(state.pathParameters['id']!),
                 viewerIsSeller: false,
               ),
-            ),
-          )
-            path: '/home',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: HomePage(),
             ),
           ),
           GoRoute(
@@ -90,7 +88,7 @@ class RouterService {
                 NoTransitionPage(child: ErrorPage()),
           ),
         ],
-      )
+      ),
     ],
   );
 }
