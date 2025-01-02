@@ -1,4 +1,5 @@
 import 'package:chabok_front/models/product.dart';
+import 'package:flutter/foundation.dart';
 
 class ProductService {
   static ProductService? _instance;
@@ -6,6 +7,11 @@ class ProductService {
   static ProductService get instance {
     _instance ??= ProductService();
     return _instance!;
+  }
+
+  @visibleForTesting
+  static set instance(ProductService value) {
+    _instance = value;
   }
 
   Future<List<Product>> get suggestions {

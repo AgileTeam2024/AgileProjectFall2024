@@ -54,7 +54,10 @@ class RouterService {
           GoRoute(
             path: '/product/:id',
             pageBuilder: (context, state) => NoTransitionPage(
-              child: ProductViewPage(int.parse(state.pathParameters['id']!)),
+              child: ProductViewPage(
+                int.parse(state.pathParameters['id']!),
+                viewerIsSeller: false,
+              ),
             ),
           )
         ],

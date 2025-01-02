@@ -1,12 +1,14 @@
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/services/product.dart';
-import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/images_display.dart';
 import 'package:chabok_front/widgets/seller.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
+
+@visibleForTesting
+final scrollableKey = GlobalKey();
 
 class ProductViewPage extends StatefulWidget {
   final int id;
@@ -54,6 +56,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
                 ),
                 Expanded(
                   child: SingleChildScrollView(
+                    key: scrollableKey,
                     child: Column(
                       spacing: 8,
                       mainAxisAlignment: MainAxisAlignment.start,
