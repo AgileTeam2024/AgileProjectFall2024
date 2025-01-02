@@ -114,16 +114,18 @@ class _SellerWidget extends StatelessWidget {
     return Row(
       children: [
         _SellerPfpWidget(seller.profilePicture),
-        Padding(
-          padding: const EdgeInsets.all(5),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _SellerUsernameWidget(seller.username),
-              SizedBox(height: 1.5),
-              _SellerRatingWidget(seller.averageRating)
-            ],
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _SellerUsernameWidget(seller.username),
+                SizedBox(height: 1.5),
+                _SellerRatingWidget(seller.averageRating)
+              ],
+            ),
           ),
         ),
       ],

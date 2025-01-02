@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/widgets/toast.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +8,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../tests_setup_teardown.dart';
 
 void main() {
+  setUpAll(() => HttpOverrides.global = null);
+
   testWidgets('Displays success toast with correct message and colors',
       (WidgetTester tester) async {
     setUpWidgetTest(tester);
-    final response = ServerResponse('{"message": "Success"}', 200);
+    final response = ServerResponse.visualize('{"message": "Success"}', 200);
     final toast =
         CustomToast(text: response.message!, toastType: ToastType.success);
 

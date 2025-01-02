@@ -35,7 +35,7 @@ class NetworkService {
       },
       body: jsonEncode(body),
     );
-    return ServerResponse(response.body, response.statusCode);
+    return ServerResponse.visualize(response.body, response.statusCode);
   }
 
   Future<ServerResponse> get<T>(
@@ -50,6 +50,6 @@ class NetworkService {
         'Content-Type': 'application/json',
       },
     );
-    return ServerResponse(response.body, response.statusCode);
+    return ServerResponse.visualize(response.body, response.statusCode);
   }
 }

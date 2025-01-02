@@ -37,7 +37,6 @@ class MainAppBar extends AppBar {
             future: authService.isLoggedIn,
             builder: (context, snapshot) {
               if (snapshot.hasData && !snapshot.hasError) {
-                print(snapshot.data);
                 return ProfileButton(
                   isLogged: snapshot.data!,
                 );
