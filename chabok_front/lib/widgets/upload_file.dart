@@ -96,7 +96,6 @@ class UploadFileWidget extends StatelessWidget {
               padding: EdgeInsets.symmetric(
                 horizontal: isBigScreen ? 10 : 20,
                 vertical: isBigScreen ? 20 : 10,
-
               ),
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
