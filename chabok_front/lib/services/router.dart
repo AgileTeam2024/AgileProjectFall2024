@@ -1,5 +1,6 @@
 import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
+import 'package:chabok_front/pages/profile.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,17 @@ class RouterService {
             pageBuilder: (context, state) => NoTransitionPage(
               child: RegisterPage(),
             ),
-          )
+          ),
+          GoRoute(
+            path: '/profile',
+            redirect: (context, state) async {
+              if (!(await _authService.isLoggedIn)) return '/';
+              return null;
+            },
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: UserProfilePage(),
+            ),
+          ),
         ],
       )
     ],

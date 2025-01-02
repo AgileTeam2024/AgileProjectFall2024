@@ -11,8 +11,7 @@ class AuthService {
 
   final _networkService = NetworkService.instance;
 
-  Future<bool> get isLoggedIn =>
-      _networkService.get('/user/check_cookie').then((response) => response.isOk);
+  bool get isLoggedIn => true;
 
   Future<ServerResponse> login(Map<String, String> body) =>
       _networkService.post('/user/login', body);

@@ -21,9 +21,7 @@ class ProfileButton extends StatelessWidget {
     );
   }
 
-  void _goToProfilePage() {
-    // todo
-  }
+  void _goToProfilePage() => RouterService.go('/profile');
 
   void _goToAuthPage() => RouterService.go('/login');
 }
