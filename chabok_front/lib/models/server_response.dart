@@ -9,7 +9,7 @@ class ServerResponse extends http.Response {
   ServerResponse(super.body, super.statusCode);
 
   ServerResponse.visualize(super.body, super.statusCode) {
-    if (isOk || isUnauthorized) return;
+    if (isOk || is401 || is400) return;
     RouterService.go('/error/${super.statusCode}');
   }
 
@@ -19,7 +19,9 @@ class ServerResponse extends http.Response {
 
   bool get isRequestError => super.statusCode ~/ 100 == 4;
 
-  bool get isUnauthorized => super.statusCode == 401;
+  bool get is401 => super.statusCode == 401;
+
+  bool get is400 => super.statusCode == 400;
 
   Map<String, dynamic> get bodyJson => jsonDecode(super.body);
 
