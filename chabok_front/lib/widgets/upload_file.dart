@@ -7,7 +7,7 @@ import 'package:flutter_dropzone/flutter_dropzone.dart';
 class UploadFileWidget extends StatelessWidget {
   Map<String, Uint8List> files;
 
-  final Function(Map<String, Uint8List> files) onFilesChange;
+  final void Function(Map<String, Uint8List> files) onFilesChange;
 
   final int minimumFiles;
   final int? maximumFiles;
