@@ -67,25 +67,19 @@ class _ProductViewPageState extends State<ProductViewPage> {
                           spacing: 5,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            if (isSeller)
+                            if (isSeller) ...[
                               Button.icon(
                                 onPressed: onEditProduct,
                                 icon: Icons.edit,
-                              )
-                            else
+                              ),
+                              Button.icon(
+                                onPressed: onDeleteProduct,
+                                icon: Icons.delete,
+                              ),
+                            ] else
                               Button.icon(
                                 onPressed: onReport,
                                 icon: Icons.report,
-                              ),
-                            if (isFavorite)
-                              Button.icon(
-                                onPressed: removeFromFavorite,
-                                icon: Icons.favorite,
-                              )
-                            else
-                              Button.icon(
-                                onPressed: addToFavorite,
-                                icon: Icons.favorite_border,
                               ),
                             Button.text(
                               text: '${product.category} Category',
@@ -141,17 +135,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
     );
   }
 
-  bool get isFavorite => false;
-
   bool get isSeller => true;
-
-  void addToFavorite() {
-    // todo send request to backend
-  }
-
-  void removeFromFavorite() {
-    // todo send request to backend
-  }
 
   void onReport() {
     // todo send request to backend
@@ -161,7 +145,9 @@ class _ProductViewPageState extends State<ProductViewPage> {
     // todo send request to backend
   }
 
-  void goToSellerPage(String username) => RouterService.go('/user/$username');
+  void onDeleteProduct() {
+    // todo send request to backend
+  }
 
   String formatPrice(double price) {
     return price.toStringAsFixed(0).replaceAllMapped(
