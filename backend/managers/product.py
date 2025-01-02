@@ -119,7 +119,7 @@ class ProductManager:
 
     # TODO : Add edit and delete
 
-    def get_product_by_id(self, product_id: int) -> (flask.Flask, int):
+    def get_product(self, product_id: int) -> (flask.Flask, int):
         """
         Retrieve a product by its ID.
 
