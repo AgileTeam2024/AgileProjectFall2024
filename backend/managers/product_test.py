@@ -77,7 +77,7 @@ class ProductManagerTest(absltest.TestCase):
     def test_get_product_by_id(self) -> None:
         """Test Retrieving product by id."""
         self.mock_product_query.get.return_value = self.product1
-        result, status = self.product_manager.get_product_by_id(1)
+        result, status = self.product_manager.get_product(1)
         self.assertEqual(status, backend.initializers.settings.HTTPStatus.OK.value)
         self.assertEqual(self.product1.to_dict(), result.json['product'])
 
