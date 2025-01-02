@@ -27,7 +27,6 @@ class NetworkService {
     Map<String, String>? headers,
     Map<String, dynamic>? query,
   }) async {
-    print(_buildUrl(path, query));
     final response = await http.post(
       _buildUrl(path, query),
       headers: {
@@ -36,6 +35,21 @@ class NetworkService {
       },
       body: jsonEncode(body),
     );
-    return ServerResponse(response.body, response.statusCode);
+    return ServerResponse.visualize(response.body, response.statusCode);
+  }
+
+  Future<ServerResponse> get<T>(
+    String path, {
+    Map<String, String>? headers,
+    Map<String, dynamic>? query,
+  }) async {
+    final response = await http.get(
+      _buildUrl(path, query),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    );
+    return ServerResponse.visualize(response.body, response.statusCode);
   }
 }

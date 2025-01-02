@@ -9,56 +9,56 @@ class Product(backend.initializers.database.DB.Model):
     """
 
     __tablename__ = 'products'
+
     PRODUCT_NAME_MAX_LENGTH = 50
     CITY_NAME_MAX_LENGTH = 50
     DESCRIPTION_MAX_LENGTH = 500
     STATUS_OPTIONS = ['for sale', 'sold', 'reserved']
-    CATEGORY_OPTIONS = ['Other', 'Electronics', 'Clothing', 'Home & Garden', 'Sports & Outdoors', 'Toys & Games',
-                        'Automative', 'Books & Media']
+    CATEGORY_OPTIONS = [
+        'Other', 'Electronics', 'Clothing', 'Home & Garden', 'Sports & Outdoors', 'Toys & Games',
+        'Automative', 'Books & Media'
+    ]
 
     id = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.Integer,
         primary_key=True,
         autoincrement=True
     )
-
+    user_username = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String,
+        backend.initializers.database.DB.ForeignKey('users.username'),
+        nullable=False
+    )
     created_at = backend.initializers.database.DB.Column(
         sqlalchemy.DateTime,
         server_default=sqlalchemy.func.now()
     )
-
-    product_name = backend.initializers.database.DB.Column(
+    name = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(PRODUCT_NAME_MAX_LENGTH),
         nullable=False
     )
-
     price = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.Float,
         nullable=False
     )
-
-    # TODO : 1 to 10 images, at least must have one
-    picture = backend.initializers.database.DB.Column(
-        backend.initializers.database.DB.String(255),
-        nullable=True
+    pictures = backend.initializers.database.DB.relationship(
+        'Picture',
+        backref='product',
+        lazy=True
     )
-
     city_name = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(CITY_NAME_MAX_LENGTH),
         nullable=True
     )
-
     description = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(DESCRIPTION_MAX_LENGTH),
         nullable=True
     )
-
     status = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.Enum(*STATUS_OPTIONS, name='status'),
         default='for sale',
         nullable=False
     )
-
     # can be defined as a class
     # TODO : check doc
     category = backend.initializers.database.DB.Column(
@@ -73,4 +73,42 @@ class Product(backend.initializers.database.DB.Model):
         """
         return f"<Product(id={self.id}, name={self.product_name}, price={self.price}, status={self.status})>"
 
-    # TODO : add username as foreign key
+    def to_dict(self) -> dict:
+        """Convert the Product instance to a dictionary for JSON serialization."""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'name': self.name,
+            'price': self.price,
+            'pictures': [picture.filename for picture in self.pictures],  # Assuming Picture has a filename attribute
+            'city_name': self.city_name,
+            'description': self.description,
+            'status': self.status,
+            'category': self.category
+        }
+
+
+class Picture(backend.initializers.database.DB.Model):
+    """
+    Represents a product's picture.
+    """
+    id = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.Integer,
+        primary_key=True
+    )
+    filename = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String(255),
+        nullable=False
+    )
+    product_id = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.Integer,
+        backend.initializers.database.DB.ForeignKey('products.id'),
+        nullable=False
+    )
+
+    def to_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'filename': self.filename
+        }

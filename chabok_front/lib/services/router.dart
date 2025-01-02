@@ -1,11 +1,15 @@
+import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
 import 'package:chabok_front/pages/product_view.dart';
+import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class RouterService {
+  static AuthService get _authService => AuthService.instance;
+
   static final _rootNavKey = GlobalKey<NavigatorState>(debugLabel: 'root');
   static final _shellNavKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
 
@@ -17,10 +21,12 @@ class RouterService {
   static final router = GoRouter(
     navigatorKey: _rootNavKey,
     initialLocation: '/',
+    onException: (_, __, ___) => go('/error/404', extra: 'Page not found :('),
     routes: [
       ShellRoute(
         navigatorKey: _shellNavKey,
         builder: (context, state, child) {
+          print('${state.fullPath} ${state.pathParameters} ${state.extra}');
           return Scaffold(
             appBar: MainAppBar(),
             body: child,
@@ -29,14 +35,13 @@ class RouterService {
         routes: [
           GoRoute(
             path: '/',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: HomePage(),
-            ),
+            redirect: (context, state) => '/home',
           ),
           GoRoute(
             path: '/login',
-            redirect: (context, state) {
-              // todo check if is logged in, it navigates to '/'
+            redirect: (context, state) async {
+              if (await _authService.isLoggedIn) return '/';
+              return null;
             },
             pageBuilder: (context, state) => NoTransitionPage(
               child: LoginPage(),
@@ -44,8 +49,9 @@ class RouterService {
           ),
           GoRoute(
             path: '/register',
-            redirect: (context, state) {
-              // todo check if is logged in, it navigates to '/'
+            redirect: (context, state) async {
+              if (await _authService.isLoggedIn) return '/';
+              return null;
             },
             pageBuilder: (context, state) => NoTransitionPage(
               child: RegisterPage(),
@@ -60,6 +66,29 @@ class RouterService {
               ),
             ),
           )
+            path: '/home',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: HomePage(),
+            ),
+          ),
+          GoRoute(
+            path: '/error/:code',
+            pageBuilder: (context, state) {
+              final code = state.pathParameters['code'];
+              final message = state.extra?.toString();
+              return NoTransitionPage(
+                child: ErrorPage(
+                  errorCode: code == null ? null : int.tryParse(code),
+                  message: message,
+                ),
+              );
+            },
+          ),
+          GoRoute(
+            path: '/error',
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: ErrorPage()),
+          ),
         ],
       )
     ],
