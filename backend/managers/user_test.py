@@ -3,11 +3,10 @@ from unittest.mock import MagicMock
 
 import flask
 import flask_jwt_extended
-import werkzeug.datastructures.headers
-from absl import flags
 from absl.testing import absltest
 
 import backend.initializers.settings
+import backend.initializers.test_util
 import backend.managers.user
 import backend.models.user
 
@@ -50,15 +49,18 @@ class UserManagerTest(absltest.TestCase):
                     username="existing_user",
                     email="existing_email@email.com"
                 ))  # Simulate an existing email
+
         self.mock_user_query.filter_by.side_effect = mock_filter_by
 
-        response, status_code = self.user_manager.register("nonexisting_user", "password123", "existing_email@email.com")
+        response, status_code = self.user_manager.register("nonexisting_user", "password123",
+                                                           "existing_email@email.com")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
         self.assertEqual(response.json, {'message': 'Email already exists'})
 
     def test_register_email_incorrect_format(self) -> None:
         """Test that registration fails when the format is wrong."""
-        for email in ["abc", "abc@", "abc@email", "abc@email.", "@", "@email", "@email.com", "email.com", ".com", "com"]:
+        for email in ["abc", "abc@", "abc@email", "abc@email.", "@", "@email", "@email.com", "email.com", ".com",
+                      "com"]:
             with self.subTest(msg=f"Checking for invalid email {email}", email=email):
                 self.mock_user_query.filter_by.return_value.first.return_value = None
                 response, status_code = self.user_manager.register("nonexisting_user", "password123", email)
@@ -75,7 +77,8 @@ class UserManagerTest(absltest.TestCase):
     def test_register_email_successful(self) -> None:
         """Test that registration is succcessful if everything is good."""
         self.mock_user_query.filter_by.return_value.first.return_value = None
-        response, status_code = self.user_manager.register("nonexisting_user", "password123", "nonexisting_user@email.com")
+        response, status_code = self.user_manager.register("nonexisting_user", "password123",
+                                                           "nonexisting_user@email.com")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.CREATED.value)
         self.assertEqual(response.json, {'message': 'User registered successfully.'})
 
@@ -113,12 +116,5 @@ class UserManagerTest(absltest.TestCase):
 
 
 if __name__ == "__main__":
-    # Set required flags to suppress unit-test's flag parse error.
-    flags.FLAGS.__setattr__(backend.initializers.settings.db_username.name, "db_username")
-    flags.FLAGS.__setattr__(backend.initializers.settings.db_password.name, "db_password")
-    flags.FLAGS.__setattr__(backend.initializers.settings.db_name.name, "db_name")
-    flags.FLAGS.__setattr__(backend.initializers.settings.db_host.name, "db_host")
-    flags.FLAGS.__setattr__(backend.initializers.settings.db_port.name, "db_port")
-    flags.FLAGS.__setattr__(backend.initializers.settings.app_secret_key.name, "app_secret_key")
-
+    backend.initializers.test_util.pass_flags_as_parsed()
     absltest.main()
