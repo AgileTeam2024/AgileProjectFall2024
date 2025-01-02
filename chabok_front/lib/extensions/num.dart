@@ -8,14 +8,20 @@ extension NumExtension on num {
     return '${this / 1_000_000_000}B';
   }
 
-  String get decimalFormat => '$this'
-      .split('')
-      .reversed
-      .toList()
-      .fixedGrouped(groupSize: 3)
-      .map((lst) => lst.join())
-      .join(',')
-      .split('')
-      .reversed
-      .join();
+  String get decimalFormat {
+    final double = '$this';
+    final intPart = double.split('.')[0];
+    final decPart = double.contains('.') ? '.${double.split('.')[1]}' : '';
+    return intPart
+            .split('')
+            .reversed
+            .toList()
+            .fixedGrouped(groupSize: 3)
+            .map((lst) => lst.join())
+            .join(',')
+            .split('')
+            .reversed
+            .join() +
+        decPart;
+  }
 }
