@@ -6,7 +6,7 @@ import datetime
 
 import backend.models.user
 import backend.initializers.database
-from flask import request
+import backend.initializers.settings
 
 
 class UserManager:
@@ -120,7 +120,6 @@ class UserManager:
         self.delete_cookie_if_exists(username)
 
         access_token = flask_jwt_extended.create_access_token(username)
-        print(len(access_token))
         flask_jwt_extended.set_access_cookies(response, access_token)
         user = backend.models.user.User.query.filter_by(username=username).first()
         user.cookie = access_token
@@ -138,7 +137,7 @@ class UserManager:
         flask_jwt_extended.unset_access_cookies(response)
 
     def check_cookie(self) -> (flask.Flask, int):
-        cookie = request.cookies.get("access_token_cookie")
+        cookie = flask.request.cookies.get("access_token_cookie")
         username = flask_jwt_extended.get_jwt_identity()
         user = backend.models.user.User.query.filter_by(username=username).first()
         if user and user.cookie != cookie:

@@ -1,8 +1,8 @@
-import re
+import os
 
 import flask
-import flask_wtf
-import wtforms
+import flask_jwt_extended
+import werkzeug.utils
 
 import backend.managers.product
 import backend.models.product
@@ -14,66 +14,144 @@ product_bp = flask.Blueprint('product', __name__)
 @product_bp.route('/create', methods=['POST'])
 def create() -> (flask.Flask, int):
     """
-    Product Creation API.
+    Create a new product.
     ---
     tags:
       - Product
     parameters:
-      - name: product_name
-        type: string
+      - name: name
+        in: formData
         required: true
+        type: string
         description: The name of the product.
       - name: price
-        type: number
+        in: formData
         required: true
+        type: number
+        format: float
         description: The price of the product.
       - name: city_name
+        in: formData
+        required: false
         type: string
-        required: true
         description: The city where the product is located.
       - name: description
+        in: formData
+        required: true
         type: string
-        required: false
-        description: A description of the product (optional).
+        description: Description about the product.
+      - name: status
+        in: formData
+        required: true
+        type: string
+        enum:
+          - reserved
+          - sold
+          - for sale
+        description: The status of the product.
       - name: category
+        in: formData
+        required: true
         type: string
+        enum:
+          - Other
+          - Electronics
+          - Clothing
+          - Home & Garden
+          - Sports & Outdoors
+          - Toys & Games
+          - Automotive  # Corrected spelling from "Automative"
+          - Books & Media
+        description: The category of the product.
+      - name: pictures
+        in: formData
         required: false
-        description: The category of the product (default is 'Other').
+        type: array  # Note that this should be handled as a file upload in Swagger.
+        items:
+          type: string
+          format: binary  # Indicate that these are file uploads.
+        description: Images of the product. You can upload multiple images.
     responses:
-      201:
+      '201':
         description: Product created successfully.
-      400:
-        description: Invalid input data.
-      500:
-        description: Internal server error.
-    
+      '400':
+        description: Bad Request if any required fields are missing or invalid.
     """
-    query_params = flask.request.args.to_dict()
 
-    product_name = query_params.get('product_name', '')
-    if not product_name:
+    # user_username = flask_jwt_extended.get_jwt_identity()
+    # Validate product name exists.
+    name = flask.request.form.get('name')
+    if not name:
         return (
-            flask.jsonify({'message': 'Product name cannot be empty.'}),
-            backend.initializers.setting.HTTPStatus.BAD_REQUEST.value
+            flask.jsonify({'message': 'Missing product name.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
-    price = query_params.get('price', type=float)
-    if price is None or not isinstance(price, (int, float)) or price <= 0:
+    # Validate price exists and it is a valid float number.
+    price = flask.request.form.get('price')
+    if not price:
         return (
-            flask.jsonify({'message': 'Please enter price value correctly.'}),
-            HTTPStatus.BAD_REQUEST.value
+            flask.jsonify({'message': 'Missing price.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
-    # TODO : city name can be optional
-    city_name = query_params.get('city_name')
-    if not city_name:
+    try:
+        price = float(price)
+    except ValueError:
         return (
-            flask.jsonify({'message': 'City name cannot be empty.'}),
-            backend.initializers.setting.HTTPStatus.BAD_REQUEST.value
+            flask.jsonify({'message': 'Price must be a valid float number.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
-    description = query_params.get('description')
-    category = query_params.get('category', default='Other')
-    # TODO : check for valid category
-    return backend.managers.product.ProductManager.instance.create_product(product_name, price, city_name, description,
-                                                                           category)
+    city_name = flask.request.form.get('city_name')
+    description = flask.request.form.get('description')
+    if not description:
+        return (
+            flask.jsonify({'message': 'Missing description.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    # Validate status exists and has a value in defined status enum.
+    status = flask.request.form.get('status')
+    if not status:
+        return (
+            flask.jsonify({'message': 'Missing status.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    if status not in backend.models.product.Product.STATUS_OPTIONS:
+        return (
+            flask.jsonify({'message': 'Invalid value for status.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    # Validate category exists and has a value in defined category enum.
+    category = flask.request.form.get('category')
+    if not category:
+        return (
+            flask.jsonify({'message': 'Missing status.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+
+    # Get list of files from the 'pictures' field
+    image_files = flask.request.files.getlist('pictures')
+    images = []
+    images_path = []
+    # Validate files and create path for storing them.
+    for image_file in image_files:
+        if (image_file and '.' in image_file.filename and
+                image_file.filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}):
+            filename = werkzeug.utils.secure_filename(image_file.filename)
+            image_path = os.path.join(flask.current_app.config['UPLOAD_FOLDER'], filename)
+            images.append(image_file)
+            images_path.append(image_path)
+
+    product_data = {
+        'name': name,
+        'price': price,
+        'city_name': city_name,
+        'status': status,
+        'category': category,
+        'user_username': 'farhad',
+        'images': images,
+        'images_path': images_path,
+        'description': description
+    }
+    return backend.managers.product.ProductManager.instance.create_product(product_data)
 
 
 @product_bp.route('/search', methods=['GET'])
@@ -235,4 +313,4 @@ def get_product_by_id():
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
 
-    return backend.managers.product.ProductManager.instance.get_product(product_id)
+    return backend.managers.product.ProductManager.instance.get_product_by_id(product_id)

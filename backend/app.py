@@ -105,6 +105,8 @@ def main(_: list[str]) -> None:
     flask_app.config['JWT_SECRET_KEY'] = backend.initializers.settings.app_secret_key.value
     # Add location for storing files like images.
     flask_app.config['UPLOAD_FOLDER'] = 'uploads/'
+    # Set the maximum content length to 16 megabytes
+    flask_app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
     # Create application managers.
     create_managers(flask_app)
     # Register routers blueprint.
