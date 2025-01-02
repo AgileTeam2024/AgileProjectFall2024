@@ -10,8 +10,9 @@ import 'package:flutter/material.dart';
 
 class ProductViewPage extends StatefulWidget {
   final int id;
+  final bool viewerIsSeller;
 
-  const ProductViewPage(this.id, {super.key});
+  const ProductViewPage(this.id, {super.key, required this.viewerIsSeller});
 
   @override
   State<ProductViewPage> createState() => _ProductViewPageState();
@@ -67,7 +68,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
                           spacing: 5,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            if (isSeller) ...[
+                            if (widget.viewerIsSeller) ...[
                               Button.icon(
                                 onPressed: onEditProduct,
                                 icon: Icons.edit,
@@ -134,8 +135,6 @@ class _ProductViewPageState extends State<ProductViewPage> {
           }),
     );
   }
-
-  bool get isSeller => true;
 
   void onReport() {
     // todo send request to backend
