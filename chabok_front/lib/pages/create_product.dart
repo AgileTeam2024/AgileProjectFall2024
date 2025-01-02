@@ -125,11 +125,6 @@ class _CreateProductPageState extends State<CreateProductPage> {
                   ],
                 ),
               ),
-              // Button.filled(
-              //   text: 'Submit',
-              //   icon: Icons.check,
-              //   onPressed: _createProduct,
-              // )
             ],
           ),
         ),
