@@ -1,3 +1,4 @@
+import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
 import 'package:chabok_front/services/auth.dart';
@@ -76,6 +77,32 @@ void main() {
       expect(find.byType(HomePage), findsOneWidget);
       tearDownWidgetTest(tester);
     });
+  });
+
+  testWidgets('Navigates to error page with correct code and message',
+      (tester) async {
+    setUpWidgetTest(tester);
+    final router = RouterService.router;
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+    RouterService.go('/error/404', extra: 'Page not found :(');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ErrorPage), findsOneWidget);
+    tearDownWidgetTest(tester);
+  });
+
+  testWidgets("Navigates to error page if page doesn't exist", (tester) async {
+    setUpWidgetTest(tester);
+    final router = RouterService.router;
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+    RouterService.go('/abc');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ErrorPage), findsOneWidget);
+    expect(find.text('Page not found :('), findsOneWidget);
+    tearDownWidgetTest(tester);
   });
 }
 
