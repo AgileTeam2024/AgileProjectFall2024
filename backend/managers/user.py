@@ -141,7 +141,7 @@ class UserManager:
         cookie = request.cookies.get("access_token_cookie")
         username = flask_jwt_extended.get_jwt_identity()
         user = backend.models.user.User.query.filter_by(username=username).first()
-        if user.cookie != cookie:
+        if user and user.cookie != cookie:
             return (
                 flask.jsonify({"msg": "Token is invalid."}),
                 backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
