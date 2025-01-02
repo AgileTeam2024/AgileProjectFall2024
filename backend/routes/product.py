@@ -76,7 +76,7 @@ def create() -> (flask.Flask, int):
                                                                            category)
 
 
-@product_bp.route('/search', methods=['POST'])
+@product_bp.route('/search', methods=['GET'])
 def search() -> (flask.Flask, int):
     """
     Search for products based on various filters.
@@ -108,7 +108,7 @@ def search() -> (flask.Flask, int):
         - reserved
         - sold
         description: Status of the product (e.g., available, out_of_stock).
-      - name: sort_created_by
+      - name: sort_created_at
         in: query
         type: string
         required: false
@@ -198,3 +198,41 @@ def search() -> (flask.Flask, int):
         filters['sort_price'] = filters['sort_price']
 
     return backend.managers.product.ProductManager.instance.search_product(filters)
+
+
+@product_bp.route('/get_product_by_id', methods=['GET'])
+def get_product_by_id():
+    """
+    Retrieve a product by its ID.
+    ---
+    tags:
+      - Product
+    parameters:
+      - name: product_id
+        in: query
+        type: integer
+        required: true
+        description: The ID of the product to retrieve.
+    responses:
+      200:
+        description: Product details retrieved successfully.
+      404:
+        description: No product found with the provided ID.
+      400:
+        description: Invalid input, product ID must be an integer.
+    """
+    product_id = flask.request.args.get('product_id')
+    # Check if product ID is missing
+    if not product_id:
+        return (
+            flask.jsonify({'message': 'Missing product ID.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    # Check if product ID is a valid integer.
+    if not product_id.isdigit():
+        return (
+            flask.jsonify({'message': 'Product ID must be an integer.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+
+    return backend.managers.product.ProductManager.instance.get_product(product_id)

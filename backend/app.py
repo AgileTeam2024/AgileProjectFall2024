@@ -89,6 +89,8 @@ def main(_: list[str]) -> None:
     flask_cors.CORS(flask_app)
     # Set secret key used for generating tokens.
     flask_app.config['JWT_SECRET_KEY'] = backend.initializers.settings.app_secret_key.value
+    # Add location for storing files like images.
+    flask_app.config['UPLOAD_FOLDER'] = 'uploads/'
     # Create application managers.
     create_managers(flask_app)
     # Register routers blueprint.
