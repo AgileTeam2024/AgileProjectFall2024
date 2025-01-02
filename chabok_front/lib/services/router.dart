@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class RouterService {
-  static final _authService = AuthService.instance;
+  static AuthService get _authService => AuthService.instance;
 
   static final _rootNavKey = GlobalKey<NavigatorState>(debugLabel: 'root');
   static final _shellNavKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
@@ -25,6 +25,7 @@ class RouterService {
       ShellRoute(
         navigatorKey: _shellNavKey,
         builder: (context, state, child) {
+          print('${state.fullPath} ${state.pathParameters} ${state.extra}');
           return Scaffold(
             appBar: MainAppBar(),
             body: child,
