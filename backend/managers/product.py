@@ -1,3 +1,6 @@
+import os
+import datetime
+
 import flask
 
 import backend.models.product
@@ -40,7 +43,11 @@ class ProductManager:
 
         # Iterate over the list of pictures to save each one.
         for file, filename in zip(product_data['images'], product_data['images_path']):
-            file_path = f"./backend/{flask.current_app.config['UPLOAD_FOLDER']}{filename}"
+            # Generate a new filename by appending a timestamp to avoid duplicate name.
+            base, extension = os.path.splitext(filename)
+            timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            new_filename = f"{base}_{timestamp}{extension}"
+            file_path = f"./backend/{flask.current_app.config['UPLOAD_FOLDER']}{new_filename}"
             file.save(file_path)
             # Create a new Picture instance associated with the newly created product.
             new_picture = backend.models.product.Picture(
