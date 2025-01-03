@@ -1,8 +1,8 @@
+from typing import Optional
+import datetime
+
 import flask
 import flask_jwt_extended
-from typing import Optional
-import re
-import datetime
 
 import backend.models.user
 import backend.initializers.database
@@ -18,11 +18,6 @@ class UserManager:
         if not UserManager.instance:
             self.flask_app = flask_app
             self.jwt_manager = flask_jwt_extended.JWTManager(flask_app)
-            flask_app.config["JWT_COOKIE_SECURE"] = False
-            flask_app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-            flask_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(seconds=UserManager.COOKIE_MAX_AGE)
-            flask_app.config["JWT_SESSION_COOKIE"] = UserManager.COOKIE_MAX_AGE
-            flask_app.config["JWT_COOKIE_SAMESITE"] = 'None'
             UserManager.instance = self
 
     def register(self, username: str, password: str, email: Optional[str] = None) -> (flask.Flask, int):
@@ -50,17 +45,12 @@ class UserManager:
                 flask.jsonify({'message': 'Username already exists'}),
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
-        if email:
-            if backend.models.user.User.query.filter_by(email=email).first():
-                return (
-                    flask.jsonify({'message': 'Email already exists'}),
-                    backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-                )
-            if not is_valid_email_regex(email):
-                return (
-                    flask.jsonify({'message': 'Email must be the correct format.'}),
-                    backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-                )
+        # check uniqueness of the given email.
+        if backend.models.user.User.query.filter_by(email=email).first():
+            return (
+                flask.jsonify({'message': 'Email already exists'}),
+                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+            )
 
         # Create a new user instance.
         # TODO: Store password as hashed-value.
@@ -105,60 +95,19 @@ class UserManager:
                 flask.jsonify({'message': 'Username and password do not match.'}),
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
-        
-        response = flask.make_response(flask.jsonify({'message': 'Login successful!'}))
 
         # Generate new access token for the user to access protected APIs.
-        self.set_cookie(response, username)
+        access_token = flask_jwt_extended.create_access_token(identity=username)
+        response = flask.jsonify({'access_token': access_token})
 
-        return (
-            response,
-            backend.initializers.settings.HTTPStatus.OK.value
+        # Set the access token in a cookie with appropriate attributes for cross-origin.
+        response.set_cookie(
+            'access_token',
+            access_token,
+            max_age=3600,  # TTL in seconds (1 hour)
+            httponly=True,
+            secure=False,
+            samesite='None'  # Allow cross-origin requests.
         )
 
-    def set_cookie(self, response, username):
-        self.delete_cookie_if_exists(username)
-
-        access_token = flask_jwt_extended.create_access_token(username)
-        flask_jwt_extended.set_access_cookies(response, access_token)
-        user = backend.models.user.User.query.filter_by(username=username).first()
-        user.cookie = access_token
-        # Add the new cookie to the database.
-        backend.initializers.database.DB.session.add(user)
-        backend.initializers.database.DB.session.commit()
-
-    def reset_cookie(self, response):
-        username = flask_jwt_extended.get_jwt_identity()
-        self.set_cookie(response, username)
-
-    def remove_cookie(self, response):
-        username = flask_jwt_extended.get_jwt_identity()
-        self.delete_cookie_if_exists(username)
-        flask_jwt_extended.unset_access_cookies(response)
-
-    def check_cookie(self) -> (flask.Flask, int):
-        cookie = flask.request.cookies.get("access_token_cookie")
-        username = flask_jwt_extended.get_jwt_identity()
-        user = backend.models.user.User.query.filter_by(username=username).first()
-        if user and user.cookie != cookie:
-            return (
-                flask.jsonify({"msg": "Token is invalid."}),
-                backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
-            )
-        return (
-            flask.jsonify({"message": "Token is valid."}),
-            backend.initializers.settings.HTTPStatus.OK.value
-        )
-
-    def delete_cookie_if_exists(self, username):
-        user = backend.models.user.User.query.filter_by(username=username).first()
-        user.cookie = None
-        backend.initializers.database.DB.session.add(user)
-        backend.initializers.database.DB.session.commit()
-
-
-def is_valid_email_regex(email):
-    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    if re.fullmatch(regex, email):
-        return True
-    return False
+        return response, backend.initializers.settings.HTTPStatus.OK.value

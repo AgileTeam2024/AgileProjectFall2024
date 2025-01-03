@@ -57,16 +57,6 @@ class UserManagerTest(absltest.TestCase):
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
         self.assertEqual(response.json, {'message': 'Email already exists'})
 
-    def test_register_email_incorrect_format(self) -> None:
-        """Test that registration fails when the format is wrong."""
-        for email in ["abc", "abc@", "abc@email", "abc@email.", "@", "@email", "@email.com", "email.com", ".com",
-                      "com"]:
-            with self.subTest(msg=f"Checking for invalid email {email}", email=email):
-                self.mock_user_query.filter_by.return_value.first.return_value = None
-                response, status_code = self.user_manager.register("nonexisting_user", "password123", email)
-                self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
-                self.assertEqual(response.json, {'message': 'Email must be the correct format.'})
-
     def test_register_successful(self) -> None:
         """Test that a new user can register successfully with a unique username."""
         self.mock_user_query.filter_by.return_value.first.return_value = None
@@ -107,12 +97,12 @@ class UserManagerTest(absltest.TestCase):
         )
         response, status_code = self.user_manager.login("user", "password123")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
-        # Check if the response contains the correct message.
-        self.assertEqual(response.json, {'message': 'Login successful!'})
-        # Verify that the token cookie is in headers.
-        headers = dict(response.headers.items())
-        self.assertIn('Set-Cookie', headers)
-        self.assertNotEmpty(headers['Set-Cookie'].split(';')[0])
+        # Check if the response contains an access token.
+        data = response.get_json()
+        self.assertIn('access_token', data)
+        # Verify that the token is not empty.
+        token = data['access_token']
+        self.assertTrue(token)
 
 
 if __name__ == "__main__":
