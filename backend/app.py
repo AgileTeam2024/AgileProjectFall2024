@@ -1,4 +1,6 @@
 import os
+import datetime
+
 import flask
 import flask_migrate
 import flask_cors
@@ -113,9 +115,10 @@ def main(_: list[str]) -> None:
     flask_app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
     # Config authentication for protected APIs.
     flask_app.config['JWT_TOKEN_LOCATION'] = ['headers']
+    flask_app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=60)
     # Maximum number of files in a multipart form.
     flask_app.config['MAX_FORM_PARTS'] = 10
-    flask_app.config['MAX_FORM_MEMORY_SIZE'] = 50 * 1024 * 1024 # 50 MB
+    flask_app.config['MAX_FORM_MEMORY_SIZE'] = 50 * 1024 * 1024  # 50 MB
     # Create application managers.
     create_managers(flask_app)
     # Register routers blueprint.

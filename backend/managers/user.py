@@ -98,7 +98,16 @@ class UserManager:
 
         # Generate new access token for the user to access protected APIs.
         access_token = flask_jwt_extended.create_access_token(identity=username)
-        return (
-            flask.jsonify({'access_token': access_token}),
-            backend.initializers.settings.HTTPStatus.OK.value
+        response = flask.jsonify({'access_token': access_token})
+
+        # Set the access token in a cookie with appropriate attributes for cross-origin.
+        response.set_cookie(
+            'access_token',
+            access_token,
+            max_age=3600,  # TTL in seconds (1 hour)
+            httponly=True,
+            secure=False,
+            samesite='None'  # Allow cross-origin requests.
         )
+
+        return response, backend.initializers.settings.HTTPStatus.OK.value
