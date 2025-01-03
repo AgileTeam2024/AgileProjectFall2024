@@ -163,3 +163,20 @@ def refresh_token() -> (flask.Flask, int):
     """
     return backend.managers.user.UserManager.instance.refresh_token(flask_jwt_extended.get_jwt()["jti"],
                                                                     flask_jwt_extended.get_jwt_identity())
+
+
+@user_bp.route('/delete', methods=['GET'])
+@flask_jwt_extended.jwt_required()
+def delete_user() -> (flask.Flask, int):
+    """
+    User delete API.
+    ---
+    tags:
+      - User
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Successfully deleted the user
+    """
+    return backend.managers.user.UserManager.instance.delete_account(flask_jwt_extended.get_jwt_identity())

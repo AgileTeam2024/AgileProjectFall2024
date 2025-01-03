@@ -1,5 +1,5 @@
+import os
 from typing import Optional
-import datetime
 
 import flask
 import flask_jwt_extended
@@ -7,7 +7,7 @@ import flask_jwt_extended
 import backend.models.user
 import backend.initializers.database
 import backend.initializers.settings
-import backend.models.user
+import backend.models.product
 
 
 class UserManager:
@@ -160,3 +160,32 @@ class UserManager:
             samesite='None'  # Allow cross-origin requests.
         )
         return response, backend.initializers.settings.HTTPStatus.OK.value
+
+    def delete_account(self, username: str) -> (flask.Flask, int):
+        """
+        Deletes a user's account.
+        By deleting user's account, every other items belonged to that user would be deleted, too.
+
+        Args:
+            username (str): The username of the user.
+
+        Returns:
+            response (flask.Response): A Flask response object containing successfully deleted a user.
+            status_code (int): HTTP status code indicating success (200).
+        """
+        products_to_delete = backend.models.product.Product.query.filter_by(user_username=username).all()
+
+        for product in products_to_delete:
+            pictures_to_delete = backend.models.product.Picture.query.filter_by(product_id=product.id).all()
+            for picture in pictures_to_delete:
+                backend.initializers.database.DB.session.delete(picture)
+                os.remove(picture.filename)
+            backend.initializers.database.DB.session.delete(product)
+
+        user = backend.models.user.User.query.filter_by(username=username).first()
+        backend.initializers.database.DB.session.delete(user)
+        backend.initializers.database.DB.session.commit()
+        return (
+            flask.jsonify({"message": "User deleted successfully."}),
+            backend.initializers.settings.HTTPStatus.OK.value
+        )
