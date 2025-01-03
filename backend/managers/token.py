@@ -18,3 +18,8 @@ def revoked_token_callback(jwt_header, jwt_payload):
         flask.jsonify({"description": "The token has been revoked.", "error": "token_revoked"}),
         backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
     )
+
+
+@backend.managers.user.UserManager.instance.jwt_manager.expired_token_loader
+def my_expired_token_callback(expired_token):
+    return flask.jsonify({"message": "Token is expired."}), backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value

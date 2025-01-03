@@ -19,7 +19,7 @@ class UserManager:
             self.jwt_manager = flask_jwt_extended.JWTManager(flask_app)
             UserManager.instance = self
             # Setup checking revoked tokens.
-            import backend.managers.token_revoker
+            import backend.managers.token
 
     def register(self, username: str, password: str, email: Optional[str] = None) -> (flask.Flask, int):
         """
@@ -97,10 +97,10 @@ class UserManager:
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
 
-        # Generate new access token for the user to access protected APIs.
+        # Generate new access token and refresh token for the user to access protected APIs.
         access_token = flask_jwt_extended.create_access_token(identity=username)
-        response = flask.jsonify({'access_token': access_token})
-
+        refresh_token = flask_jwt_extended.create_refresh_token(username)
+        response = flask.jsonify({'access_token': access_token, "refresh_token": refresh_token})
         # Set the access token in a cookie with appropriate attributes for cross-origin.
         response.set_cookie(
             'access_token',
@@ -110,7 +110,6 @@ class UserManager:
             secure=False,
             samesite='None'  # Allow cross-origin requests.
         )
-
         return response, backend.initializers.settings.HTTPStatus.OK.value
 
     def logout(self, jti: str) -> (flask.Flask, int):
@@ -122,11 +121,42 @@ class UserManager:
                 - A Flask response object with a JSON message indicating success.
                 - An integer representing the OK HTTP status code (200).
         """
-        revoked_token = backend.models.user.RevokedToken(jti=jti)
-        backend.initializers.database.DB.session.add(revoked_token)
-        backend.initializers.database.DB.session.commit()
+        UserManager._revoke_token(jti)
 
         # Remove the token from the user cookie.
         response = flask.jsonify({"message": "User logged out successfully."})
         response.set_cookie('access_token', '', expires=0)
+        return response, backend.initializers.settings.HTTPStatus.OK.value
+
+    @classmethod
+    def _revoke_token(self, jti: str) -> (flask.Flask, int):
+        """Revokes a token."""
+        revoked_token = backend.models.user.RevokedToken(jti=jti)
+        backend.initializers.database.DB.session.add(revoked_token)
+        backend.initializers.database.DB.session.commit()
+
+    def refresh_token(self, jti: str, username: str):
+        """
+        Generate a new access token for the user to access protected APIs, and revoke the previous one.
+
+        Args:
+            username (str): The username of the user requesting a new access token.
+
+        Returns:
+            response (flask.Response): A Flask response object containing the new access token set in a cookie.
+            status_code (int): HTTP status code indicating the result of the operation.
+        """
+        UserManager._revoke_token(jti)
+        # Generate new access token for the user to access protected APIs.
+        access_token = flask_jwt_extended.create_access_token(identity=username)
+        response = flask.jsonify({'access_token': access_token})
+        # Set the access token in a cookie with appropriate attributes for cross-origin.
+        response.set_cookie(
+            'access_token',
+            access_token,
+            max_age=3600,  # TTL in seconds (1 hour)
+            httponly=True,
+            secure=False,
+            samesite='None'  # Allow cross-origin requests.
+        )
         return response, backend.initializers.settings.HTTPStatus.OK.value
