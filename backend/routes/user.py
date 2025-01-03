@@ -1,5 +1,6 @@
 import email_validator
 import flask
+import flask_jwt_extended
 
 import backend.managers.user
 import backend.models.user
@@ -121,3 +122,12 @@ def login() -> (flask.Flask, int):
         )
 
     return backend.managers.user.UserManager.instance.login(username, password)
+
+
+@user_bp.route('/create', methods=['POST'])
+@flask_jwt_extended.jwt_required()
+def logout():
+    """
+    User logout API.
+    """
+    return backend.managers.user.UserManager.instance.logout(flask_jwt_extended.get_jwt()['jti'])

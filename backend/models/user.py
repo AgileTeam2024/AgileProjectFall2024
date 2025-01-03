@@ -1,3 +1,5 @@
+import sqlalchemy
+
 import backend.initializers.database
 
 
@@ -37,3 +39,15 @@ class User(backend.initializers.database.DB.Model):
             Return a string representation of the User instance.
         """
         return self.username
+
+
+class RevokedToken(backend.initializers.database.DB.Model):
+    """Represents a revoked JWT token."""
+    jti = backend.initializers.database.DB.Column(backend.initializers.database.DB.String(36), primary_key=True)
+    revoked_at = backend.initializers.database.DB.Column(
+        sqlalchemy.DateTime,
+        server_default=sqlalchemy.func.now()
+    )
+
+    def __repr__(self):
+        return f"<RevokedToken {self.jti}>"

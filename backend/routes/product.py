@@ -86,7 +86,7 @@ def create() -> (flask.Flask, int):
         description: Bad Request if any required fields are missing or invalid.
     """
 
-    # user_username = flask_jwt_extended.get_jwt_identity()
+    user_username = flask_jwt_extended.get_jwt_identity()
     # Validate product name exists.
     name = flask.request.form.get('name')
     if not name:
@@ -153,7 +153,7 @@ def create() -> (flask.Flask, int):
         'city_name': city_name,
         'status': status,
         'category': category,
-        'user_username': 'farhad',
+        'user_username': user_username,
         'images': images,
         'images_path': images_path,
         'description': description
