@@ -142,4 +142,8 @@ class ProductManager:
                 flask.jsonify({'message': 'No product found with the provided ID.'}),
                 backend.initializers.settings.HTTPStatus.NOT_FOUND.value
             )
-        return flask.jsonify({"product": product.to_dict()}), backend.initializers.settings.HTTPStatus.OK.value
+        product_dict = product.to_dict()
+        if product.user_username:
+            seller = backend.models.user.User.query.get(product.user_username).to_dict()
+            product_dict['seller'] = seller
+        return flask.jsonify({"product": product_dict}), backend.initializers.settings.HTTPStatus.OK.value

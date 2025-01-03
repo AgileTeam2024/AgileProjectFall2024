@@ -42,3 +42,11 @@ class User(backend.initializers.database.DB.Model):
         """
 
         return self.username
+
+    def to_dict(self) -> dict:
+        """Convert the User instance to a dictionary for JSON serialization."""
+        return {
+            'username': self.username,
+            'is_banned': self.is_banned,
+            'email': self.email,
+        }
