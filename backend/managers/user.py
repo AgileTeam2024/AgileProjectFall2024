@@ -7,18 +7,19 @@ import flask_jwt_extended
 import backend.models.user
 import backend.initializers.database
 import backend.initializers.settings
+import backend.models.user
 
 
 class UserManager:
     instance = None
-
-    COOKIE_MAX_AGE = datetime.timedelta(days=1).seconds
 
     def __init__(self, flask_app: flask.Flask):
         if not UserManager.instance:
             self.flask_app = flask_app
             self.jwt_manager = flask_jwt_extended.JWTManager(flask_app)
             UserManager.instance = self
+            # Setup checking revoked tokens.
+            import backend.managers.token_revoker
 
     def register(self, username: str, password: str, email: Optional[str] = None) -> (flask.Flask, int):
         """
@@ -110,4 +111,22 @@ class UserManager:
             samesite='None'  # Allow cross-origin requests.
         )
 
+        return response, backend.initializers.settings.HTTPStatus.OK.value
+
+    def logout(self, jti: str) -> (flask.Flask, int):
+        """
+        Revokes current access token of user, and remove it from the cookie.
+
+        Returns:
+            tuple: A tuple containing:
+                - A Flask response object with a JSON message indicating success.
+                - An integer representing the OK HTTP status code (200).
+        """
+        revoked_token = backend.models.user.RevokedToken(jti=jti)
+        backend.initializers.database.DB.session.add(revoked_token)
+        backend.initializers.database.DB.session.commit()
+
+        # Remove the token from the user cookie.
+        response = flask.jsonify({"message": "User logged out successfully."})
+        response.set_cookie('access_token', '', expires=0)
         return response, backend.initializers.settings.HTTPStatus.OK.value

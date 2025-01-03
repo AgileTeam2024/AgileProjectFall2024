@@ -1,5 +1,4 @@
 import flask
-import os
 
 import backend.models.product
 import backend.initializers.database
