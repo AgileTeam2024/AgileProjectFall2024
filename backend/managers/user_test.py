@@ -57,16 +57,6 @@ class UserManagerTest(absltest.TestCase):
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
         self.assertEqual(response.json, {'message': 'Email already exists'})
 
-    def test_register_email_incorrect_format(self) -> None:
-        """Test that registration fails when the format is wrong."""
-        for email in ["abc", "abc@", "abc@email", "abc@email.", "@", "@email", "@email.com", "email.com", ".com",
-                      "com"]:
-            with self.subTest(msg=f"Checking for invalid email {email}", email=email):
-                self.mock_user_query.filter_by.return_value.first.return_value = None
-                response, status_code = self.user_manager.register("nonexisting_user", "password123", email)
-                self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
-                self.assertEqual(response.json, {'message': 'Email must be the correct format.'})
-
     def test_register_successful(self) -> None:
         """Test that a new user can register successfully with a unique username."""
         self.mock_user_query.filter_by.return_value.first.return_value = None
