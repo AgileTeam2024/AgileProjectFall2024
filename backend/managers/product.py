@@ -13,43 +13,41 @@ class ProductManager:
             self.flask_app = flask_app
             ProductManager.instance = self
 
-    def create_product(self, product_name: str, price: float, city_name: str, description: str = None,
-                       category: str = 'Other') -> (flask.Flask, int):
+    def create_product(self, product_data: dict) -> (flask.Flask, int):
         """
-        Creates a new product with the provided details.
+        Create a new product in the database.
 
         Args:
-            product_name (str): The name of the product.
-            price (float): The price of the product.
-            city_name (str): The city where the product is located.
-            description (str): A description of the product (optional).
-            category (str): The category of the product (default is 'Other').
+            product_data (dict): A dictionary containing product details such as name, description,
+                                 price, user username, status, category, city name, and pictures.
 
         Returns:
-                - A Flask response object with a JSON message indicating success or failure.
-                - An integer representing the HTTP status code (e.g., 201 for created, 400 for bad request).
-
+            tuple: A tuple containing a JSON response and an HTTP status code.
         """
-        # TODO : Check cookie
-        # Check for empty fields
-        if not product_name or price <= 0 or not city_name:
-            return (
-                flask.jsonify({'message': 'Invalid input data.'}),
-                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-            )
 
-        # Create product instance
+        # Create a new Product instance using the provided product data.
         new_product = backend.models.product.Product(
-            product_name=product_name,
-            price=price,
-            city_name=city_name,
-            description=description
+            name=product_data['name'],
+            description=product_data['description'],
+            price=product_data['price'],
+            user_username=product_data['user_username'],
+            status=product_data['status'],
+            category=product_data['category'],
+            city_name=product_data.get('city_name', ''),
         )
-
-        # Adding the new product to the database
         backend.initializers.database.DB.session.add(new_product)
-        backend.initializers.database.DB.session.commit()
 
+        # Iterate over the list of pictures to save each one.
+        for file, file_path in zip(product_data['images'], product_data['images_path']):
+            file.save(file_path)
+            # Create a new Picture instance associated with the newly created product.
+            new_picture = backend.models.product.Picture(
+                filename=file_path,
+                product_id=new_product.id,
+            )
+            backend.initializers.database.DB.session.add(new_picture)
+
+        backend.initializers.database.DB.session.commit()
         return (
             flask.jsonify({"message": "Product created successfully."}),
             backend.initializers.settings.HTTPStatus.CREATED.value

@@ -95,7 +95,8 @@ class Picture(backend.initializers.database.DB.Model):
     """
     id = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.Integer,
-        primary_key=True
+        primary_key=True,
+        autoincrement=True
     )
     filename = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(255),

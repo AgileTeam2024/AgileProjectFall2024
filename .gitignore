@@ -16,3 +16,6 @@ __pycache__/
 # Ignore idea
 .idea/
 .DS_Store
+
+# Migration files
+backend/migrations

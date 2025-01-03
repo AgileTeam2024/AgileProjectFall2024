@@ -34,6 +34,10 @@ def register() -> (flask.Flask, int):
               type: string
               description: The password for the new user.
               example: "secure_password"
+            email:
+              type: string
+              description: The email for the new user.
+              example: "email@example.com"
     responses:
       201:
         description: User registered successfully.
