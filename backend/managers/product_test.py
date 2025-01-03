@@ -22,10 +22,14 @@ class ProductManagerTest(absltest.TestCase):
         self.mock_db_session = mock.patch("backend.initializers.database.DB.session").start()
         # Mock query on user model.
         self.mock_product_query = mock.patch("backend.models.product.Product.query").start()
+        self.mock_user_query = mock.patch("backend.models.user.User.query").start()
         # Create instances or products for test inputs.
         self.product1 = backend.models.product.Product(id=1, name='Apple iPhone 13', price=999.99, status='reserved')
         self.product2 = backend.models.product.Product(id=2, name='Samsung Galaxy S21', price=799.99, status='reserved')
         self.product3 = backend.models.product.Product(id=3, name='Apple Watch Series 6', price=399.99, status='sold')
+
+        self.user1 = backend.models.user.User(username='seller1', email='seller@email.com')
+        self.product4 = backend.models.product.Product(id=4, name='Apple Watch Series 6', price=399.99, status='sold', user_username='seller1')
 
     def tearDown(self) -> None:
         self.mock_db_session.stop()
@@ -80,6 +84,16 @@ class ProductManagerTest(absltest.TestCase):
         result, status = self.product_manager.get_product(1)
         self.assertEqual(status, backend.initializers.settings.HTTPStatus.OK.value)
         self.assertEqual(self.product1.to_dict(), result.json['product'])
+
+    def test_get_product_by_id_returns_seller_info_too(self) -> None:
+        """Test Retrieving product by id."""
+        self.mock_user_query.get.return_value = self.user1
+        self.mock_product_query.get.return_value = self.product4
+        result, status = self.product_manager.get_product(4)
+        self.assertEqual(status, backend.initializers.settings.HTTPStatus.OK.value)
+        expected_product = self.product4.to_dict()
+        expected_product['seller'] = self.user1.to_dict()
+        self.assertEqual(expected_product, result.json['product'])
 
 
 if __name__ == "__main__":
