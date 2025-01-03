@@ -116,6 +116,7 @@ def main(_: list[str]) -> None:
     # Config authentication for protected APIs.
     flask_app.config['JWT_TOKEN_LOCATION'] = ['headers']
     flask_app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=60)
+    flask_app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(minutes=180)
     # Maximum number of files in a multipart form.
     flask_app.config['MAX_FORM_PARTS'] = 10
     flask_app.config['MAX_FORM_MEMORY_SIZE'] = 50 * 1024 * 1024  # 50 MB

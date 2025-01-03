@@ -124,10 +124,42 @@ def login() -> (flask.Flask, int):
     return backend.managers.user.UserManager.instance.login(username, password)
 
 
-@user_bp.route('/create', methods=['POST'])
+@user_bp.route('/logout', methods=['GET'])
 @flask_jwt_extended.jwt_required()
 def logout():
     """
     User logout API.
+    ---
+    tags:
+      - User
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Successfully logged out
+      401:
+        description: Token has expired or is invalid
     """
     return backend.managers.user.UserManager.instance.logout(flask_jwt_extended.get_jwt()['jti'])
+
+
+@user_bp.route('/refresh', methods=['GET'])
+@flask_jwt_extended.jwt_required(refresh=True)
+def refresh_token() -> (flask.Flask, int):
+    """
+    Refresh access token API.
+    ---
+    tags:
+      - User
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Successfully refreshed access token
+      401:
+        description: Token has expired or is invalid
+      403:
+        description: Refresh token is required but not provided or invalid
+    """
+    return backend.managers.user.UserManager.instance.refresh_token(flask_jwt_extended.get_jwt()["jti"],
+                                                                    flask_jwt_extended.get_jwt_identity())

@@ -97,12 +97,16 @@ class UserManagerTest(absltest.TestCase):
         )
         response, status_code = self.user_manager.login("user", "password123")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
-        # Check if the response contains an access token.
+        # Check if the response contains token.
         data = response.get_json()
         self.assertIn('access_token', data)
+        self.assertIn('refresh_token', data)
         # Verify that the token is not empty.
-        token = data['access_token']
-        self.assertTrue(token)
+        access_token = data['access_token']
+        self.assertTrue(access_token)
+        # Verify that the token is not empty.
+        refresh_token = data['refresh_token']
+        self.assertTrue(refresh_token)
 
 
 if __name__ == "__main__":
