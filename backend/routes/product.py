@@ -12,12 +12,21 @@ product_bp = flask.Blueprint('product', __name__)
 
 
 @product_bp.route('/create', methods=['POST'])
+@flask_jwt_extended.jwt_required()
 def create() -> (flask.Flask, int):
     """
     Create a new product.
     ---
+    components:
+      securitySchemes:
+        BearerAuth:
+          type: http
+          scheme: bearer
+          bearerFormat: JWT
     tags:
       - Product
+    security:
+      - BearerAuth: []
     parameters:
       - name: name
         in: formData
@@ -65,11 +74,10 @@ def create() -> (flask.Flask, int):
         description: The category of the product.
       - name: pictures
         in: formData
-        required: false
-        type: array  # Note that this should be handled as a file upload in Swagger.
-        items:
-          type: string
-          format: binary  # Indicate that these are file uploads.
+        type: file
+        required: true
+        allowMultiple: true
+        collectionFormat: multi
         description: Images of the product. You can upload multiple images.
     responses:
       '201':
@@ -136,9 +144,8 @@ def create() -> (flask.Flask, int):
         if (image_file and '.' in image_file.filename and
                 image_file.filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}):
             filename = werkzeug.utils.secure_filename(image_file.filename)
-            image_path = os.path.join(flask.current_app.config['UPLOAD_FOLDER'], filename)
             images.append(image_file)
-            images_path.append(image_path)
+            images_path.append(filename)
 
     product_data = {
         'name': name,

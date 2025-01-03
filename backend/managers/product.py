@@ -1,4 +1,5 @@
 import flask
+import os
 
 import backend.models.product
 import backend.initializers.database
@@ -36,9 +37,11 @@ class ProductManager:
             city_name=product_data.get('city_name', ''),
         )
         backend.initializers.database.DB.session.add(new_product)
+        backend.initializers.database.DB.session.commit()
 
         # Iterate over the list of pictures to save each one.
-        for file, file_path in zip(product_data['images'], product_data['images_path']):
+        for file, filename in zip(product_data['images'], product_data['images_path']):
+            file_path = f"./backend/{flask.current_app.config['UPLOAD_FOLDER']}{filename}"
             file.save(file_path)
             # Create a new Picture instance associated with the newly created product.
             new_picture = backend.models.product.Picture(

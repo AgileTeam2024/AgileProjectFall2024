@@ -1,9 +1,5 @@
-import re
-
+import email_validator
 import flask
-import flask_wtf
-import wtforms
-import flask_jwt_extended
 
 import backend.managers.user
 import backend.models.user
@@ -47,7 +43,6 @@ def register() -> (flask.Flask, int):
 
     # Get JSON data from the request body.
     data = flask.request.get_json()
-    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     # Check existence of username and password.
     username = data.get('username', '')
     if not username:
@@ -66,7 +61,15 @@ def register() -> (flask.Flask, int):
         return (
             flask.jsonify({'message': 'Email is missing.'}),
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-      )
+        )
+    # Validate the email.
+    try:
+        email_validator.validate_email(email)
+    except email_validator.EmailNotValidError as e:
+        return (
+            flask.jsonify({'message': 'Email is invalid.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
 
     return backend.managers.user.UserManager.instance.register(username, password, email)
 
@@ -118,20 +121,3 @@ def login() -> (flask.Flask, int):
         )
 
     return backend.managers.user.UserManager.instance.login(username, password)
-
-
-@user_bp.route('/check_cookie', methods=['GET'])
-@flask_jwt_extended.jwt_required()
-def check_cookie():
-    """
-    Check Cookie API.
-    ---
-    tags:
-      - User
-    responses:
-      200:
-        description: Token is valid.
-      401:
-        description: Token is invalid or expired.
-    """
-    return backend.managers.user.UserManager.instance.check_cookie()

@@ -28,17 +28,12 @@ class User(backend.initializers.database.DB.Model):
     )
     email = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(EMAIL_MAX_LENGTH),
-        unique=True
+        unique=True,
+        nullable=False
     )
-    cookie = backend.initializers.database.DB.Column(
-        backend.initializers.database.DB.String(COOKIE_MAX_LENGTH),  # TODO: Store it as hashed-value.
-        nullable=True
-    )
-
 
     def __repr__(self) -> str:
         """
             Return a string representation of the User instance.
         """
-
         return self.username
