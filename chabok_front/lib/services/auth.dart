@@ -35,7 +35,7 @@ class AuthService {
 
   final _networkService = NetworkService.instance;
 
-  Future<bool> get isLoggedIn async => false;
+  bool get isLoggedIn => accessToken != null;
 
   Future<ServerResponse> login(Map<String, String> body) =>
       _networkService.post('/user/login', body).then((response) {

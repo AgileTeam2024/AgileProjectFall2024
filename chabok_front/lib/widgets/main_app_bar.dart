@@ -33,16 +33,8 @@ class MainAppBar extends AppBar {
   List<Widget>? get actions => [
         Padding(
           padding: const EdgeInsets.only(right: 10),
-          child: FutureBuilder<bool>(
-            future: authService.isLoggedIn,
-            builder: (context, snapshot) {
-              if (snapshot.hasData && !snapshot.hasError) {
-                return ProfileButton(
-                  isLogged: snapshot.data!,
-                );
-              }
-              return Container();
-            },
+          child: ProfileButton(
+            isLogged: authService.isLoggedIn,
           ),
         )
       ];
