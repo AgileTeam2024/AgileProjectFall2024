@@ -10,94 +10,92 @@ class UserProfilePage extends StatelessWidget {
     return Center(
       child: SingleChildScrollView(
         child: CardWidget(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 20,
-              children: [
-                // User Info Section
-                Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: UserInfoWidget(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 20,
+            children: [
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: UserInfoWidget(),
+                ),
+              ),
+              ProductsListWidget(
+                title: 'Your Products',
+                products: List.generate(
+                  5,
+                  // todo get user Products from backend
+                  (i) => Product(
+                    id: i,
+                    name: 'Product $i',
+                    seller: User(id: i, username: 'ckdks'),
+                    imageUrls: ['assets/sample_images/product_img1.jpg'],
+                    category: '',
+                    location: '',
+                    status: '',
+                    description: 'Description on Product $i',
                   ),
                 ),
-                ProductsListWidget(
-                  title: 'Your Products',
-                  products: List.generate(
-                    5,
-                    (i) => Product(
-                      id: i,
-                      name: 'Product $i',
-                      seller: User(id: i, username: 'ckdks'),
-                      imageUrls: ['assets/sample_images/product_img1.jpg'],
-                      category: '',
-                      location: '',
-                      status: '',
-                      description: 'Description on Product $i',
+              ),
+              ProductsListWidget(
+                title: 'Previous Purchases',
+                products: List.generate(
+                  5,
+                  // todo get user Previous Purchases from backend
+                  (i) => Product(
+                    id: i,
+                    name: 'Product $i',
+                    seller: User(id: i, username: 'ckdks'),
+                    imageUrls: ['assets/sample_images/product_img1.jpg'],
+                    category: '',
+                    location: '',
+                    status: '',
+                    description: 'Description on Product $i',
+                  ),
+                ),
+              ),
+              // Actions Section
+              Text(
+                'Account Actions',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.redAccent,
+                ),
+              ),
+              Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(Icons.logout, color: Colors.blueAccent),
+                      title: Text('Log Out'),
+                      onTap: _logout,
                     ),
-                  ),
-                ),
-                ProductsListWidget(
-                  title: 'Previous Purchases',
-                  products: List.generate(
-                    5,
-                    (i) => Product(
-                      id: i,
-                      name: 'Product $i',
-                      seller: User(id: i, username: 'ckdks'),
-                      imageUrls: ['assets/sample_images/product_img1.jpg'],
-                      category: '',
-                      location: '',
-                      status: '',
-                      description: 'Description on Product $i',
+                    Divider(),
+                    ListTile(
+                      leading:
+                          Icon(Icons.person_remove, color: Colors.orange),
+                      title: Text('Edit Profile'),
+                      onTap: _goToEditProfile,
                     ),
-                  ),
+                    Divider(),
+                    ListTile(
+                      leading: Icon(Icons.delete, color: Colors.red),
+                      title: Text('Delete Account'),
+                      onTap: _deleteAccount,
+                    ),
+                  ],
                 ),
-                // Actions Section
-                Text(
-                  'Account Actions',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.redAccent,
-                  ),
-                ),
-                Card(
-                  elevation: 3,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: Icon(Icons.logout, color: Colors.blueAccent),
-                        title: Text('Log Out'),
-                        onTap: _logout,
-                      ),
-                      Divider(),
-                      ListTile(
-                        leading:
-                            Icon(Icons.person_remove, color: Colors.orange),
-                        title: Text('Edit Profile'),
-                        onTap: _goToEditProfile,
-                      ),
-                      Divider(),
-                      ListTile(
-                        leading: Icon(Icons.delete, color: Colors.red),
-                        title: Text('Delete Account'),
-                        onTap: _deleteAccount,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -124,6 +122,7 @@ class UserInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // todo get user profile from backend
     return Row(
       children: [
         CircleAvatar(
