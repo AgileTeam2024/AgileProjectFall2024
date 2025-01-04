@@ -11,7 +11,7 @@ void main() {
   setUpAll(() => HttpOverrides.global = null);
 
   testWidgets('Displays success toast with correct message and colors',
-      (WidgetTester tester) async {
+      (tester) async {
     setUpWidgetTest(tester);
     final response = ServerResponse.visualize('{"message": "Success"}', 200);
     final toast =
@@ -28,7 +28,7 @@ void main() {
   });
 
   testWidgets('Displays error toast with correct message and colors',
-      (WidgetTester tester) async {
+      (tester) async {
     setUpWidgetTest(tester);
     final response = ServerResponse('{"message": "Error"}', 400);
     final toast =
@@ -45,7 +45,7 @@ void main() {
   });
 
   testWidgets('Displays warning toast with correct message and colors',
-      (WidgetTester tester) async {
+      (tester) async {
     setUpWidgetTest(tester);
     final toast = CustomToast(text: 'Warning', toastType: ToastType.warning);
 

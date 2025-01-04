@@ -1,11 +1,10 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:chabok_front/widgets/show_hide_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('ShowHideButton Tests', () {
-    testWidgets('should render "SHOW" when isShown is false',
-        (WidgetTester tester) async {
+    testWidgets('should render "SHOW" when isShown is false', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -21,8 +20,7 @@ void main() {
       expect(buttonText, findsOneWidget);
     });
 
-    testWidgets('should render "HIDE" when isShown is true',
-        (WidgetTester tester) async {
+    testWidgets('should render "HIDE" when isShown is true', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
