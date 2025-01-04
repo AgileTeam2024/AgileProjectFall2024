@@ -1,6 +1,7 @@
 import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
+import 'package:chabok_front/pages/profile.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +46,20 @@ void main() {
       expect(find.byType(RegisterPage), findsOneWidget);
       tearDownWidgetTest(tester);
     });
+
+    testWidgets('Redirects to home going to profile page', (tester) async {
+      setUpWidgetTest(tester);
+      await tester.pumpAndSettle();
+
+      final router = RouterService.router;
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+      RouterService.go('/profile');
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HomePage), findsOneWidget);
+      tearDownWidgetTest(tester);
+    });
   });
 
   group('If user is logged in', () {
@@ -75,6 +90,18 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(HomePage), findsOneWidget);
+      tearDownWidgetTest(tester);
+    });
+
+    testWidgets('Navigates to profile page', (tester) async {
+      setUpWidgetTest(tester);
+      final router = RouterService.router;
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+      RouterService.go('/profile');
+      await tester.pumpAndSettle();
+
+      expect(find.byType(UserProfilePage), findsOneWidget);
       tearDownWidgetTest(tester);
     });
   });

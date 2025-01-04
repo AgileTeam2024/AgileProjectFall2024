@@ -32,11 +32,15 @@ class UserProfilePage extends StatelessWidget {
                   (i) => Product(
                     id: i,
                     name: 'Product $i',
-                    seller: User(id: i, username: 'ckdks'),
+                    seller: User(
+                        username: 'ckdks',
+                        phoneNumber: '09121234567',
+                        email: 'seller@gmail.com'),
                     imageUrls: ['assets/sample_images/product_img1.jpg'],
                     category: '',
                     location: '',
                     status: '',
+                    price: 1000,
                     description: 'Description on Product $i',
                   ),
                 ),
@@ -49,11 +53,15 @@ class UserProfilePage extends StatelessWidget {
                   (i) => Product(
                     id: i,
                     name: 'Product $i',
-                    seller: User(id: i, username: 'ckdks'),
+                    seller: User(
+                        username: 'ckdks',
+                        phoneNumber: '09121234567',
+                        email: 'seller@gmail.com'),
                     imageUrls: ['assets/sample_images/product_img1.jpg'],
                     category: '',
                     location: '',
                     status: '',
+                    price: 1000,
                     description: 'Description on Product $i',
                   ),
                 ),
@@ -81,8 +89,7 @@ class UserProfilePage extends StatelessWidget {
                     ),
                     Divider(),
                     ListTile(
-                      leading:
-                          Icon(Icons.person_remove, color: Colors.orange),
+                      leading: Icon(Icons.person_remove, color: Colors.orange),
                       title: Text('Edit Profile'),
                       onTap: _goToEditProfile,
                     ),
