@@ -112,5 +112,5 @@ class MockAuthService extends Mock implements AuthService {
   MockAuthService(this._isLoggedIn);
 
   @override
-  Future<bool> get isLoggedIn async => _isLoggedIn;
+  bool get isLoggedIn => _isLoggedIn;
 }
