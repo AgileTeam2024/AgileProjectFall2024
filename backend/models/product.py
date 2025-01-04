@@ -77,7 +77,7 @@ class Product(backend.initializers.database.DB.Model):
         """Convert the Product instance to a dictionary for JSON serialization."""
         return {
             'id': self.id,
-            'user_id': self.user_id,
+            'user_username': self.user_username,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'name': self.name,
             'price': self.price,
@@ -95,7 +95,8 @@ class Picture(backend.initializers.database.DB.Model):
     """
     id = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.Integer,
-        primary_key=True
+        primary_key=True,
+        autoincrement=True
     )
     filename = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(255),

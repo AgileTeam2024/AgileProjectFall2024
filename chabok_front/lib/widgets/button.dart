@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Button extends StatelessWidget {
-  final String text;
+  final String? text;
   final IconData? icon;
   final void Function()? onPressed;
 
@@ -9,7 +9,7 @@ class Button extends StatelessWidget {
 
   const Button({
     super.key,
-    required this.text,
+    this.text,
     this.icon,
     this.onPressed,
     required this.type,
@@ -36,16 +36,21 @@ class Button extends StatelessWidget {
     this.onPressed,
   }) : type = ButtonType.filled;
 
+  const Button.icon({
+    super.key,
+    this.icon,
+    this.onPressed,
+  })  : type = ButtonType.icon,
+        text = '';
+
   @override
   Widget build(BuildContext context) {
     final child = Row(
+      spacing: 3,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (icon != null) Padding(
-          padding: const EdgeInsets.only(right: 3),
-          child: Icon(icon),
-        ),
-        Text(text, style: TextStyle(fontWeight: FontWeight.bold)),
+        if (icon != null) Icon(icon),
+        Text(text ?? '', style: TextStyle(fontWeight: FontWeight.bold)),
       ],
     );
     switch (type) {
@@ -55,8 +60,16 @@ class Button extends StatelessWidget {
         return OutlinedButton(onPressed: onPressed, child: child);
       case ButtonType.filled:
         return ElevatedButton(onPressed: onPressed, child: child);
+      case ButtonType.icon:
+        return Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white54,
+          ),
+          child: IconButton(onPressed: onPressed, icon: Icon(icon)),
+        );
     }
   }
 }
 
-enum ButtonType { text, outlined, filled }
+enum ButtonType { text, outlined, filled, icon }

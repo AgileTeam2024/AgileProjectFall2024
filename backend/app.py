@@ -1,4 +1,6 @@
 import os
+import datetime
+
 import flask
 import flask_migrate
 import flask_cors
@@ -85,8 +87,12 @@ def register_routes(flask_app: flask.Flask) -> None:
 
     flask_app.register_blueprint(backend.routes.user.user_bp, url_prefix='/api/user')
     flask_app.register_blueprint(backend.routes.product.product_bp, url_prefix='/api/product')
+    # Create authorize button for protected APIs in swagger.
+    SWAGGER_TEMPLATE = {
+        "securityDefinitions": {"BearerAuth": {"type": "apiKey", "name": "Authorization", "in": "header"}}
+    }
     # Create Swagger documentation for APIs.
-    flasgger.Swagger(flask_app)
+    flasgger.Swagger(flask_app, template=SWAGGER_TEMPLATE)
 
 
 def main(_: list[str]) -> None:
@@ -105,6 +111,15 @@ def main(_: list[str]) -> None:
     flask_app.config['JWT_SECRET_KEY'] = backend.initializers.settings.app_secret_key.value
     # Add location for storing files like images.
     flask_app.config['UPLOAD_FOLDER'] = 'uploads/'
+    # Set the maximum content length to 16 megabytes.
+    flask_app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
+    # Config authentication for protected APIs.
+    flask_app.config['JWT_TOKEN_LOCATION'] = ['headers']
+    flask_app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=60)
+    flask_app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(minutes=180)
+    # Maximum number of files in a multipart form.
+    flask_app.config['MAX_FORM_PARTS'] = 10
+    flask_app.config['MAX_FORM_MEMORY_SIZE'] = 50 * 1024 * 1024  # 50 MB
     # Create application managers.
     create_managers(flask_app)
     # Register routers blueprint.

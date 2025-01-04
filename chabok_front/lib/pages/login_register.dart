@@ -1,4 +1,3 @@
-import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/view_models/text_field.dart';
@@ -154,7 +153,7 @@ class RegisterPage extends LoginRegisterPage {
           'email': EmailTextFieldViewModel(
             label: 'Email',
             icon: Icons.email,
-            required: false,
+            required: true,
           ),
         });
 
