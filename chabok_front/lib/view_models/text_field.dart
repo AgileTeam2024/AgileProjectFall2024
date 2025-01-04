@@ -1,12 +1,17 @@
+import 'package:chabok_front/extensions/num.dart';
 import 'package:chabok_front/extensions/string_pattern_check.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TextFieldViewModel {
   final TextEditingController controller = TextEditingController();
   final IconData icon;
   final String? helper, hint, error, label;
-  TextInputType type = TextInputType.text;
   final bool required, readOnly;
+  final int? maxLines;
+
+  TextInputType type = TextInputType.text;
+  List<TextInputFormatter>? inputFormatters;
   bool obscureText;
 
   String get text => controller.text;
@@ -22,6 +27,8 @@ class TextFieldViewModel {
     required this.required,
     this.readOnly = false,
     this.obscureText = false,
+    this.inputFormatters,
+    this.maxLines,
   });
 
   String? validator(String? text) {
@@ -40,6 +47,7 @@ class PasswordTextFieldViewModel extends TextFieldViewModel {
     required super.required,
     super.readOnly,
     super.obscureText = true,
+    super.maxLines = 1,
   }) {
     type = TextInputType.visiblePassword;
   }
@@ -76,4 +84,51 @@ class EmailTextFieldViewModel extends TextFieldViewModel {
     if (!text!.isEmail) return 'Incorrect email format.';
     return null;
   }
+}
+
+class MoneyTextFieldViewModel extends TextFieldViewModel {
+  MoneyTextFieldViewModel({
+    super.icon = Icons.money,
+    super.helper,
+    super.hint,
+    super.error,
+    super.label,
+    required super.required,
+    super.readOnly,
+  }) {
+    inputFormatters = [
+      TextInputFormatter.withFunction((olderValue, oldValue) {
+        if (oldValue.text.isEmpty) return oldValue;
+        try {
+          final newValue =
+              int.parse(oldValue.text.replaceAll(',', '')).decimalFormat;
+          return oldValue.copyWith(
+            text: newValue,
+            selection: TextSelection(
+              baseOffset: newValue.length,
+              extentOffset: newValue.length,
+            ),
+          );
+        } on FormatException {
+          return olderValue;
+        }
+      }),
+    ];
+    type = TextInputType.numberWithOptions();
+  }
+}
+
+class OptionsTextFieldViewModel extends TextFieldViewModel {
+  final List<String> options;
+
+  OptionsTextFieldViewModel({
+    required this.options,
+    required super.icon,
+    super.helper,
+    super.hint,
+    super.error,
+    super.label,
+    required super.required,
+    super.readOnly,
+  });
 }

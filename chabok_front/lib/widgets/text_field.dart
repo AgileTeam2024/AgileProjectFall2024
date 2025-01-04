@@ -16,11 +16,31 @@ class _CustomTextFieldState extends State<CustomTextField> {
   Widget build(BuildContext context) {
     final viewModel = widget.viewModel;
 
+    if (viewModel is OptionsTextFieldViewModel) {
+      return DropdownButtonFormField(
+        onChanged: (selected) => viewModel.controller.text = selected ?? '',
+        items: viewModel.options
+            .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
+            .toList(),
+        decoration: InputDecoration(
+          helperText: viewModel.helper,
+          hintText: viewModel.hint,
+          errorText: viewModel.error,
+          icon: Icon(viewModel.icon),
+          labelText:
+              viewModel.required ? viewModel.label?.required : viewModel.label,
+          border: OutlineInputBorder(),
+        ),
+      );
+    }
+
     return TextFormField(
       controller: viewModel.controller,
       readOnly: viewModel.readOnly,
       keyboardType: viewModel.type,
+      maxLines: viewModel.maxLines,
       validator: viewModel.validator,
+      inputFormatters: viewModel.inputFormatters,
       obscureText: viewModel.obscureText,
       decoration: InputDecoration(
         helperText: viewModel.helper,
@@ -42,7 +62,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   ),
                 ],
               )
-            : null,
+            : (viewModel is MoneyTextFieldViewModel ? Text('IRR') : null),
         border: OutlineInputBorder(),
       ),
     );
@@ -50,5 +70,5 @@ class _CustomTextFieldState extends State<CustomTextField> {
 }
 
 extension _StringRequired on String {
-  String? get required => '${this} *';
+  String? get required => '$this *';
 }
