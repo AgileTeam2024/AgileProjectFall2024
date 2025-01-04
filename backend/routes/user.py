@@ -1,8 +1,5 @@
-import re
-
+import email_validator
 import flask
-import flask_wtf
-import wtforms
 import flask_jwt_extended
 
 import backend.managers.user
@@ -34,6 +31,10 @@ def register() -> (flask.Flask, int):
               type: string
               description: The password for the new user.
               example: "secure_password"
+            email:
+              type: string
+              description: The email for the new user.
+              example: "email@example.com"
     responses:
       201:
         description: User registered successfully.
@@ -43,7 +44,6 @@ def register() -> (flask.Flask, int):
 
     # Get JSON data from the request body.
     data = flask.request.get_json()
-    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     # Check existence of username and password.
     username = data.get('username', '')
     if not username:
@@ -62,7 +62,15 @@ def register() -> (flask.Flask, int):
         return (
             flask.jsonify({'message': 'Email is missing.'}),
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-      )
+        )
+    # Validate the email.
+    try:
+        email_validator.validate_email(email)
+    except email_validator.EmailNotValidError as e:
+        return (
+            flask.jsonify({'message': 'Email is invalid.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
 
     return backend.managers.user.UserManager.instance.register(username, password, email)
 
@@ -116,18 +124,59 @@ def login() -> (flask.Flask, int):
     return backend.managers.user.UserManager.instance.login(username, password)
 
 
-@user_bp.route('/check_cookie', methods=['GET'])
+@user_bp.route('/logout', methods=['GET'])
 @flask_jwt_extended.jwt_required()
-def check_cookie():
+def logout():
     """
-    Check Cookie API.
+    User logout API.
     ---
     tags:
       - User
+    security:
+      - BearerAuth: []
     responses:
       200:
-        description: Token is valid.
+        description: Successfully logged out
       401:
-        description: Token is invalid or expired.
+        description: Token has expired or is invalid
     """
-    return backend.managers.user.UserManager.instance.check_cookie()
+    return backend.managers.user.UserManager.instance.logout(flask_jwt_extended.get_jwt()['jti'])
+
+
+@user_bp.route('/refresh', methods=['GET'])
+@flask_jwt_extended.jwt_required(refresh=True)
+def refresh_token() -> (flask.Flask, int):
+    """
+    Refresh access token API.
+    ---
+    tags:
+      - User
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Successfully refreshed access token
+      401:
+        description: Token has expired or is invalid
+      403:
+        description: Refresh token is required but not provided or invalid
+    """
+    return backend.managers.user.UserManager.instance.refresh_token(flask_jwt_extended.get_jwt()["jti"],
+                                                                    flask_jwt_extended.get_jwt_identity())
+
+
+@user_bp.route('/delete', methods=['GET'])
+@flask_jwt_extended.jwt_required()
+def delete_user() -> (flask.Flask, int):
+    """
+    User delete API.
+    ---
+    tags:
+      - User
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Successfully deleted the user
+    """
+    return backend.managers.user.UserManager.instance.delete_account(flask_jwt_extended.get_jwt_identity())

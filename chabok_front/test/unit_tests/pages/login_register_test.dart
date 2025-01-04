@@ -1,7 +1,7 @@
+import 'package:chabok_front/pages/login_register.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:chabok_front/pages/login_register.dart';
 
 import '../tests_setup_teardown.dart';
 
@@ -25,25 +25,24 @@ void main() {
       expect((loginPage.navigateToOtherForm[1] as Button).text, 'Register');
     });
 
-    testWidgets('Form validates correctly on submission',
-            (WidgetTester tester) async {
-          setUpWidgetTest(tester);
+    testWidgets('Form validates correctly on submission', (tester) async {
+      setUpWidgetTest(tester);
 
-          await tester.pumpWidget(MaterialApp(home: LoginPage()));
+      await tester.pumpWidget(MaterialApp(home: LoginPage()));
 
-          // Verify that the submit button is present
-          final submitButton = find.widgetWithText(ElevatedButton, 'Login');
-          expect(submitButton, findsOneWidget);
+      // Verify that the submit button is present
+      final submitButton = find.widgetWithText(ElevatedButton, 'Login');
+      expect(submitButton, findsOneWidget);
 
-          // Leave the fields empty and try submitting the form
-          await tester.tap(submitButton.first);
-          await tester.pump();
+      // Leave the fields empty and try submitting the form
+      await tester.tap(submitButton.first);
+      await tester.pump();
 
-          // Verify that the validation errors are shown
-          expect(find.text('This field is Required!'), findsNWidgets(2));
+      // Verify that the validation errors are shown
+      expect(find.text('This field is Required!'), findsNWidgets(2));
 
-          tearDownWidgetTest(tester);
-        });
+      tearDownWidgetTest(tester);
+    });
   });
 
   group('RegisterPage Tests', () {

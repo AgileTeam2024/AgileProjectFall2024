@@ -1,6 +1,7 @@
 import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
+import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -37,14 +38,18 @@ class RouterService {
             redirect: (context, state) => '/home',
           ),
           GoRoute(
+            path: '/home',
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: HomePage()),
+          ),
+          GoRoute(
             path: '/login',
             redirect: (context, state) async {
               if (await _authService.isLoggedIn) return '/';
               return null;
             },
-            pageBuilder: (context, state) => NoTransitionPage(
-              child: LoginPage(),
-            ),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: LoginPage()),
           ),
           GoRoute(
             path: '/register',
@@ -52,14 +57,16 @@ class RouterService {
               if (await _authService.isLoggedIn) return '/';
               return null;
             },
-            pageBuilder: (context, state) => NoTransitionPage(
-              child: RegisterPage(),
-            ),
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: RegisterPage()),
           ),
           GoRoute(
-            path: '/home',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: HomePage(),
+            path: '/product/:id',
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: ProductViewPage(
+                int.parse(state.pathParameters['id']!),
+                viewerIsSeller: false,
+              ),
             ),
           ),
           GoRoute(
@@ -81,7 +88,7 @@ class RouterService {
                 NoTransitionPage(child: ErrorPage()),
           ),
         ],
-      )
+      ),
     ],
   );
 }
