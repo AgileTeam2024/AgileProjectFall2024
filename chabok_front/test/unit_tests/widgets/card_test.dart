@@ -1,11 +1,10 @@
 import 'package:chabok_front/widgets/card.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('CardWidget Tests', () {
-    testWidgets('should render child with correct styling',
-        (WidgetTester tester) async {
+    testWidgets('should render child with correct styling', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

@@ -1,6 +1,7 @@
 import 'package:chabok_front/extensions/num.dart';
 import 'package:chabok_front/models/product.dart';
-import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/services/router.dart';
+import 'package:chabok_front/widgets/seller.dart';
 import 'package:flutter/material.dart';
 
 class ProductsWidget extends StatelessWidget {
@@ -28,7 +29,7 @@ class ProductsWidget extends StatelessWidget {
           final displayImage = product.imageUrls.firstOrNull;
 
           return MaterialButton(
-            onPressed: () {},
+            onPressed: () => RouterService.go('/product/${product.id}'),
             color: Colors.white,
             hoverElevation: 2,
             focusElevation: 2,
@@ -42,7 +43,7 @@ class ProductsWidget extends StatelessWidget {
                 SizedBox(height: 7.5),
                 _ProductPriceWidget(product.price),
                 SizedBox(height: 2.5),
-                _SellerWidget(seller),
+                SellerWidget(seller),
               ],
             ),
           );
@@ -100,87 +101,6 @@ class _ProductPriceWidget extends StatelessWidget {
         color: Colors.black87,
       ),
       textAlign: TextAlign.end,
-    );
-  }
-}
-
-class _SellerWidget extends StatelessWidget {
-  final User seller;
-
-  const _SellerWidget(this.seller);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _SellerPfpWidget(seller.profilePicture),
-        Padding(
-          padding: const EdgeInsets.all(5),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _SellerUsernameWidget(seller.username),
-              SizedBox(height: 1.5),
-              _SellerRatingWidget(seller.averageRating)
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SellerPfpWidget extends StatelessWidget {
-  final String? pfp;
-
-  const _SellerPfpWidget(this.pfp);
-
-  @override
-  Widget build(BuildContext context) {
-    return CircleAvatar(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(100),
-        child: pfp == null
-            ? Container()
-            : Image(
-                image: AssetImage(pfp!),
-              ),
-      ),
-    );
-  }
-}
-
-class _SellerUsernameWidget extends StatelessWidget {
-  final String username;
-
-  const _SellerUsernameWidget(this.username);
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Text(
-      username,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
-    );
-  }
-}
-
-class _SellerRatingWidget extends StatelessWidget {
-  final double? rating;
-
-  const _SellerRatingWidget(this.rating);
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Text(
-      rating != null ? '$rating ⭐️' : '',
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: textTheme.labelSmall,
     );
   }
 }

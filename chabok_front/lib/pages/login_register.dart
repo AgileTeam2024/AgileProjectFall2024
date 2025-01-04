@@ -153,7 +153,7 @@ class RegisterPage extends LoginRegisterPage {
           'email': EmailTextFieldViewModel(
             label: 'Email',
             icon: Icons.email,
-            required: false,
+            required: true,
           ),
         });
 

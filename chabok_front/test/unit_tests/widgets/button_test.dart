@@ -1,11 +1,10 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Button Tests', () {
-    testWidgets('should render TextButton for text type',
-        (WidgetTester tester) async {
+    testWidgets('should render TextButton for text type', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -25,7 +24,7 @@ void main() {
     });
 
     testWidgets('should render OutlinedButton for outlined type',
-        (WidgetTester tester) async {
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -44,8 +43,7 @@ void main() {
       expect(buttonText, findsOneWidget);
     });
 
-    testWidgets('should render ElevatedButton for filled type',
-        (WidgetTester tester) async {
+    testWidgets('should render ElevatedButton for filled type', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -62,6 +60,25 @@ void main() {
 
       final buttonText = find.text('Click Me');
       expect(buttonText, findsOneWidget);
+    });
+
+    testWidgets('should render IconButton for icon type', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Button.icon(
+              icon: Icons.add,
+              onPressed: () {},
+            ),
+          ),
+        ),
+      );
+
+      final iconButton = find.byType(IconButton);
+      expect(iconButton, findsOneWidget);
+
+      final icon = find.byIcon(Icons.add);
+      expect(icon, findsOneWidget);
     });
   });
 }

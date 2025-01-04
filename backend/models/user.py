@@ -1,3 +1,5 @@
+import sqlalchemy
+
 import backend.initializers.database
 
 
@@ -10,6 +12,7 @@ class User(backend.initializers.database.DB.Model):
     USERNAME_MAX_LENGTH = 50
     PASSWORD_MAX_LENGTH = 128
     EMAIL_MAX_LENGTH = 128
+    COOKIE_MAX_LENGTH = 356
 
     username = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(USERNAME_MAX_LENGTH),
@@ -27,13 +30,31 @@ class User(backend.initializers.database.DB.Model):
     )
     email = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String(EMAIL_MAX_LENGTH),
-        unique=True
+        unique=True,
+        nullable=False
     )
-
 
     def __repr__(self) -> str:
         """
             Return a string representation of the User instance.
         """
-
         return self.username
+
+    def to_dict(self) -> dict:
+        """Convert the User instance to a dictionary for JSON serialization."""
+        return {
+            'username': self.username,
+            'is_banned': self.is_banned,
+            'email': self.email,
+        }
+
+class RevokedToken(backend.initializers.database.DB.Model):
+    """Represents a revoked JWT token."""
+    jti = backend.initializers.database.DB.Column(backend.initializers.database.DB.String(36), primary_key=True)
+    revoked_at = backend.initializers.database.DB.Column(
+        sqlalchemy.DateTime,
+        server_default=sqlalchemy.func.now()
+    )
+
+    def __repr__(self):
+        return f"<RevokedToken {self.jti}>"

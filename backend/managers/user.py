@@ -1,11 +1,13 @@
+import os
+from typing import Optional
+
 import flask
 import flask_jwt_extended
-from typing import Optional
-import re
 
 import backend.models.user
 import backend.initializers.database
 import backend.initializers.settings
+import backend.models.product
 
 
 class UserManager:
@@ -16,6 +18,8 @@ class UserManager:
             self.flask_app = flask_app
             self.jwt_manager = flask_jwt_extended.JWTManager(flask_app)
             UserManager.instance = self
+            # Setup checking revoked tokens.
+            import backend.managers.token
 
     def register(self, username: str, password: str, email: Optional[str] = None) -> (flask.Flask, int):
         """
@@ -42,17 +46,12 @@ class UserManager:
                 flask.jsonify({'message': 'Username already exists'}),
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
-        if email:
-            if backend.models.user.User.query.filter_by(email=email).first():
-                return (
-                    flask.jsonify({'message': 'Email already exists'}),
-                    backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-                )
-            if not is_valid_email_regex(email):
-                return (
-                    flask.jsonify({'message': 'Email must be the correct format.'}),
-                    backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-                )
+        # check uniqueness of the given email.
+        if backend.models.user.User.query.filter_by(email=email).first():
+            return (
+                flask.jsonify({'message': 'Email already exists'}),
+                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+            )
 
         # Create a new user instance.
         # TODO: Store password as hashed-value.
@@ -97,30 +96,96 @@ class UserManager:
                 flask.jsonify({'message': 'Username and password do not match.'}),
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
-        
-        response = flask.make_response(flask.jsonify({'message': 'Login successful!'}))
 
+        # Generate new access token and refresh token for the user to access protected APIs.
+        access_token = flask_jwt_extended.create_access_token(identity=username)
+        refresh_token = flask_jwt_extended.create_refresh_token(username)
+        response = flask.jsonify({'access_token': access_token, "refresh_token": refresh_token})
+        # Set the access token in a cookie with appropriate attributes for cross-origin.
+        response.set_cookie(
+            'access_token',
+            access_token,
+            max_age=3600,  # TTL in seconds (1 hour)
+            httponly=True,
+            secure=False,
+            samesite='None'  # Allow cross-origin requests.
+        )
+        return response, backend.initializers.settings.HTTPStatus.OK.value
+
+    def logout(self, jti: str) -> (flask.Flask, int):
+        """
+        Revokes current access token of user, and remove it from the cookie.
+
+        Returns:
+            tuple: A tuple containing:
+                - A Flask response object with a JSON message indicating success.
+                - An integer representing the OK HTTP status code (200).
+        """
+        UserManager._revoke_token(jti)
+
+        # Remove the token from the user cookie.
+        response = flask.jsonify({"message": "User logged out successfully."})
+        response.set_cookie('access_token', '', expires=0)
+        return response, backend.initializers.settings.HTTPStatus.OK.value
+
+    @classmethod
+    def _revoke_token(self, jti: str) -> (flask.Flask, int):
+        """Revokes a token."""
+        revoked_token = backend.models.user.RevokedToken(jti=jti)
+        backend.initializers.database.DB.session.add(revoked_token)
+        backend.initializers.database.DB.session.commit()
+
+    def refresh_token(self, jti: str, username: str):
+        """
+        Generate a new access token for the user to access protected APIs, and revoke the previous one.
+
+        Args:
+            username (str): The username of the user requesting a new access token.
+
+        Returns:
+            response (flask.Response): A Flask response object containing the new access token set in a cookie.
+            status_code (int): HTTP status code indicating the result of the operation.
+        """
+        UserManager._revoke_token(jti)
         # Generate new access token for the user to access protected APIs.
         access_token = flask_jwt_extended.create_access_token(identity=username)
-
-        # Set Cookie for user
+        response = flask.jsonify({'access_token': access_token})
+        # Set the access token in a cookie with appropriate attributes for cross-origin.
         response.set_cookie(
-            'access-token',
+            'access_token',
             access_token,
-            httponly=True,  
+            max_age=3600,  # TTL in seconds (1 hour)
+            httponly=True,
             secure=False,
-            max_age=86400,
-            samesite='Lax'
+            samesite='None'  # Allow cross-origin requests.
         )
+        return response, backend.initializers.settings.HTTPStatus.OK.value
+
+    def delete_account(self, username: str) -> (flask.Flask, int):
+        """
+        Deletes a user's account.
+        By deleting user's account, every other items belonged to that user would be deleted, too.
+
+        Args:
+            username (str): The username of the user.
+
+        Returns:
+            response (flask.Response): A Flask response object containing successfully deleted a user.
+            status_code (int): HTTP status code indicating success (200).
+        """
+        products_to_delete = backend.models.product.Product.query.filter_by(user_username=username).all()
+
+        for product in products_to_delete:
+            pictures_to_delete = backend.models.product.Picture.query.filter_by(product_id=product.id).all()
+            for picture in pictures_to_delete:
+                backend.initializers.database.DB.session.delete(picture)
+                os.remove(picture.filename)
+            backend.initializers.database.DB.session.delete(product)
+
+        user = backend.models.user.User.query.filter_by(username=username).first()
+        backend.initializers.database.DB.session.delete(user)
+        backend.initializers.database.DB.session.commit()
         return (
-            response,
+            flask.jsonify({"message": "User deleted successfully."}),
             backend.initializers.settings.HTTPStatus.OK.value
         )
-
-
-
-def is_valid_email_regex(email):
-    regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    if re.fullmatch(regex, email):
-        return True
-    return False

@@ -1,4 +1,8 @@
+import os
+import datetime
+
 import flask
+import flask_migrate
 import flask_cors
 import flasgger
 from absl import app as absl_app
@@ -26,6 +30,7 @@ def connect_to_db(flask_app: flask.Flask) -> None:
     import backend.initializers.database
     # Load database models to ensure their tables existence.
     import backend.models.user
+    import backend.models.product
 
     # Configure the Flask app for setting up the SQLAlchemy database connection.
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -41,6 +46,18 @@ def connect_to_db(flask_app: flask.Flask) -> None:
         # Create corresponding tables of models in database, If they don't already exist.
         with flask_app.app_context():
             backend.initializers.database.DB.create_all()
+
+        # Applying migration to previous models to update them.
+        migrate = flask_migrate.Migrate(flask_app, backend.initializers.database.DB, command='migrate')
+        with flask_app.app_context():
+            if not os.path.exists(backend.initializers.settings.MIGRATIONS_DIRECTORY):
+                flask_migrate.init(backend.initializers.settings.MIGRATIONS_DIRECTORY)
+        with flask_app.app_context():
+            # Generate a migration script if there are changes.
+            flask_migrate.migrate(directory=backend.initializers.settings.MIGRATIONS_DIRECTORY,
+                                  message="Auto-generated migration")
+            # Apply any pending migrations.
+            flask_migrate.upgrade(directory=backend.initializers.settings.MIGRATIONS_DIRECTORY)
     except Exception as e:
         raise Exception("Failed to initialize database: " + str(e))
 
@@ -52,8 +69,10 @@ def create_managers(flask_app: flask.Flask) -> None:
         flask_app (flask.Flask): The Flask application instance used for initializing managers.
     """
     import backend.managers.user
+    import backend.managers.product
 
     backend.managers.user.UserManager(flask_app)
+    backend.managers.product.ProductManager(flask_app)
 
 
 def register_routes(flask_app: flask.Flask) -> None:
@@ -64,10 +83,16 @@ def register_routes(flask_app: flask.Flask) -> None:
         flask_app (flask.Flask): The Flask application instance to which the routes will be registered.
     """
     import backend.routes.user
+    import backend.routes.product
 
     flask_app.register_blueprint(backend.routes.user.user_bp, url_prefix='/api/user')
+    flask_app.register_blueprint(backend.routes.product.product_bp, url_prefix='/api/product')
+    # Create authorize button for protected APIs in swagger.
+    SWAGGER_TEMPLATE = {
+        "securityDefinitions": {"BearerAuth": {"type": "apiKey", "name": "Authorization", "in": "header"}}
+    }
     # Create Swagger documentation for APIs.
-    flasgger.Swagger(flask_app)
+    flasgger.Swagger(flask_app, template=SWAGGER_TEMPLATE)
 
 
 def main(_: list[str]) -> None:
@@ -84,6 +109,17 @@ def main(_: list[str]) -> None:
     flask_cors.CORS(flask_app)
     # Set secret key used for generating tokens.
     flask_app.config['JWT_SECRET_KEY'] = backend.initializers.settings.app_secret_key.value
+    # Add location for storing files like images.
+    flask_app.config['UPLOAD_FOLDER'] = 'uploads/'
+    # Set the maximum content length to 16 megabytes.
+    flask_app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
+    # Config authentication for protected APIs.
+    flask_app.config['JWT_TOKEN_LOCATION'] = ['headers']
+    flask_app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=60)
+    flask_app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(minutes=180)
+    # Maximum number of files in a multipart form.
+    flask_app.config['MAX_FORM_PARTS'] = 10
+    flask_app.config['MAX_FORM_MEMORY_SIZE'] = 50 * 1024 * 1024  # 50 MB
     # Create application managers.
     create_managers(flask_app)
     # Register routers blueprint.

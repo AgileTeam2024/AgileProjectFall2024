@@ -20,31 +20,28 @@ jobs:
           echo "FLASK_HOST=0.0.0.0" >> .env
           echo "FLASK_PORT=8000" >> .env
 
-      - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
 
       - name: Remove all existing containers and images using Docker Compose
         run: |
-          ssh root@185.231.59.87 "
-            cd /AgileProjectFall2024 &&
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "
+            cd AgileProjectFall2024 &&
             docker-compose down --rmi all -v --remove-orphans
           "
 
       - name: Remove previous codes
         run: |
-          ssh root@185.231.59.87 "
-            rm -rf /AgileProjectFall2024/*
-            rm -rf /AgileProjectFall2024/.*
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "
+            find AgileProjectFall2024 -mindepth 1 ! -path 'AgileProjectFall2024/backend/migrations*' ! -path 'AgileProjectFall2024/backend/uploads*' -exec rm -rf {} +
           "
 
       - name: Copy code and .env file to server
         run: |
-          rsync -avz --delete ./ root@185.231.59.87:/AgileProjectFall2024
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" rsync -avz --delete ./ ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}:AgileProjectFall2024
         env:
-          RSYNC_RSH: "ssh -o StrictHostKeyChecking=no"
+          RSYNC_RSH: "sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh -o StrictHostKeyChecking=no"
 
       - name: Deploy to server
         run: |
-          ssh root@185.231.59.87 "cd /AgileProjectFall2024 && docker-compose up -d --build"
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "cd AgileProjectFall2024 && docker-compose up -d --build"
