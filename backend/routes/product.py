@@ -321,3 +321,39 @@ def get_product_by_id():
         )
 
     return backend.managers.product.ProductManager.instance.get_product_by_id(product_id)
+
+
+@product_bp.route('/delete', methods=['DELETE'])
+@flask_jwt_extended.jwt_required()
+def delete_product() -> (flask.Flask, int):
+    """
+    Product delete API.
+    ---
+    tags:
+      - Product
+    responses:
+      200: successful delete
+      400: bad request
+      401: unauthorized user access
+    """
+    username = flask.request.args.get('user_username')
+    user = flask_jwt_extended.get_jwt_identity()
+    if username != user:
+        return (
+            flask.jsonify({'message': 'You cannot delete this product.'}),
+             backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
+            )
+    product_id = flask.request.args.get('id')
+    if not product_id:
+        return (
+            flask.jsonify({'message': 'Missing product ID.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    if not product_id.isdigit():
+        return (
+            flask.jsonify({'message': 'Product ID must be an integer.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+
+    return backend.managers.product.PeoductManager.instance.delete_product(product_id)
+
