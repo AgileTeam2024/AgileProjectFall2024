@@ -50,7 +50,12 @@ class Button extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (icon != null) Icon(icon),
-        Text(text ?? '', style: TextStyle(fontWeight: FontWeight.bold)),
+        Text(
+          text ?? '',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ],
     );
     switch (type) {

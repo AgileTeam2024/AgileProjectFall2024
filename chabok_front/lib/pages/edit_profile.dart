@@ -67,11 +67,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     ];
 
-    final imageAddress = user.profilePicture ??
-        '/backend/uploads/1403-10-03_16.22.08_20250105110254.jpg';
+    final imageAddress = user.profilePicture;
     if (imageAddress != null) {
       _networkService
-          .getImage(imageAddress!)
+          .getImage(imageAddress)
           .then((bytes) => profilePicture = Pair(imageAddress, bytes))
           .then((_) => setState(() {}));
     }
@@ -83,13 +82,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
       child: Center(
         child: CardWidget(
           child: SizedBox(
-            width: 450,
+            width: 525,
             child: Form(
               key: formKey,
               child: Column(
-                spacing: 50,
+                spacing: 15,
                 children: [
                   Stack(
+                    alignment: Alignment.center,
                     children: [
                       CircleAvatar(
                         radius: 75,
@@ -107,36 +107,37 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       )
                     ],
                   ),
-                  Column(
-                    children: fieldViewModels
-                        .map(
-                          (vm) => Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 7.5,
-                              horizontal: 10,
-                            ),
-                            child: CustomTextField(vm),
-                          ),
-                        )
-                        .toList(),
+                  SizedBox(height: 20),
+                  ...fieldViewModels.map(
+                    (vm) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: CustomTextField(vm),
+                    ),
                   ),
+                  SizedBox(height: 20),
                   Row(
                     spacing: 10,
                     children: [
                       Expanded(
                         child: Button.text(
+                          icon: Icons.cancel_outlined,
                           text: 'Discard changes',
                           onPressed: () => RouterService.pop(),
                         ),
                       ),
                       Expanded(
                         child: Button.filled(
+                          icon: Icons.check,
                           text: 'Save changes',
                           onPressed: () {
                             if (formKey.currentState?.validate() ?? false) {
-                              fieldViewModels.asMap().map((_, e) => MapEntry(
-                                  e.label?.replaceAll(' ', '_').toLowerCase(),
-                                  e.text));
+                              fieldViewModels.asMap().map(
+                                    (_, e) => MapEntry(
+                                        e.label
+                                            ?.replaceAll(' ', '_')
+                                            .toLowerCase(),
+                                        e.text),
+                                  );
                             }
                             RouterService.pop();
                           },
