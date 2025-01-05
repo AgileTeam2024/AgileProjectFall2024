@@ -33,6 +33,22 @@ class User(backend.initializers.database.DB.Model):
         unique=True,
         nullable=False
     )
+    first_name = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String,
+        nullable=True
+    )
+    last_name = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String,
+        nullable=True
+    )
+    phone_number = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String,
+        nullable=True
+    )
+    profile_picture = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String,
+        nullable=True
+    )
 
     def __repr__(self) -> str:
         """
@@ -44,9 +60,40 @@ class User(backend.initializers.database.DB.Model):
         """Convert the User instance to a dictionary for JSON serialization."""
         return {
             'username': self.username,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'phone_number': self.phone_number,
+            'profile_picture': self.profile_picture,
             'is_banned': self.is_banned,
             'email': self.email,
         }
+
+
+class ProfilePicture(backend.initializers.database.DB.Model):
+    """
+    Represents a user's picture.
+    """
+    id = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+    filename = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String(255),
+        nullable=False
+    )
+    user_username = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String,
+        backend.initializers.database.DB.ForeignKey('users.username'),
+        nullable=False
+    )
+
+    def to_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'filename': self.filename
+        }
+
 
 class RevokedToken(backend.initializers.database.DB.Model):
     """Represents a revoked JWT token."""
