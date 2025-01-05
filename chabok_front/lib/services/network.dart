@@ -13,8 +13,10 @@ class NetworkService {
     return _instance!;
   }
 
-  static const host = '127.0.0.1';
-  static const port = 8000;
+  // static const host = '127.0.0.1';
+  // static const port = 8000;
+  static const host = 'http://185.231.59.87';
+  static const port = 80;
 
   Uri _buildUrl(
     String path,
