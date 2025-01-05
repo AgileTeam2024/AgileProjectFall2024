@@ -7,6 +7,7 @@ class User {
   final String username, email, phoneNumber;
   final String? firstName, lastName;
   final String? profilePicture;
+  final String? address;
 
   User({
     required this.username,
@@ -15,9 +16,12 @@ class User {
     required this.email,
     required this.phoneNumber,
     this.profilePicture,
+    this.address,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
+
+  bool get hasBeenEditedBefore => ![firstName, lastName].contains(null);
 }

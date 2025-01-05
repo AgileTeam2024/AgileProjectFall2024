@@ -89,38 +89,38 @@ class _CreateProductPageState extends State<CreateProductPage> {
                     Expanded(
                       child: isBigScreen
                           ? Column(
-                              children: fieldViewModels
-                                  .map(
-                                    (vm) => Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 7.5,
-                                        horizontal: 10,
-                                      ),
-                                      child: CustomTextField(vm),
-                                    ),
-                                  )
-                                  .toList(),
-                            )
-                          : Column(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: 15,
-                              children: fieldViewModels
-                                  .fixedGrouped(groupSize: 2)
-                                  .map(
-                                    (vmList) => Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      spacing: 20,
-                                      children: vmList
-                                          .map(
-                                            (vm) => Expanded(
-                                              child: CustomTextField(vm),
-                                            ),
-                                          )
-                                          .toList(),
-                                    ),
-                                  )
-                                  .toList(),
+                        children: fieldViewModels
+                            .map(
+                              (vm) => Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 7.5,
+                              horizontal: 10,
                             ),
+                            child: CustomTextField(vm),
+                          ),
+                        )
+                            .toList(),
+                      )
+                          : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 15,
+                        children: fieldViewModels
+                            .fixedGrouped(groupSize: 2)
+                            .map(
+                              (vmList) => Row(
+                            mainAxisSize: MainAxisSize.min,
+                            spacing: 20,
+                            children: vmList
+                                .map(
+                                  (vm) => Expanded(
+                                child: CustomTextField(vm),
+                              ),
+                            )
+                                .toList(),
+                          ),
+                        )
+                            .toList(),
+                      ),
                     ),
                   ],
                 ),

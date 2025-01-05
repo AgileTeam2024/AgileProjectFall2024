@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class TextFieldViewModel {
-  final TextEditingController controller = TextEditingController();
+  final TextEditingController controller;
   final IconData icon;
-  final String? helper, hint, error, label;
+  final String? helper, hint, error, label, initialText;
   final bool required, readOnly;
   final int? maxLines;
 
@@ -29,7 +29,8 @@ class TextFieldViewModel {
     this.obscureText = false,
     this.inputFormatters,
     this.maxLines,
-  });
+    this.initialText,
+  }) : controller = TextEditingController(text: initialText);
 
   String? validator(String? text) {
     if (required && (text?.isEmpty ?? false)) return 'This field is Required!';
@@ -48,6 +49,7 @@ class PasswordTextFieldViewModel extends TextFieldViewModel {
     super.readOnly,
     super.obscureText = true,
     super.maxLines = 1,
+    super.initialText,
   }) {
     type = TextInputType.visiblePassword;
   }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/services/auth.dart';
@@ -12,12 +13,19 @@ class NetworkService {
     return _instance!;
   }
 
-  Uri _buildUrl(String path, Map<String, dynamic>? query) {
+  static const host = '127.0.0.1';
+  static const port = 8000;
+
+  Uri _buildUrl(
+    String path,
+    Map<String, dynamic>? query, [
+    String prefix = '/api',
+  ]) {
     return Uri(
       scheme: 'http',
-      host: '185.231.59.87',
-      port: 80,
-      path: '/api/${path.substring(1)}',
+      host: host,
+      port: port,
+      path: '$prefix/${path.substring(1)}',
       queryParameters: query,
     );
   }
@@ -27,7 +35,6 @@ class NetworkService {
     dynamic body, {
     Map<String, String>? headers,
     Map<String, dynamic>? query,
-    bool auth = true,
   }) async {
     final response = await http.post(
       _buildUrl(path, query),
@@ -45,7 +52,6 @@ class NetworkService {
     String path, {
     Map<String, String>? headers,
     Map<String, dynamic>? query,
-    bool auth = true,
   }) async {
     final response = await http.get(
       _buildUrl(path, query),
@@ -55,5 +61,17 @@ class NetworkService {
       },
     );
     return ServerResponse.visualize(response.body, response.statusCode);
+  }
+
+  Future<Uint8List> getImage(String path, {bool useOurServer = true}) async {
+    final url = useOurServer ? _buildUrl(path, {}, '') : Uri.parse(path);
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept': 'image/*',
+        'Authorization': 'Bearer ${AuthService.instance.accessToken}'
+      },
+    );
+    return response.bodyBytes;
   }
 }

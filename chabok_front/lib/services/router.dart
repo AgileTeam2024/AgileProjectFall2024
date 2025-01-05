@@ -1,12 +1,13 @@
+import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/pages/create_product.dart';
+import 'package:chabok_front/pages/edit_profile.dart';
 import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
-import 'package:chabok_front/pages/profile.dart';
 import 'package:chabok_front/pages/product_view.dart';
+import 'package:chabok_front/pages/profile.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
-import 'package:chabok_front/widgets/main_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -48,7 +49,7 @@ class RouterService {
           GoRoute(
             path: '/login',
             redirect: (context, state) async {
-              if (await _authService.isLoggedIn) return '/';
+              if (_authService.isLoggedIn) return '/';
               return null;
             },
             pageBuilder: (context, state) =>
@@ -57,7 +58,7 @@ class RouterService {
           GoRoute(
             path: '/register',
             redirect: (context, state) async {
-              if (await _authService.isLoggedIn) return '/';
+              if (_authService.isLoggedIn) return '/';
               return null;
             },
             pageBuilder: (context, state) =>
@@ -83,12 +84,28 @@ class RouterService {
           ),
           GoRoute(
             path: '/profile',
-            redirect: (context, state) async {
-              if (!(await _authService.isLoggedIn)) return '/';
+            redirect: (context, state) {
+              if (!_authService.isLoggedIn) return '/';
               return null;
             },
             pageBuilder: (context, state) => NoTransitionPage(
               child: UserProfilePage(),
+            ),
+          ),
+          GoRoute(
+            path: '/edit-profile',
+            redirect: (context, state) {
+              if (!_authService.isLoggedIn) return '/';
+              return null;
+            },
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: EditProfilePage(
+                user: User(
+                  username: 'username',
+                  email: 'email@gmail.com',
+                  phoneNumber: '+9939232965',
+                ),
+              ),
             ),
           ),
           GoRoute(
