@@ -320,4 +320,4 @@ def get_product_by_id():
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
 
-    return backend.managers.product.ProductManager.instance.get_product_by_id(product_id)
+    return backend.managers.product.ProductManager.instance.get_product(product_id)
