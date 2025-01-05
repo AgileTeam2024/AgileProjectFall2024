@@ -1,4 +1,5 @@
 import os
+import datetime
 from typing import Optional
 
 import flask
@@ -189,3 +190,58 @@ class UserManager:
             flask.jsonify({"message": "User deleted successfully."}),
             backend.initializers.settings.HTTPStatus.OK.value
         )
+
+    def get_profile(self, username: str) -> (flask.Flask, int):
+        """
+        Get user's profile information.
+
+        Args:
+            username (str): The username of the user.
+
+        Returns:
+            response (flask.Response): A Flask response object containing successfully deleted a user.
+            status_code (int): HTTP status code indicating success (200).
+        """
+        user = backend.models.user.User.query.filter_by(username=username).first()
+        return flask.jsonify({"profile": user.to_dict()}), backend.initializers.settings.HTTPStatus.OK.value
+
+    def edit_profile(self, username: str, info: dict) -> (flask.Flask, int):
+        """
+        Update user's profile.
+
+        Args:
+            username (str): The username of the user.
+            info (dict): A dictionary containing information about the user.
+
+        Returns:
+            response (flask.Response): A Flask response object containing successfully deleted a user.
+            status_code (int): HTTP status code indicating success (200).
+        """
+        user = backend.models.user.User.query.filter_by(username=username).first()
+        user.email = info.get('email', user.email)
+        user.phone_number = info.get('phone_number', user.phone_number)
+        user.first_name = info.get('first_name', user.first_name)
+        user.last_name = info.get('last_name', user.last_name)
+
+        if 'image' in info:
+            # Remove the previous profile picture if exists.
+            old_picture = backend.models.user.ProfilePicture.query.filter_by(user_username=user.username).first()
+            if old_picture:
+                backend.initializers.database.DB.session.delete(old_picture)
+                os.remove(f"./backend/uploads/{old_picture.filename}")
+            # Save if new profile picture is uploaded.
+            filename = info['image_filename']
+            base, extension = os.path.splitext(filename)
+            timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            new_filename = f"{base}_{timestamp}{extension}"
+            file_path = f"./backend/{flask.current_app.config['UPLOAD_FOLDER']}{new_filename}"
+            info['image'].save(file_path)
+
+            new_profile_picture = backend.models.user.ProfilePicture(
+                filename=new_filename,
+                user_username=username
+            )
+            backend.initializers.database.DB.session.add(new_profile_picture)
+
+        backend.initializers.database.DB.session.commit()
+        return flask.jsonify({"message": "User edited successfully."}), backend.initializers.settings.HTTPStatus.OK.value

@@ -1,5 +1,3 @@
-import os
-
 import flask
 import flask_jwt_extended
 import werkzeug.utils

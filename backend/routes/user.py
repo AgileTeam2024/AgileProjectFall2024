@@ -1,6 +1,7 @@
 import email_validator
 import flask
 import flask_jwt_extended
+import werkzeug.utils
 
 import backend.managers.user
 import backend.models.user
@@ -180,3 +181,92 @@ def delete_user() -> (flask.Flask, int):
         description: Successfully deleted the user
     """
     return backend.managers.user.UserManager.instance.delete_account(flask_jwt_extended.get_jwt_identity())
+
+
+@user_bp.route('/get_profile_by_username', methods=['GET'])
+@flask_jwt_extended.jwt_required()
+def get_profile_by_username() -> (flask.Flask, int):
+    """
+    User get profile by username API.
+    ---
+    tags:
+      - User
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Successfully get profile by username.
+    """
+    return backend.managers.user.UserManager.instance.get_profile(flask_jwt_extended.get_jwt_identity())
+
+
+@user_bp.route('/edit_profile', methods=['POST'])
+@flask_jwt_extended.jwt_required()
+def edit() -> (flask.Flask, int):
+    """
+    User edit profile API.
+    ---
+    tags:
+      - User
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: first_name
+        in: formData
+        required: false
+        type: string
+        description: The first name of the user.
+      - name: last_name
+        in: formData
+        required: false
+        type: string
+        description: The last name of the user.
+      - name: email
+        in: formData
+        required: false
+        type: string
+        description: The email of the user.
+      - name: phone number
+        in: formData
+        required: false
+        type: string
+        description: The phone number of the user.
+      - name: profile_picture
+        in: formData
+        type: file
+        required: false
+        description: The profile picture of the user.
+    responses:
+      200:
+        description: Successfully edited the user
+    """
+    info = {}
+    # Get new values of profile fields.
+    first_name = flask.request.form.get('first_name')
+    if first_name:
+        info['first_name'] = first_name
+    last_name = flask.request.form.get('last_name')
+    if last_name:
+        info['last_name'] = last_name
+    email = flask.request.form.get('email')
+    if email:
+        # Validate the email.
+        try:
+            email_validator.validate_email(email)
+        except email_validator.EmailNotValidError as e:
+            return (
+                flask.jsonify({'message': 'Email is invalid.'}),
+                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+            )
+        info['email'] = email
+    phone_number = flask.request.form.get('phone_number')
+    if phone_number:
+        info['phone_number'] = phone_number
+    # Get the new profile picture.
+    profile_picture = flask.request.files.get('profile_picture')
+    if (profile_picture and '.' in profile_picture.filename and
+            profile_picture.filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}):
+        filename = werkzeug.utils.secure_filename(profile_picture.filename)
+        info['image'] = profile_picture
+        info['image_filename'] = filename
+    return backend.managers.user.UserManager.instance.edit_profile(flask_jwt_extended.get_jwt_identity(), info)
