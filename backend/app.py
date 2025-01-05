@@ -104,7 +104,7 @@ def main(_: list[str]) -> None:
     """
 
     # Create the Flask app.
-    flask_app = flask.Flask(__name__)
+    flask_app = flask.Flask(__name__, static_folder='uploads', static_url_path='/backend/uploads')
     # Enable CORS for all routes and origins, since frontend would be hosted in different port from backend.
     flask_cors.CORS(flask_app)
     # Set secret key used for generating tokens.
