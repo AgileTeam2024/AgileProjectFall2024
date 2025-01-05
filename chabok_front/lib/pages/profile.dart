@@ -113,9 +113,7 @@ class UserProfilePage extends StatelessWidget {
     // todo connect to back
   }
 
-  void _goToEditProfile() {
-    // todo
-  }
+  void _goToEditProfile() => RouterService.go('/edit-profile');
 
   void _logout() {
     // todo connect to back
