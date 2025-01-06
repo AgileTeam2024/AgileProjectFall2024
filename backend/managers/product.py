@@ -126,8 +126,6 @@ class ProductManager:
 
         return flask.jsonify({"products": products_as_dicts}), backend.initializers.settings.HTTPStatus.OK.value
 
-    # TODO : Add edit and delete
-
     def get_product(self, product_id: int) -> (flask.Flask, int):
         """
         Retrieve a product by its ID.
@@ -254,3 +252,30 @@ class ProductManager:
         backend.initializers.database.DB.session.commit()
         return flask.jsonify(
             {"message": "Product is reported successfully."}), backend.initializers.settings.HTTPStatus.OK.value
+
+    def get_products_on_sale(self, user_username: str) -> (flask.Flask, int):
+        """
+        Returns a list of products belonging to a user that are on sale.
+
+        Args:
+            user_username (str): username of the user
+        Returns:
+            response (flask.Response): A Flask response object containing successfully returning a list.
+            status_code (int):
+                200: successful search
+                404: no products found
+        """
+        products = backend.models.product.Product.query.filter_by(
+            user_username=user_username,
+            status='for sale'
+        ).all()
+
+        if not products:
+            return (
+                {"message": "No products found for this user."},
+                backend.initializers.settings.HTTPStatus.NOT_FOUND.value
+            )
+
+        products_as_dicts = [product.to_dict() for product in products]
+
+        return flask.jsonify({"products": products_as_dicts}), backend.initializers.settings.HTTPStatus.OK.value

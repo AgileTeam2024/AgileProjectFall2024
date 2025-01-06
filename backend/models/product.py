@@ -16,7 +16,7 @@ class Product(backend.initializers.database.DB.Model):
     STATUS_OPTIONS = ['for sale', 'sold', 'reserved']
     # Categories : real estate, automobile, digital & electronics , kitchenware, personal items, entertainment, others
     CATEGORY_OPTIONS = [
-        'Others', 'Real estate', 'Automobile', 'Digital & Electronics', 'Kitchenware', 'Entertainment',
+        'Others', 'Real-Estate', 'Automobile', 'Digital & Electronics', 'Kitchenware', 'Entertainment',
         'Personal Items'
     ]
 

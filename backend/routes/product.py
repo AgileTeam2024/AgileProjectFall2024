@@ -403,14 +403,13 @@ def edit_product() -> (flask.Flask, int):
         required: true
         type: string
         enum:
-          - Other
-          - Electronics
-          - Clothing
-          - Home & Garden
-          - Sports & Outdoors
-          - Toys & Games
-          - Automotive  # Corrected spelling from "Automative"
-          - Books & Media
+          - Others
+          - Digitals & Electronics
+          - Automobile
+          - Kitchenware
+          - Real-Estate
+          - Personal Items
+          - Entertainment
         description: The category of the product.
       - name: pictures
         in: formData
@@ -519,3 +518,16 @@ def report_product() -> (flask.Flask, int):
         )
     return backend.managers.product.ProductManager.instance.report_product(reporter_username, reported_product,
                                                                            description)
+
+    @product_bp.route('/sale_list', methods=['GET'])
+    @flask_jwt_extended.jwt_required()
+    def get_products_on_sale() -> (flask.Flask, int):
+        """
+        API for returning a list of products that are on sale for a user.
+
+        tags:
+            - product
+
+        """
+        username = flask_jwt_extended.get_jwt_identity()
+        return backend.managers.product.ProductManager.instance.get_products_on_sale(username)
