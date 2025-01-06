@@ -267,9 +267,6 @@ class UserManager:
                 flask.jsonify({"message": "The reported user does not exist."}),
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
-        print(reported_user)
-        print(reported_user)
-        print(description)
         report = backend.models.report.UserReport(
             reported_user=reported_user.username,
             reporter_username=reporter_username,

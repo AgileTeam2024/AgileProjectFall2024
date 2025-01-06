@@ -108,6 +108,23 @@ class UserManagerTest(absltest.TestCase):
         refresh_token = data['refresh_token']
         self.assertTrue(refresh_token)
 
+    def test_successful_report(self):
+        """Test that reporting user is successful."""
+        self.mock_user_query.filter_by.return_value.first.return_value = backend.models.user.User(
+            username="user",
+            password="password123"
+        )
+        response, status_code = self.user_manager.report_user("user1", "user", "dummy")
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {'message': 'User is reported successfully.'})
+
+    def test_user_report_user_does_not_exist(self):
+        """Test invalidating reporting non-existent user."""
+        self.mock_user_query.filter_by.return_value.first.return_value = None
+        response, status_code = self.user_manager.report_user("user1", "user", "dummy")
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
+        self.assertEqual(response.json, {'message': 'The reported user does not exist.'})
+
 
 if __name__ == "__main__":
     backend.initializers.test_util.pass_flags_as_parsed()
