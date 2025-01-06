@@ -1,4 +1,6 @@
 import 'package:chabok_front/models/product.dart';
+import 'package:chabok_front/services/network.dart';
+import 'package:chabok_front/view_models/text_field.dart';
 import 'package:flutter/foundation.dart';
 
 class ProductService {
@@ -13,6 +15,8 @@ class ProductService {
   static set instance(ProductService value) {
     _instance = value;
   }
+
+  final _networkService = NetworkService.instance;
 
   Future<List<Product>> get suggestions {
     // todo get from back
@@ -46,5 +50,21 @@ class ProductService {
     // todo send request to back
     final list = await suggestions;
     return list.where((p) => p.id == id).first;
+  }
+
+  Future<bool> createProduct(
+    Map<String, dynamic> fields,
+    Map<String, Uint8List?>? images,
+  ) async {
+    // fields['category'] = 'Other';
+    images?.removeWhere((path, bytes) => bytes == null);
+    final response = await _networkService.postFormData(
+      '/product/create',
+      fields,
+      files: {
+        'picture': images?.map((k, v) => MapEntry(k, v!)) ?? {},
+      },
+    );
+    return response.isOk;
   }
 }

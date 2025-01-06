@@ -2,11 +2,14 @@ import 'dart:typed_data';
 
 import 'package:chabok_front/extensions/list.dart';
 import 'package:chabok_front/models/product.dart';
+import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/services/network.dart';
+import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/view_models/text_field.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/main_fab.dart';
 import 'package:chabok_front/widgets/text_field.dart';
+import 'package:chabok_front/widgets/toast.dart';
 import 'package:chabok_front/widgets/upload_file.dart';
 import 'package:flutter/material.dart';
 
@@ -28,6 +31,7 @@ class CreateEditProductPage extends StatefulWidget {
         'Digital & Electronics',
         'Kitchenware',
         'Personal Items',
+        'Entertainment',
         'Others'
       ],
     ),
@@ -62,15 +66,20 @@ class CreateEditProductPage extends StatefulWidget {
   @override
   State<CreateEditProductPage> createState() => _CreateEditProductPageState();
 
-  void submit() {
+  void submit({
+    required Map<String, TextFieldViewModel> fields,
+    Map<String, Uint8List?>? images,
+  }) {
     throw UnimplementedError('Should be overridden!');
   }
 }
 
 class _CreateEditProductPageState extends State<CreateEditProductPage> {
-  late final Map<String, Uint8List> images;
+  late Map<String, Uint8List> images;
 
   Map<String, TextFieldViewModel> get fields => widget.fields;
+
+  final formKey = GlobalKey<FormState>();
 
   final _networkService = NetworkService.instance;
 
@@ -91,69 +100,88 @@ class _CreateEditProductPageState extends State<CreateEditProductPage> {
     return Scaffold(
       floatingActionButton: MainFAB(
         icon: Icons.check,
-        onPressed: widget.submit,
+        onPressed: submit,
       ),
       body: Center(
         child: CardWidget(
-          child: Flex(
-            direction: isBigScreen ? Axis.horizontal : Axis.vertical,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: UploadFileWidget(
-                  files: images,
-                  onFilesChange: (newFiles) =>
-                      setState(() => images = newFiles),
-                  minimumFiles: 1,
-                  maximumFiles: 10,
+          child: Form(
+            key: formKey,
+            child: Flex(
+              direction: isBigScreen ? Axis.horizontal : Axis.vertical,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: UploadFileWidget(
+                    files: images,
+                    onFilesChange: (newFiles) =>
+                        setState(() => images = newFiles),
+                    minimumFiles: 1,
+                    maximumFiles: 10,
+                  ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(15),
-                child: isBigScreen ? VerticalDivider() : Divider(),
-              ),
-              Expanded(
-                child: isBigScreen
-                    ? Column(
-                        children: fields.values
-                            .map(
-                              (vm) => Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 7.5,
-                                  horizontal: 10,
+                Padding(
+                  padding: EdgeInsets.all(15),
+                  child: isBigScreen ? VerticalDivider() : Divider(),
+                ),
+                Expanded(
+                  child: isBigScreen
+                      ? Column(
+                          children: fields.values
+                              .map(
+                                (vm) => Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 7.5,
+                                    horizontal: 10,
+                                  ),
+                                  child: CustomTextField(vm),
                                 ),
-                                child: CustomTextField(vm),
-                              ),
-                            )
-                            .toList(),
-                      )
-                    : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 15,
-                        children: fields.values
-                            .toList()
-                            .fixedGrouped(groupSize: 2)
-                            .map(
-                              (vmList) => Row(
-                                mainAxisSize: MainAxisSize.min,
-                                spacing: 20,
-                                children: vmList
-                                    .map(
-                                      (vm) => Expanded(
-                                        child: CustomTextField(vm),
-                                      ),
-                                    )
-                                    .toList(),
-                              ),
-                            )
-                            .toList(),
-                      ),
-              ),
-            ],
+                              )
+                              .toList(),
+                        )
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: 15,
+                          children: fields.values
+                              .toList()
+                              .fixedGrouped(groupSize: 2)
+                              .map(
+                                (vmList) => Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 20,
+                                  children: vmList
+                                      .map(
+                                        (vm) => Expanded(
+                                          child: CustomTextField(vm),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  void submit() {
+    if (images.isEmpty) {
+      CustomToast.showToast(
+        context,
+        ServerResponse.visualize(
+          '{"message": "Please upload at least one image for your product."}',
+          400,
+        ),
+      );
+      return;
+    }
+    if (formKey.currentState?.validate() ?? false) {
+      widget.submit(fields: fields, images: images);
+    }
   }
 }
 
@@ -161,19 +189,17 @@ class CreateProductPage extends CreateEditProductPage {
   CreateProductPage({super.key});
 
   @override
-  void submit() {
-    // curl --location 'http://185.231.59.87/api/product/create' \
-    // --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczNjExMTEwOCwianRpIjoiMmU1N2MxNjYtZjU3YS00MjU5LThkMDYtYmIxNWNjNzQ3ZjllIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImRvcnJpbiIsIm5iZiI6MTczNjExMTEwOCwiY3NyZiI6Ijc3ZTRmNjcyLTRiZWMtNDE0Yi05YzkxLWFjNWZmNTQ5ZDM4ZSIsImV4cCI6MTczNjExNDcwOH0.htdQwYUmhktkTEBdEwZh92-L7GWl31tCVW8mYdpFw_k' \
-    // --form 'name="product name 8"' \
-    // --form 'price="1023445"' \
-    // --form 'city_name="Tehran, Iran"' \
-    // --form 'description="My product is a good product :)"' \
-    // --form 'status="for sale"' \
-    // --form 'category="Electronics"' \
-    // --form 'picture=@"/Users/dorrinsotoudeh/Downloads/IMG_552278780ADD-1.jpeg"' \
-    // --form 'picture=@"/Users/dorrinsotoudeh/Downloads/1403-10-03 16.22.08 copy.jpg"'
-
-
+  void submit({required Map<String, TextFieldViewModel> fields, Map<String, Uint8List?>? images}) {
+    final productService = ProductService.instance;
+    productService.createProduct(
+      fields.map((k, vm) {
+        var text = vm.controller.text;
+        if (k == 'price') text = text.replaceAll(',', '');
+        return MapEntry(k, text);
+      })
+        ..putIfAbsent('status', () => 'for sale'),
+      images,
+    );
   }
 }
 
@@ -193,7 +219,7 @@ class EditProductPage extends CreateEditProductPage {
         );
 
   @override
-  void submit() {
+  void submit({required Map<String, TextFieldViewModel> fields, Map<String, Uint8List?>? images}) {
     // todo edit product in back
   }
 }
