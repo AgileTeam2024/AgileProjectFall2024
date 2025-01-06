@@ -226,7 +226,6 @@ class ProductManager:
 
         return flask.jsonify({"message": "Product edited successfully."}), backend.initializers.settings.HTTPStatus.OK.value
 
-
     def report_product(self, reporter_username: str, reported_product: int, description: str) -> (flask.Flask, int):
         """
         Report product.

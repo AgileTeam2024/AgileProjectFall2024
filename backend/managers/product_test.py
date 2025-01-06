@@ -29,7 +29,8 @@ class ProductManagerTest(absltest.TestCase):
         self.product3 = backend.models.product.Product(id=3, name='Apple Watch Series 6', price=399.99, status='sold')
 
         self.user1 = backend.models.user.User(username='seller1', email='seller@email.com')
-        self.product4 = backend.models.product.Product(id=4, name='Apple Watch Series 6', price=399.99, status='sold', user_username='seller1')
+        self.product4 = backend.models.product.Product(id=4, name='Apple Watch Series 6', price=399.99, status='sold',
+                                                       user_username='seller1')
 
     def tearDown(self) -> None:
         self.mock_db_session.stop()
@@ -94,6 +95,22 @@ class ProductManagerTest(absltest.TestCase):
         expected_product = self.product4.to_dict()
         expected_product['seller'] = self.user1.to_dict()
         self.assertEqual(expected_product, result.json['product'])
+
+    def test_successful_report(self):
+        """Test that reporting product is successful."""
+        self.mock_product_query.filter_by.return_value.first.return_value = self.product1
+        response, status_code = self.product_manager.report_product("user",
+                                                                    self.product1.id, "dummy")
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {'message': 'Product is reported successfully.'})
+
+    def test_product_report_product_does_not_exist(self):
+        """Test invalidating reporting non-existent product."""
+        self.mock_product_query.filter_by.return_value.first.return_value = None
+        response, status_code = self.product_manager.report_product("user",
+                                                                    self.product1.id, "dummy")
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
+        self.assertEqual(response.json, {'message': 'The reported product does not exist.'})
 
 
 if __name__ == "__main__":
