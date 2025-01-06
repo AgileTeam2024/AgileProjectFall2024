@@ -165,7 +165,7 @@ class ProductManager:
             product_id (Integer): The id of the product to be deleted.
         Returns:
             response (flask.Response): A Flask response object containing successfully deleted a user.
-            status_code (int): HTTP status code indicating success (200).
+            status_code (int): HTTP status code indicating successful delete (204).
         """
         
 
@@ -178,6 +178,50 @@ class ProductManager:
         backend.initializers.database.DB.session.commit()
         return (
             flask.jsonify({"message": "Product deleted successfully."}),
-            backend.initializers.settings.HTTPStatus.OK.value
+            backend.initializers.settings.HTTPStatus.NO_CONTENT.value
         )
     
+    def edit_product(self, product_id: int, product_data: dict) -> (flask.Flask):
+        """
+        Edit product's properties.
+
+        Args:
+            product_id (int): The id of the product.
+            product_data (dict): A dictionary containing the updated info of the product.
+        Returns:
+            response (flask.Response): A Flask response object containing successfully deleted a user.
+            status_code (int): HTTP status code indicating success (200).
+        """
+
+        product = backend.models.product.Product.query.filter_by(id=product_id).first()
+        product.name = product_data.get('name', product.name)
+        product.price = product_data.get('price', product.price)
+        product.city_name = product_data.get('city_name', product.city_name)
+        product.description = product_data.get('description', product.description)
+        product.status = product_data.get('status', product.status)
+        product.category = product_data.get('category', product.category)
+        product.user_username = product_data.get('user_username', product.user_username)
+
+        # Deleting old pictures
+        product_pictures = backend.models.product.Picture.query.filter_by(id=product.id).all()
+        for picture in product_pictures:
+            backend.initializers.database.DB.session.delete(picture)
+            os.remove(picture.filename)
+
+        # Adding new pictures
+        for file, filename in zip(product_data['images'], product_data['images_path']):
+            # Generate a new filename by appending a timestamp to avoid duplicate name.
+            base, extension = os.path.splitext(filename)
+            timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            new_filename = f"{base}_{timestamp}{extension}"
+            file_path = f"./backend/{flask.current_app.config['UPLOAD_FOLDER']}{new_filename}"
+            file.save(file_path)
+            # Create a new Picture instance associated with the newly created product.
+            new_picture = backend.models.product.Picture(
+                filename=new_filename,
+                product_id=product_id,
+            )
+            backend.initializers.database.DB.session.add(new_picture)
+
+        backend.initializers.database.DB.session.commit()
+        return flask.jsonify({"message": "Product edited successfully."}), backend.initializers.settings.HTTPStatus.OK.value
