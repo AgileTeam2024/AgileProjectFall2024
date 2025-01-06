@@ -95,66 +95,59 @@ class _CreateEditProductPageState extends State<CreateEditProductPage> {
       ),
       body: Center(
         child: CardWidget(
-          child: Column(
-            spacing: 15,
+          child: Flex(
+            direction: isBigScreen ? Axis.horizontal : Axis.vertical,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: Flex(
-                  direction: isBigScreen ? Axis.horizontal : Axis.vertical,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: UploadFileWidget(
-                        files: images,
-                        onFilesChange: (newFiles) =>
-                            setState(() => images = newFiles),
-                        minimumFiles: 1,
-                        maximumFiles: 10,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(15),
-                      child: isBigScreen ? VerticalDivider() : Divider(),
-                    ),
-                    Expanded(
-                      child: isBigScreen
-                          ? Column(
-                              children: fields.values
-                                  .map(
-                                    (vm) => Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 7.5,
-                                        horizontal: 10,
-                                      ),
-                                      child: CustomTextField(vm),
-                                    ),
-                                  )
-                                  .toList(),
-                            )
-                          : Column(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: 15,
-                              children: fields.values
-                                  .toList()
-                                  .fixedGrouped(groupSize: 2)
-                                  .map(
-                                    (vmList) => Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      spacing: 20,
-                                      children: vmList
-                                          .map(
-                                            (vm) => Expanded(
-                                              child: CustomTextField(vm),
-                                            ),
-                                          )
-                                          .toList(),
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
-                    ),
-                  ],
+                child: UploadFileWidget(
+                  files: images,
+                  onFilesChange: (newFiles) =>
+                      setState(() => images = newFiles),
+                  minimumFiles: 1,
+                  maximumFiles: 10,
                 ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(15),
+                child: isBigScreen ? VerticalDivider() : Divider(),
+              ),
+              Expanded(
+                child: isBigScreen
+                    ? Column(
+                        children: fields.values
+                            .map(
+                              (vm) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 7.5,
+                                  horizontal: 10,
+                                ),
+                                child: CustomTextField(vm),
+                              ),
+                            )
+                            .toList(),
+                      )
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 15,
+                        children: fields.values
+                            .toList()
+                            .fixedGrouped(groupSize: 2)
+                            .map(
+                              (vmList) => Row(
+                                mainAxisSize: MainAxisSize.min,
+                                spacing: 20,
+                                children: vmList
+                                    .map(
+                                      (vm) => Expanded(
+                                        child: CustomTextField(vm),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            )
+                            .toList(),
+                      ),
               ),
             ],
           ),
@@ -169,7 +162,18 @@ class CreateProductPage extends CreateEditProductPage {
 
   @override
   void submit() {
-    // todo create product in back
+    // curl --location 'http://185.231.59.87/api/product/create' \
+    // --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczNjExMTEwOCwianRpIjoiMmU1N2MxNjYtZjU3YS00MjU5LThkMDYtYmIxNWNjNzQ3ZjllIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImRvcnJpbiIsIm5iZiI6MTczNjExMTEwOCwiY3NyZiI6Ijc3ZTRmNjcyLTRiZWMtNDE0Yi05YzkxLWFjNWZmNTQ5ZDM4ZSIsImV4cCI6MTczNjExNDcwOH0.htdQwYUmhktkTEBdEwZh92-L7GWl31tCVW8mYdpFw_k' \
+    // --form 'name="product name 8"' \
+    // --form 'price="1023445"' \
+    // --form 'city_name="Tehran, Iran"' \
+    // --form 'description="My product is a good product :)"' \
+    // --form 'status="for sale"' \
+    // --form 'category="Electronics"' \
+    // --form 'picture=@"/Users/dorrinsotoudeh/Downloads/IMG_552278780ADD-1.jpeg"' \
+    // --form 'picture=@"/Users/dorrinsotoudeh/Downloads/1403-10-03 16.22.08 copy.jpg"'
+
+
   }
 }
 
