@@ -270,3 +270,46 @@ def edit() -> (flask.Flask, int):
         info['image'] = profile_picture
         info['image_filename'] = filename
     return backend.managers.user.UserManager.instance.edit_profile(flask_jwt_extended.get_jwt_identity(), info)
+
+
+@user_bp.route('/report_user', methods=['POST'])
+@flask_jwt_extended.jwt_required()
+def report_user() -> (flask.Flask, int):
+    """
+    Report a user for inappropriate behavior.
+    ---
+    tags:
+      - User
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: reported_username
+        in: formData
+        type: string
+        required: true
+        description: The username of the user being reported.
+      - name: description
+        in: formData
+        type: string
+        required: true
+        description: A description of the reason for reporting the user.
+    responses:
+      200:
+        description: User is reported successfully.
+      400:
+        description: Bad request. Missing required fields.
+    """
+    reported_username = flask.request.form.get('reported_username')
+    if not reported_username:
+        return (
+            flask.jsonify({'message': 'Missing reported username.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    description = flask.request.form.get('description')
+    if not description:
+        return (
+            flask.jsonify({'message': 'Missing description.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    return backend.managers.user.UserManager.instance.report_user(flask_jwt_extended.get_jwt_identity(),
+                                                                  reported_username, description)

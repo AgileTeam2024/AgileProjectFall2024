@@ -9,6 +9,7 @@ import backend.models.user
 import backend.initializers.database
 import backend.initializers.settings
 import backend.models.product
+import backend.models.report
 
 
 class UserManager:
@@ -244,4 +245,37 @@ class UserManager:
             backend.initializers.database.DB.session.add(new_profile_picture)
 
         backend.initializers.database.DB.session.commit()
-        return flask.jsonify({"message": "User edited successfully."}), backend.initializers.settings.HTTPStatus.OK.value
+        return flask.jsonify(
+            {"message": "User edited successfully."}), backend.initializers.settings.HTTPStatus.OK.value
+
+    def report_user(self, reporter_username: str, reported_user: str, description: str) -> (flask.Flask, int):
+        """
+        Report user.
+
+        Args:
+            reporter_username (str): The username of the user who reported.
+            reported_user(str): The username of the reported user.
+            description (str): The description of why the user was reported.
+
+        Returns:
+            response (flask.Response): A Flask response object containing successfully deleted a user.
+            status_code (int): HTTP status code indicating success or bad request (200, 400).
+        """
+        reported_user = backend.models.user.User.query.filter_by(username=reported_user).first()
+        if not reported_user:
+            return (
+                flask.jsonify({"message": "The reported user does not exist."}),
+                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+            )
+        print(reported_user)
+        print(reported_user)
+        print(description)
+        report = backend.models.report.UserReport(
+            reported_user=reported_user.username,
+            reporter_username=reporter_username,
+            description=description
+        )
+        backend.initializers.database.DB.session.add(report)
+        backend.initializers.database.DB.session.commit()
+        return flask.jsonify(
+            {"message": "User is reported successfully."}), backend.initializers.settings.HTTPStatus.OK.value
