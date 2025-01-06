@@ -168,7 +168,7 @@ class ProductManager:
             status_code (int): HTTP status code indicating successful delete (204).
         """
 
-        product_pictures = backend.models.product.Picture.query.filter_by(product_id=product.id).all()
+        product_pictures = backend.models.product.Picture.query.filter_by(product_id=product_id).all()
         for picture in product_pictures:
             backend.initializers.database.DB.session.delete(picture)
             os.remove(picture.filename)
@@ -180,7 +180,7 @@ class ProductManager:
             backend.initializers.settings.HTTPStatus.NO_CONTENT.value
         )
 
-    def edit_product(self, product_id: int, product_data: dict) -> (flask.Flask):
+    def edit_product(self, product_id: int, product_data: dict) -> (flask.Flask, int):
         """
         Edit product's properties.
 
@@ -223,6 +223,7 @@ class ProductManager:
             backend.initializers.database.DB.session.add(new_picture)
 
         backend.initializers.database.DB.session.commit()
+
         return flask.jsonify({"message": "Product edited successfully."}), backend.initializers.settings.HTTPStatus.OK.value
 
 

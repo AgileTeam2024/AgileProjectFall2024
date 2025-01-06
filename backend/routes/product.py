@@ -431,7 +431,7 @@ def edit_product() -> (flask.Flask, int):
     product_price = flask.request.form.get('price')
     if product_price:
         try:
-            price = float(price)
+            price = float(product_price)
             data['price'] = product_price
         except ValueError:
             return (
@@ -515,3 +515,4 @@ def report_product() -> (flask.Flask, int):
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
     return backend.managers.product.ProductManager.instance.report_product(reporter_username, reported_product,
+                                                                           description)
