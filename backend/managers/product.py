@@ -7,6 +7,7 @@ import backend.models.product
 import backend.initializers.database
 import backend.initializers.settings
 import backend.models.user
+import backend.models.report
 
 
 class ProductManager:
@@ -156,7 +157,6 @@ class ProductManager:
             product_dict['seller'] = seller
         return flask.jsonify({"product": product_dict}), backend.initializers.settings.HTTPStatus.OK.value
 
-    
     def delete_product(self, product_id) -> (flask.Flask, int):
         """
         Deletes a product.
@@ -167,7 +167,6 @@ class ProductManager:
             response (flask.Response): A Flask response object containing successfully deleted a user.
             status_code (int): HTTP status code indicating successful delete (204).
         """
-        
 
         product_pictures = backend.models.product.Picture.query.filter_by(product_id=product.id).all()
         for picture in product_pictures:
@@ -180,7 +179,7 @@ class ProductManager:
             flask.jsonify({"message": "Product deleted successfully."}),
             backend.initializers.settings.HTTPStatus.NO_CONTENT.value
         )
-    
+
     def edit_product(self, product_id: int, product_data: dict) -> (flask.Flask):
         """
         Edit product's properties.
@@ -225,3 +224,33 @@ class ProductManager:
 
         backend.initializers.database.DB.session.commit()
         return flask.jsonify({"message": "Product edited successfully."}), backend.initializers.settings.HTTPStatus.OK.value
+
+
+    def report_product(self, reporter_username: str, reported_product: int, description: str) -> (flask.Flask, int):
+        """
+        Report product.
+
+        Args:
+            reporter_username: (str): The username of the user who reported.
+            reported_product(str): The ID of the reported product.
+            description (str): The description of why the user was reported.
+
+        Returns:
+            response (flask.Response): A Flask response object containing successfully deleted a user.
+            status_code (int): HTTP status code indicating success (200).
+        """
+        reported_product = backend.models.product.Product.query.filter_by(id=reported_product).first()
+        if not reported_product:
+            return (
+                flask.jsonify({"message": "The reported product does not exist."}),
+                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+            )
+        report = backend.models.report.ProductReport(
+            reported_product=reported_product.id,
+            reporter_username=reporter_username,
+            description=description
+        )
+        backend.initializers.database.DB.session.add(report)
+        backend.initializers.database.DB.session.commit()
+        return flask.jsonify(
+            {"message": "Product is reported successfully."}), backend.initializers.settings.HTTPStatus.OK.value

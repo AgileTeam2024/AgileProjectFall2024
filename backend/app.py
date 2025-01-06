@@ -31,6 +31,7 @@ def connect_to_db(flask_app: flask.Flask) -> None:
     # Load database models to ensure their tables existence.
     import backend.models.user
     import backend.models.product
+    import backend.models.report
 
     # Configure the Flask app for setting up the SQLAlchemy database connection.
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = (

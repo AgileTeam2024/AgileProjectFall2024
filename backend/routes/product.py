@@ -355,6 +355,7 @@ def delete_product() -> (flask.Flask, int):
 
     return backend.managers.product.ProductManager.instance.delete_product(product_id)
 
+
 @product_bp.route('/edit_product', methods=['POST'])
 @flask_jwt_extended.jwt_required()
 def edit_product() -> (flask.Flask, int):
@@ -429,14 +430,14 @@ def edit_product() -> (flask.Flask, int):
         data['name'] = product_name
     product_price = flask.request.form.get('price')
     if product_price:
-      try:
-        price = float(price)
-        data['price'] = product_price
-      except ValueError:
-        return (
-            flask.jsonify({'message': 'Price must be a valid float number.'}),
-            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-        )
+        try:
+            price = float(price)
+            data['price'] = product_price
+        except ValueError:
+            return (
+                flask.jsonify({'message': 'Price must be a valid float number.'}),
+                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+            )
     product_city = flask.request.form.get('city_name')
     if product_city:
         data['city_name'] = product_city
@@ -463,6 +464,54 @@ def edit_product() -> (flask.Flask, int):
     data['images'] = images
     data['images_path'] = images_path
     data['user_username'] = user_username
-  
+
     return backend.managers.product.ProductManager.instance.edit_product(product_id, data)
-    
+
+
+@product_bp.route('/report_product', methods=['POST'])
+@flask_jwt_extended.jwt_required()
+def report_product() -> (flask.Flask, int):
+    """
+    Report a product for inappropriate content.
+    ---
+    tags:
+      - Product
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: reported_product
+        in: formData
+        type: integer
+        required: true
+        description: The ID of the product being reported.
+      - name: description
+        in: formData
+        type: string
+        required: true
+        description: A description of the reason for reporting the user.
+    responses:
+      200:
+        description: Product is reported successfully.
+      400:
+        description: Bad request. Missing required fields.
+    """
+    reporter_username = flask_jwt_extended.get_jwt_identity()
+    reported_product = flask.request.form.get('reported_product')
+    if not reported_product:
+        return (
+            flask.jsonify({'message': 'Missing reported product.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    if not reported_product.isdigit():
+        return (
+            flask.jsonify({'message': 'Reported product must be a number.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    reported_product = int(reported_product)
+    description = flask.request.form.get('description')
+    if not description:
+        return (
+            flask.jsonify({'message': 'Missing description.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    return backend.managers.product.ProductManager.instance.report_product(reporter_username, reported_product,
