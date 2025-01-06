@@ -1,5 +1,6 @@
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/services/product.dart';
+import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/images_display.dart';
@@ -143,9 +144,10 @@ class _ProductViewPageState extends State<ProductViewPage> {
     // todo send request to backend
   }
 
-  void onEditProduct() {
-    // todo send request to backend
-  }
+  Future<void> onEditProduct() async => RouterService.go(
+        '/product/${widget.id}/edit',
+        extra: await _productService.getProductById(widget.id),
+      );
 
   void onDeleteProduct() {
     // todo send request to backend

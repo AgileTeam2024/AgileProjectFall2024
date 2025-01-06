@@ -1,3 +1,4 @@
+import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/pages/create_edit_product.dart';
 import 'package:chabok_front/pages/edit_profile.dart';
@@ -8,6 +9,7 @@ import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/pages/profile.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
+import 'package:chabok_front/widgets/main_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -32,6 +34,13 @@ class RouterService {
         builder: (context, state, child) {
           print('${state.fullPath} ${state.pathParameters} ${state.extra}');
           return Scaffold(
+            floatingActionButton: state.fullPath == '/create-product'
+                ? null
+                : MainFAB(
+                    icon: Icons.add,
+                    label: 'Create Product',
+                    onPressed: () => go('/create-product'),
+                  ),
             appBar: MainAppBar(),
             body: child,
           );
@@ -69,8 +78,18 @@ class RouterService {
             pageBuilder: (context, state) => NoTransitionPage(
               child: ProductViewPage(
                 int.parse(state.pathParameters['id']!),
-                viewerIsSeller: false,
+                viewerIsSeller: true,
               ),
+            ),
+          ),
+          GoRoute(
+            path: '/product/:id/edit',
+            redirect: (context, state) {
+              // todo check if current user is the owner of the product
+              // if not, redirect back to ProductViewPage
+            },
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: EditProductPage(state.extra as Product),
             ),
           ),
           GoRoute(
