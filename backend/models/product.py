@@ -14,9 +14,10 @@ class Product(backend.initializers.database.DB.Model):
     CITY_NAME_MAX_LENGTH = 50
     DESCRIPTION_MAX_LENGTH = 500
     STATUS_OPTIONS = ['for sale', 'sold', 'reserved']
+    # Categories : real estate, automobile, digital & electronics , kitchenware, personal items, entertainment, others
     CATEGORY_OPTIONS = [
-        'Other', 'Electronics', 'Clothing', 'Home & Garden', 'Sports & Outdoors', 'Toys & Games',
-        'Automative', 'Books & Media'
+        'Others', 'Real estate', 'Automobile', 'Digital & Electronics', 'Kitchenware', 'Entertainment',
+        'Personal Items'
     ]
 
     id = backend.initializers.database.DB.Column(

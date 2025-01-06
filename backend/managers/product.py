@@ -156,3 +156,28 @@ class ProductManager:
             product_dict['seller'] = seller
         return flask.jsonify({"product": product_dict}), backend.initializers.settings.HTTPStatus.OK.value
 
+    
+    def delete_product(self, product_id) -> (flask.Flask, int):
+        """
+        Deletes a product.
+
+        Args:
+            product_id (Integer): The id of the product to be deleted.
+        Returns:
+            response (flask.Response): A Flask response object containing successfully deleted a user.
+            status_code (int): HTTP status code indicating success (200).
+        """
+        
+
+        product_pictures = backend.models.product.Picture.query.filter_by(product_id=product.id).all()
+        for picture in product_pictures:
+            backend.initializers.database.DB.session.delete(picture)
+            os.remove(picture.filename)
+        product = backend.models.product.Product.query.filter_by(id=product_id)
+        backend.initializers.database.DB.session.delete(product)
+        backend.initializers.database.DB.session.commit()
+        return (
+            flask.jsonify({"message": "Product deleted successfully."}),
+            backend.initializers.settings.HTTPStatus.OK.value
+        )
+    
