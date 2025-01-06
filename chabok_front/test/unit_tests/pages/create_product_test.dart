@@ -1,4 +1,4 @@
-import 'package:chabok_front/pages/create_product.dart';
+import 'package:chabok_front/pages/create_edit_product.dart';
 import 'package:chabok_front/widgets/text_field.dart';
 import 'package:chabok_front/widgets/upload_file.dart';
 import 'package:flutter/material.dart';

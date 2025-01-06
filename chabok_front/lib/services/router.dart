@@ -1,5 +1,5 @@
 import 'package:chabok_front/models/user.dart';
-import 'package:chabok_front/pages/create_product.dart';
+import 'package:chabok_front/pages/create_edit_product.dart';
 import 'package:chabok_front/pages/edit_profile.dart';
 import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/pages/home.dart';
