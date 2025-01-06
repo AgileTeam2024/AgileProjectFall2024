@@ -330,17 +330,20 @@ def delete_product() -> (flask.Flask, int):
     tags:
       - Product
     responses:
-      200: successful delete
-      400: bad request
-      401: unauthorized user access
+      200:
+        description: successful delete
+      400:
+        description: bad request
+      401:
+        description: unauthorized user access
     """
     username = flask.request.args.get('user_username')
     user = flask_jwt_extended.get_jwt_identity()
     if username != user:
         return (
             flask.jsonify({'message': 'You cannot delete this product.'}),
-             backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
-            )
+            backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
+        )
     product_id = flask.request.args.get('id')
     if not product_id:
         return (
