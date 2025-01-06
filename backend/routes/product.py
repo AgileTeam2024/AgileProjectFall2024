@@ -353,5 +353,116 @@ def delete_product() -> (flask.Flask, int):
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
 
-    return backend.managers.product.PeoductManager.instance.delete_product(product_id)
+    return backend.managers.product.ProductManager.instance.delete_product(product_id)
 
+@product_bp.route('/edit_product', methods=['POST'])
+@flask_jwt_extended.jwt_required()
+def edit_product() -> (flask.Flask, int):
+    """
+    Edit product's properties.
+    ---
+    tags:
+      - Product
+    parameters:
+      - name: name
+        in: formData
+        required: true
+        type: string
+        description: The name of the product.
+      - name: price
+        in: formData
+        required: true
+        type: number
+        format: float
+        description: The price of the product.
+      - name: city_name
+        in: formData
+        required: false
+        type: string
+        description: The city where the product is located.
+      - name: description
+        in: formData
+        required: true
+        type: string
+        description: Description about the product.
+      - name: status
+        in: formData
+        required: true
+        type: string
+        enum:
+          - reserved
+          - sold
+          - for sale
+        description: The status of the product.
+      - name: category
+        in: formData
+        required: true
+        type: string
+        enum:
+          - Other
+          - Electronics
+          - Clothing
+          - Home & Garden
+          - Sports & Outdoors
+          - Toys & Games
+          - Automotive  # Corrected spelling from "Automative"
+          - Books & Media
+        description: The category of the product.
+      - name: pictures
+        in: formData
+        type: file
+        required: true
+        allowMultiple: true
+        collectionFormat: multi
+        description: Images of the product. You can upload multiple images.
+    responses:
+      '201':
+        description: Product created successfully.
+      '400':
+        description: Bad Request if any required fields are missing or invalid.
+    """
+    user_username = flask_jwt_extended.get_jwt_identity()
+    data = {}
+    product_id = flask.request.form.get('id')
+    product_name = flask.request.form.get('name')
+    if product_name:
+        data['name'] = product_name
+    product_price = flask.request.form.get('price')
+    if product_price:
+      try:
+        price = float(price)
+        data['price'] = product_price
+      except ValueError:
+        return (
+            flask.jsonify({'message': 'Price must be a valid float number.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    product_city = flask.request.form.get('city_name')
+    if product_city:
+        data['city_name'] = product_city
+    product_description = flask.request.form.get('description')
+    if product_description:
+        data['description'] = product_description
+    product_status = flask.request.form.get('status')
+    if product_status:
+        data['status'] = product_status
+    product_category = flask.request.form.get('category')
+    if product_category:
+        data['category'] = product_category
+
+    image_files = flask.request.files.getlist('picture')
+    images = []
+    images_path = []
+    # Validate files and create path for storing them.
+    for image_file in image_files:
+        if (image_file and '.' in image_file.filename and
+                image_file.filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}):
+            filename = werkzeug.utils.secure_filename(image_file.filename)
+            images.append(image_file)
+            images_path.append(filename)
+    data['images'] = images
+    data['images_path'] = images_path
+    data['user_username'] = user_username
+  
+    return backend.managers.product.ProductManager.instance.edit_product(product_id, data)
+    
