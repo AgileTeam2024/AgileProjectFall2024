@@ -21,5 +21,5 @@ def revoked_token_callback(jwt_header, jwt_payload):
 
 
 @backend.managers.user.UserManager.instance.jwt_manager.expired_token_loader
-def my_expired_token_callback(expired_token):
+def expired_token_callback(jwt_header, jwt_payload):
     return flask.jsonify({"message": "Token is expired."}), backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value

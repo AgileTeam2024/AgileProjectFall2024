@@ -1,5 +1,3 @@
-import os
-
 import flask
 import flask_jwt_extended
 import werkzeug.utils
@@ -136,7 +134,7 @@ def create() -> (flask.Flask, int):
         )
 
     # Get list of files from the 'pictures' field
-    image_files = flask.request.files.getlist('pictures')
+    image_files = flask.request.files.getlist('picture')
     images = []
     images_path = []
     # Validate files and create path for storing them.
@@ -320,7 +318,7 @@ def get_product_by_id():
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
 
-    return backend.managers.product.ProductManager.instance.get_product_by_id(product_id)
+    return backend.managers.product.ProductManager.instance.get_product(product_id)
 
 
 @product_bp.route('/delete', methods=['DELETE'])

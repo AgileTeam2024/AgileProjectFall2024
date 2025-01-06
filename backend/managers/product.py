@@ -6,6 +6,7 @@ import flask
 import backend.models.product
 import backend.initializers.database
 import backend.initializers.settings
+import backend.models.user
 
 
 class ProductManager:
@@ -51,7 +52,7 @@ class ProductManager:
             file.save(file_path)
             # Create a new Picture instance associated with the newly created product.
             new_picture = backend.models.product.Picture(
-                filename=file_path,
+                filename=new_filename,
                 product_id=new_product.id,
             )
             backend.initializers.database.DB.session.add(new_picture)
@@ -154,6 +155,7 @@ class ProductManager:
             seller = backend.models.user.User.query.get(product.user_username).to_dict()
             product_dict['seller'] = seller
         return flask.jsonify({"product": product_dict}), backend.initializers.settings.HTTPStatus.OK.value
+
     
     def delete_product(self, product_id) -> (flask.Flask, int):
         """
