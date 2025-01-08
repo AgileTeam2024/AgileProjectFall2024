@@ -31,7 +31,7 @@ class ProductManagerTest(absltest.TestCase):
         self.user1 = backend.models.user.User(username='seller1', email='seller@email.com')
         self.product4 = backend.models.product.Product(id=4, name='Apple Watch Series 6', price=399.99, status='sold',
                                                        user_username='seller1')
-        self.product5 = backend.models.product.Product(id=5, name='Laptop Asus', price=399.99, status='for sale')
+        self.product5 = backend.models.product.Product(id=5, name='Laptop Asus', price=399.99, status='for sale', user_username='seller1')
 
     def tearDown(self) -> None:
         self.mock_db_session.stop()
