@@ -8,6 +8,7 @@ import 'package:chabok_front/pages/login_register.dart';
 import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/pages/profile.dart';
 import 'package:chabok_front/services/auth.dart';
+import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:chabok_front/widgets/main_fab.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,8 @@ class RouterService {
         builder: (context, state, child) {
           print('${state.fullPath} ${state.pathParameters} ${state.extra}');
           return Scaffold(
-            floatingActionButton: state.fullPath == '/create-product'
+            floatingActionButton: ['/create-product', '/product/:id/edit']
+                    .contains(state.fullPath)
                 ? null
                 : MainFAB(
                     icon: Icons.add,
@@ -88,9 +90,29 @@ class RouterService {
               // todo check if current user is the owner of the product
               // if not, redirect back to ProductViewPage
             },
-            pageBuilder: (context, state) => NoTransitionPage(
-              child: EditProductPage(state.extra as Product),
-            ),
+            pageBuilder: (context, state) {
+              final productId = int.parse(state.pathParameters['id']!);
+              return NoTransitionPage(
+                child: FutureBuilder<Product>(
+                  future: ProductService.instance.getProductById(productId),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data != null) {
+                        return EditProductPage(snapshot.data!);
+                      }
+                    } else if (snapshot.hasError) {
+                      return ErrorPage(
+                        errorCode: 404,
+                        message: 'Product not found :(',
+                      );
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+                ),
+              );
+            },
           ),
           GoRoute(
             path: '/create-product',

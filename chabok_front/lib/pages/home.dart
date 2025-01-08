@@ -16,8 +16,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Product>>(
-      future: _productService.suggestions,
+      future: _productService.homePageProducts,
       builder: (context, snapshot) {
+        print(snapshot.error);
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }

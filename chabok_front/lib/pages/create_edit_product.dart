@@ -70,6 +70,8 @@ class CreateEditProductPage extends StatefulWidget {
     }
   }
 
+  String get action => throw UnimplementedError('Should be overridden!');
+
   @override
   State<CreateEditProductPage> createState() => _CreateEditProductPageState();
 
@@ -107,6 +109,7 @@ class _CreateEditProductPageState extends State<CreateEditProductPage> {
 
     return Scaffold(
       floatingActionButton: MainFAB(
+        label: widget.action,
         icon: Icons.check,
         onPressed: submit,
       ),
@@ -207,6 +210,9 @@ class CreateProductPage extends CreateEditProductPage {
   }
 
   @override
+  String get action => 'Create Product';
+
+  @override
   Future<void> submit(
     BuildContext context, {
     required Map<String, TextFieldViewModel> fields,
@@ -245,11 +251,26 @@ class EditProductPage extends CreateEditProductPage {
         );
 
   @override
+  String get action => 'Edit Product';
+
+  @override
   void submit(
     BuildContext context, {
     required Map<String, TextFieldViewModel> fields,
     Map<String, Uint8List?>? images,
   }) {
-    // todo edit product in back
+    ProductService.instance.editProduct(
+      fields.map((k, vm) {
+        var text = vm.controller.text;
+        if (k == 'price') text = text.replaceAll(',', '');
+        return MapEntry(k, text);
+      }),
+      images,
+    ).then((response) {
+      if (response.isOk) {
+        CustomToast.showToast(context, response);
+        RouterService.go('/');
+      }
+    });
   }
 }

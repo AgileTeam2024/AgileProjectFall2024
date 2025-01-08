@@ -15,7 +15,10 @@ class NetworkService {
 
   // static const host = '127.0.0.1';
   // static const port = 8000;
+  static const scheme = 'http';
   static const host = '185.231.59.87';
+  // static const scheme = 'https';
+  // static const host = 'pre-loved.ir';
   static const port = 80;
 
   Map<String, String>? get authHeader {
@@ -30,7 +33,7 @@ class NetworkService {
     String prefix = '/api',
   ]) {
     return Uri(
-      scheme: 'http',
+      scheme: scheme,
       host: host,
       port: port,
       path: '$prefix/${path.substring(1)}',

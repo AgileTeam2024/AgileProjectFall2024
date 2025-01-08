@@ -34,17 +34,20 @@ class ProductsWidget extends StatelessWidget {
             hoverElevation: 2,
             focusElevation: 2,
             elevation: 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                _ProductImageWidget(displayImage),
-                _ProductNameWidget(product.name),
-                SizedBox(height: 7.5),
-                _ProductPriceWidget(product.price),
-                SizedBox(height: 2.5),
-                SellerWidget(seller),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  _ProductImageWidget(displayImage),
+                  _ProductNameWidget(product.name),
+                  SizedBox(height: 7.5),
+                  _ProductPriceWidget(product.price),
+                  SizedBox(height: 2.5),
+                  SellerWidget(seller),
+                ],
+              ),
             ),
           );
         },

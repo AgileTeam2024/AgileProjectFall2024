@@ -39,7 +39,9 @@ class _ProductViewPageState extends State<ProductViewPage> {
               // todo error page
               return Container();
             }
-            if (!snapshot.hasData) return CircularProgressIndicator();
+            if (!snapshot.hasData) {
+              return Center(child: CircularProgressIndicator());
+            }
 
             final product = snapshot.data!;
             return Flex(
