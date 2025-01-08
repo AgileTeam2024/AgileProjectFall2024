@@ -17,6 +17,7 @@ class NetworkService {
   // static const port = 8000;
   static const scheme = 'http';
   static const host = '185.231.59.87';
+
   // static const scheme = 'https';
   // static const host = 'pre-loved.ir';
   static const port = 80;
@@ -65,7 +66,7 @@ class NetworkService {
     Map<String, Map<String, Uint8List>>? files,
   }) async {
     final request = http.MultipartRequest('POST', _buildUrl(path, query));
-    fields.forEach((k, v) => request.fields.putIfAbsent(k, () => v));
+    fields.forEach((k, v) => request.fields.putIfAbsent(k, () => '$v'));
     files?.forEach(
       (key, values) => values.forEach(
         (path, bytes) => request.files.add(
@@ -98,6 +99,21 @@ class NetworkService {
     final response = await http.get(
       _buildUrl(path, query),
       headers: {'Accept': 'application/json', ...?authHeader},
+    );
+    return ServerResponse.visualize(response.body, response.statusCode);
+  }
+
+  Future<ServerResponse> delete<T>(
+    String path, {
+    Map<String, dynamic>? query,
+  }) async {
+    final response = await http.delete(
+      _buildUrl(path, query),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        ...?authHeader
+      },
     );
     return ServerResponse.visualize(response.body, response.statusCode);
   }

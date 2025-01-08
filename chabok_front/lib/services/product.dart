@@ -45,18 +45,22 @@ class ProductService {
   }
 
   Future<ServerResponse> editProduct(
+    int productId,
     Map<String, dynamic> fields,
     Map<String, Uint8List?>? images,
   ) {
     images?.removeWhere((path, bytes) => bytes == null);
     return _networkService.postFormData(
       '/product/edit_product',
-      fields,
+      fields..putIfAbsent('id', () => productId),
       files: {
         'picture': images?.map((k, v) => MapEntry(k, v!)) ?? {},
       },
     );
   }
+
+  Future<ServerResponse> deleteProduct(int id) =>
+      _networkService.delete('/product/delete', query: {'id': id});
 
   Future<List<Product>> searchProducts({
     String? name,

@@ -5,6 +5,7 @@ import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/images_display.dart';
 import 'package:chabok_front/widgets/seller.dart';
+import 'package:chabok_front/widgets/toast.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 
@@ -146,13 +147,13 @@ class _ProductViewPageState extends State<ProductViewPage> {
     // todo send request to backend
   }
 
-  Future<void> onEditProduct() async => RouterService.go(
-        '/product/${widget.id}/edit',
-        extra: await _productService.getProductById(widget.id),
-      );
+  Future<void> onEditProduct() async =>
+      RouterService.go('/product/${widget.id}/edit');
 
-  void onDeleteProduct() {
-    // todo send request to backend
+  Future<void> onDeleteProduct() async {
+    final response = await _productService.deleteProduct(widget.id);
+    CustomToast.showToast(context, response);
+    if (response.isOk) RouterService.go('/');
   }
 
   String formatPrice(double price) {

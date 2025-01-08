@@ -1,10 +1,18 @@
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/services/router.dart';
+import 'package:chabok_front/services/user.dart';
 import 'package:chabok_front/widgets/card.dart';
+import 'package:chabok_front/widgets/toast.dart';
 import 'package:flutter/material.dart';
 
 class UserProfilePage extends StatelessWidget {
+  UserProfilePage({super.key});
+
+  final _authService = AuthService.instance;
+  final _userService = UserService.instance;
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -85,7 +93,7 @@ class UserProfilePage extends StatelessWidget {
                     ListTile(
                       leading: Icon(Icons.logout, color: Colors.blueAccent),
                       title: Text('Log Out'),
-                      onTap: _logout,
+                      onTap: () => _logout(context),
                     ),
                     Divider(),
                     ListTile(
@@ -115,60 +123,72 @@ class UserProfilePage extends StatelessWidget {
 
   void _goToEditProfile() => RouterService.go('/edit-profile');
 
-  void _logout() {
-    // todo connect to back
-    RouterService.go('/');
+  Future<void> _logout(BuildContext context) async {
+    final response = await _authService.logout();
+    CustomToast.showToast(context, response);
+    if (response.isOk) RouterService.go('/');
   }
 }
 
 @visibleForTesting
 class UserInfoWidget extends StatelessWidget {
-  const UserInfoWidget({super.key});
+  UserInfoWidget({super.key});
+
+  final _userService = UserService.instance;
 
   @override
   Widget build(BuildContext context) {
-    // todo get user profile from backend
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 40,
-          backgroundImage: AssetImage(
-            'assets/sample_images/seller_pfp.jpg',
-          ),
-        ),
-        SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'fff aaa',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+    return FutureBuilder<User>(
+        future: _userService.ownProfile,
+        builder: (context, snapshot) {
+          final profile = snapshot.data;
+          if (!snapshot.hasData || profile == null) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          return Row(
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundImage: profile.profilePicture == null
+                    ? null
+                    : NetworkImage(profile.profilePicture!),
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Username: fffaaa',
-              style: TextStyle(color: Colors.grey[700]),
-            ),
-            Text(
-              'Email: fa@example.com',
-              style: TextStyle(color: Colors.grey[700]),
-            ),
-            Text(
-              'Address: 123 Street',
-              style: TextStyle(color: Colors.grey[700]),
-            ),
-            Text(
-              'Phone: +1234567890',
-              style: TextStyle(color: Colors.grey[700]),
-            ),
-          ],
-        ),
-      ],
-    );
+              SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    profile.fullName,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Username: ${profile.username}',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  Text(
+                    'Email: ${profile.email ?? "-"}',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  Text(
+                    'Address: ${profile.address ?? "-"}',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  Text(
+                    'Phone: ${profile.phoneNumber ?? "-"}',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ],
+          );
+        });
   }
 }
 

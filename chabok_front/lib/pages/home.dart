@@ -18,8 +18,7 @@ class _HomePageState extends State<HomePage> {
     return FutureBuilder<List<Product>>(
       future: _productService.homePageProducts,
       builder: (context, snapshot) {
-        print(snapshot.error);
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (!snapshot.hasData) {
           return Center(child: CircularProgressIndicator());
         }
         final data = snapshot.data ?? [];

@@ -1,5 +1,6 @@
 import 'package:chabok_front/extensions/num.dart';
 import 'package:chabok_front/models/product.dart';
+import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/seller.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,9 @@ class ProductsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (products.isEmpty) {
+      return ErrorPage(errorCode: 404, message: 'No products found :(');
+    }
     return Padding(
       padding: const EdgeInsets.only(top: 25) +
           EdgeInsets.symmetric(horizontal: 250),

@@ -23,5 +23,10 @@ class User {
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
 
-  bool get hasBeenEditedBefore => ![firstName, lastName].contains(null);
+  bool get hasBeenEditedBefore => (firstName ?? lastName) != null;
+
+  String get fullName {
+    if ((firstName ?? lastName) == null) return 'Stranger';
+    return '$firstName $lastName';
+  }
 }

@@ -1,8 +1,7 @@
-import 'package:universal_html/html.dart' as html;
-
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/services/network.dart';
 import 'package:flutter/material.dart';
+import 'package:universal_html/html.dart' as html;
 
 class AuthService {
   static AuthService? _instance;
@@ -48,4 +47,13 @@ class AuthService {
 
   Future<ServerResponse> register(Map<String, String> body) =>
       _networkService.post('/user/register', body);
+
+  Future<ServerResponse> logout() =>
+      _networkService.get('/user/logout').then((response) {
+        if (response.isOk) {
+          accessToken = null;
+          refreshToken = null;
+        }
+        return response;
+      });
 }

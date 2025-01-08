@@ -260,6 +260,7 @@ class EditProductPage extends CreateEditProductPage {
     Map<String, Uint8List?>? images,
   }) {
     ProductService.instance.editProduct(
+      product.id,
       fields.map((k, vm) {
         var text = vm.controller.text;
         if (k == 'price') text = text.replaceAll(',', '');
