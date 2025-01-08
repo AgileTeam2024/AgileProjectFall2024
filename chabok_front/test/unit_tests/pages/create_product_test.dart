@@ -12,7 +12,7 @@ void main() {
       setUpWidgetTest(tester);
       await tester.pumpWidget(MaterialApp(home: CreateProductPage()));
 
-      expect(find.byType(CustomTextField), findsNWidgets(5));
+      expect(find.byType(CustomTextField), findsNWidgets(6));
       expect(find.byType(UploadFileWidget), findsOneWidget);
     });
 
@@ -36,14 +36,14 @@ void main() {
       setUpWidgetTest(tester, Size(999, 800));
       await tester.pumpWidget(MaterialApp(home: CreateProductPage()));
 
-      expect(find.byType(Column), findsNWidgets(3));
+      expect(find.byType(Column), findsNWidgets(2));
     });
 
     testWidgets('displays horizontal layout on large screens', (WidgetTester tester) async {
       setUpWidgetTest(tester, Size(1200, 800));
       await tester.pumpWidget(MaterialApp(home: CreateProductPage()));
 
-      expect(find.byType(Row), findsNWidgets(2));
+      expect(find.byType(Row), findsNWidgets(3));
     });
   });
 }

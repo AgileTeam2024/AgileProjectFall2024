@@ -1,9 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:chabok_front/models/pair.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/network.dart';
+import 'package:flutter/foundation.dart';
 
 class UserService {
   static UserService? _instance;
@@ -11,6 +10,11 @@ class UserService {
   static UserService get instance {
     _instance ??= UserService();
     return _instance!;
+  }
+
+  @visibleForTesting
+  static set instance(UserService value) {
+    _instance = value;
   }
 
   final _networkService = NetworkService.instance;
