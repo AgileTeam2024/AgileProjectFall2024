@@ -347,7 +347,7 @@ def delete_product() -> (flask.Flask, int):
       404:
         description: product with this id doesn't exist.
     """
-
+    user_username = flask_jwt_extended.get_jwt_identity()
     product_id = flask.request.args.get('product_id')
     if not product_id:
         return (
@@ -360,7 +360,7 @@ def delete_product() -> (flask.Flask, int):
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
 
-    return backend.managers.product.ProductManager.instance.delete_product(product_id)
+    return backend.managers.product.ProductManager.instance.delete_product(user_username, product_id)
 
 
 @product_bp.route('/edit_product', methods=['PUT'])
@@ -487,7 +487,7 @@ def edit_product() -> (flask.Flask, int):
     data['images_path'] = images_path
     data['user_username'] = user_username
 
-    return backend.managers.product.ProductManager.instance.edit_product(product_id, data)
+    return backend.managers.product.ProductManager.instance.edit_product(user_username, product_id, data)
 
 
 @product_bp.route('/report_product', methods=['POST'])

@@ -124,7 +124,7 @@ class ProductManagerTest(absltest.TestCase):
             'status': 'for sale',
             'category': 'Digital & Electronics',
         }
-        response, status_code = self.product_manager.edit_product(self.product1.id, product_data)
+        response, status_code = self.product_manager.edit_product(self.user1.username, self.product1.id, product_data)
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
         self.assertEqual(response.json, {'message': 'Product is edited successfully.'})
 

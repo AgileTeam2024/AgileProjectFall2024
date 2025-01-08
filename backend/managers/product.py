@@ -156,12 +156,13 @@ class ProductManager:
             product_dict['seller'] = seller
         return flask.jsonify({"product": product_dict}), backend.initializers.settings.HTTPStatus.OK.value
 
-    def delete_product(self, product_id) -> (flask.Flask, int):
+    def delete_product(self, username: str, product_id: int) -> (flask.Flask, int):
         """
         Deletes a product.
 
         Args:
             product_id (Integer): The id of the product to be deleted.
+            username (str): The username of the current user.
         Returns:
             response (flask.Response): A Flask response object containing successfully deleted a user.
             status_code (int): HTTP status code indicating successful delete (204).
@@ -172,7 +173,6 @@ class ProductManager:
                 flask.jsonify({'message': {'Product does not exist.'}}),
                 backend.initializers.settings.HTTPStatus.NOT_FOUND.value
             )
-        username = flask_jwt_extended.get_jwt_identity()
         if product.user_username != username:
             return (
                 flask.jsonify({'message': {'You do not have access to edit this product.'}}),
@@ -190,11 +190,12 @@ class ProductManager:
             backend.initializers.settings.HTTPStatus.NO_CONTENT.value
         )
 
-    def edit_product(self, product_id: int, product_data: dict) -> (flask.Flask, int):
+    def edit_product(self, username: str, product_id: int, product_data: dict) -> (flask.Flask, int):
         """
         Edit product's properties.
 
         Args:
+            username (str): The username of the current user.
             product_id (int): The id of the product.
             product_data (dict): A dictionary containing the updated info of the product.
         Returns:
@@ -208,7 +209,6 @@ class ProductManager:
                 flask.jsonify({'message': {'Product does not exist.'}}),
                 backend.initializers.settings.HTTPStatus.NOT_FOUND.value
             )
-        username = flask_jwt_extended.get_jwt_identity()
         if product.user_username != username:
             return (
                 flask.jsonify({'message': {'You do not have access to edit this product.'}}),
