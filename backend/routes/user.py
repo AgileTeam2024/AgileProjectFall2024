@@ -166,7 +166,7 @@ def refresh_token() -> (flask.Flask, int):
                                                                     flask_jwt_extended.get_jwt_identity())
 
 
-@user_bp.route('/delete', methods=['GET'])
+@user_bp.route('/delete', methods=['DELETE'])
 @flask_jwt_extended.jwt_required()
 def delete_user() -> (flask.Flask, int):
     """
@@ -200,7 +200,7 @@ def get_profile_by_username() -> (flask.Flask, int):
     return backend.managers.user.UserManager.instance.get_profile(flask_jwt_extended.get_jwt_identity())
 
 
-@user_bp.route('/edit_profile', methods=['POST'])
+@user_bp.route('/edit_profile', methods=['PUT'])
 @flask_jwt_extended.jwt_required()
 def edit() -> (flask.Flask, int):
     """

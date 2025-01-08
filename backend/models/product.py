@@ -60,6 +60,10 @@ class Product(backend.initializers.database.DB.Model):
         default='for sale',
         nullable=False
     )
+    is_banned = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.Boolean,
+        default=False
+    )
     # can be defined as a class
     # TODO : check doc
     category = backend.initializers.database.DB.Column(

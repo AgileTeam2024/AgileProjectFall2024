@@ -329,6 +329,12 @@ def delete_product() -> (flask.Flask, int):
     ---
     tags:
       - Product
+    parameters:
+      - name: product_id
+      in: query
+      type: integer
+      required: true
+      description: The ID of the product to retrieve.
     responses:
       200:
         description: successful delete
@@ -359,7 +365,7 @@ def delete_product() -> (flask.Flask, int):
     return backend.managers.product.ProductManager.instance.delete_product(product_id)
 
 
-@product_bp.route('/edit_product', methods=['POST'])
+@product_bp.route('/edit_product', methods=['PUT'])
 @flask_jwt_extended.jwt_required()
 def edit_product() -> (flask.Flask, int):
     """
@@ -368,6 +374,11 @@ def edit_product() -> (flask.Flask, int):
     tags:
       - Product
     parameters:
+      - name: product_id
+        in: query
+        type: integer
+        required: true
+        description: The ID of the product to edit.
       - name: name
         in: formData
         required: true
@@ -419,14 +430,21 @@ def edit_product() -> (flask.Flask, int):
         collectionFormat: multi
         description: Images of the product. You can upload multiple images.
     responses:
-      '201':
+      201:
         description: Product created successfully.
-      '400':
+      400:
         description: Bad Request if any required fields are missing or invalid.
+      404:
+        description: Not found if the product with the provided id doesn't exist.
     """
     user_username = flask_jwt_extended.get_jwt_identity()
     data = {}
     product_id = flask.request.form.get('id')
+    if not product_id:
+        return (
+            flask.jsonify({'message': 'No product found with this id.'}),
+            backend.initializers.settings.HTTPStatus.NOT_FOUND.value
+        )
     product_name = flask.request.form.get('name')
     if product_name:
         data['name'] = product_name
@@ -519,15 +537,56 @@ def report_product() -> (flask.Flask, int):
     return backend.managers.product.ProductManager.instance.report_product(reporter_username, reported_product,
                                                                            description)
 
-    @product_bp.route('/sale_list', methods=['GET'])
-    @flask_jwt_extended.jwt_required()
-    def get_products_on_sale() -> (flask.Flask, int):
-        """
-        API for returning a list of products that are on sale for a user.
 
-        tags:
-            - product
+@product_bp.route('/sale_list', methods=['GET'])
+@flask_jwt_extended.jwt_required()
+def get_products_on_sale() -> (flask.Flask, int):
+    """
+    API for returning a list of products that are on sale for a user.
+    ---
+    tags:
+      - product
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Product is reported successfully.
+      404:
+        description: No products found for this user.
+    """
+    username = flask_jwt_extended.get_jwt_identity()
+    return backend.managers.product.ProductManager.instance.get_products_on_sale(username)
 
-        """
-        username = flask_jwt_extended.get_jwt_identity()
-        return backend.managers.product.ProductManager.instance.get_products_on_sale(username)
+
+@product_bp.route('/ban_product', methods=['PUT'])
+def ban_product() -> (flask.Flask, int):
+    """
+    Product ban API.
+    ---
+    tags:
+      - product
+    parameters:
+    - name: product_id
+        in: query
+        type: integer
+        required: true
+        description: The ID of the product to edit.
+    responses:
+      200:
+        description: Product is reported successfully.
+      404:
+        description: No products found with this id.
+    """
+    product_id = flask.request.args.get('product_id')
+    # Check if product ID is missing
+    if not product_id:
+        return (
+            flask.jsonify({'message': 'Missing product ID.'}),
+            backend.initializers.settings.HTTPStatus.NOT_FOUND.value
+        )
+    if not product_id.isdigit():
+        return (
+            flask.jsonify({'message': 'Product ID must be an integer.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    return backend.managers.product.ProductManager.instance.ban_product(product_id)
