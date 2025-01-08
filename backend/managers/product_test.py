@@ -126,7 +126,7 @@ class ProductManagerTest(absltest.TestCase):
         }
         response, status_code = self.product_manager.edit_product(self.user1.username, self.product1.id, product_data)
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
-        self.assertEqual(response.json, {'message': 'Product is edited successfully.'})
+        self.assertEqual(response.json, {'message': 'Product edited successfully.'})
 
 
 if __name__ == "__main__":
