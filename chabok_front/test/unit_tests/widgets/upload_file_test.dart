@@ -6,10 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+
+import 'upload_file_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<FilePicker>()])
 void main() {
   group('UploadFileWidget', () {
+    late MockFilePicker mockFilePicker;
+
     late Map<String, Uint8List> files;
     late void Function(Map<String, Uint8List>) onFilesChange;
     final filename = 'assets/sample_images/product_img1.jpg';
@@ -19,6 +24,7 @@ void main() {
       HttpOverrides.global = null;
       files = {};
       onFilesChange = (newFiles) => files = newFiles;
+      mockFilePicker = MockFilePicker();
     });
 
     testWidgets('displays initial UI correctly', (tester) async {
@@ -34,7 +40,33 @@ void main() {
     });
 
     testWidgets('adds files with file_picker', (tester) async {
-      assert(false);
+      await tester.pumpWidget(MaterialApp(
+        home: UploadFileWidget(
+          files: files,
+          onFilesChange: onFilesChange,
+        ),
+      ));
+
+      final uploadWidget = find.byType(UploadFileWidget).evaluate().first.widget
+          as UploadFileWidget;
+      uploadWidget.filePicker = mockFilePicker;
+
+      when(mockFilePicker.pickFiles(type: FileType.image, allowMultiple: true))
+          .thenAnswer((_) async {
+        // print('mockFilePicker.pickFiles');
+        return FilePickerResult([
+          PlatformFile(
+            name: filename,
+            size: fileBytes.lengthInBytes,
+            bytes: fileBytes,
+          )
+        ]);
+      });
+
+      await tester.tap(find.byType(UploadFileWidget));
+      await tester.pump();
+
+      expect(files.length, 1);
     });
 
     testWidgets('removes a file', (tester) async {
