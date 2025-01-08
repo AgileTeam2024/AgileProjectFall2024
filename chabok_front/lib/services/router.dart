@@ -59,7 +59,7 @@ class RouterService {
           ),
           GoRoute(
             path: '/login',
-            redirect: (context, state) async {
+            redirect: (context, state) {
               if (_authService.isLoggedIn) return '/';
               return null;
             },
@@ -68,7 +68,7 @@ class RouterService {
           ),
           GoRoute(
             path: '/register',
-            redirect: (context, state) async {
+            redirect: (context, state) {
               if (_authService.isLoggedIn) return '/';
               return null;
             },
@@ -80,15 +80,16 @@ class RouterService {
             pageBuilder: (context, state) => NoTransitionPage(
               child: ProductViewPage(
                 int.parse(state.pathParameters['id']!),
-                viewerIsSeller: true,
               ),
             ),
           ),
           GoRoute(
             path: '/product/:id/edit',
             redirect: (context, state) {
-              // todo check if current user is the owner of the product
-              // if not, redirect back to ProductViewPage
+              if (!_authService.isLoggedIn) {
+                return '/product/${state.pathParameters['id']}';
+              }
+              return null;
             },
             pageBuilder: (context, state) {
               final productId = int.parse(state.pathParameters['id']!);

@@ -15,8 +15,9 @@ class UserService {
 
   final _networkService = NetworkService.instance;
 
-  Future<User> get ownProfile async {
+  Future<User?> get ownProfile async {
     final response = await _networkService.get('/user/get_profile_by_username');
+    if (!response.isOk) return null;
     final user = response.bodyJson['profile'];
     return User.fromJson(user);
   }

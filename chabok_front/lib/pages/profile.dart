@@ -140,7 +140,7 @@ class UserInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<User>(
+    return FutureBuilder<User?>(
         future: _userService.ownProfile,
         builder: (context, snapshot) {
           final profile = snapshot.data;
