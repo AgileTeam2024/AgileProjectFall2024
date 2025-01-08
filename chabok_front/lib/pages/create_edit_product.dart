@@ -197,15 +197,7 @@ class _CreateEditProductPageState extends State<CreateEditProductPage> {
 }
 
 class CreateProductPage extends CreateEditProductPage {
-  CreateProductPage({super.key})
-      : super(fieldsInitialValues: {
-          'status': 'for sale',
-          'name': 'product.name',
-          'category': 'Others',
-          'city_name': 'product.location',
-          'price': '12321876312',
-          'description': 'product.description',
-        }) {
+  CreateProductPage({super.key}) {
     fields['status']?.readOnly = true;
   }
 
