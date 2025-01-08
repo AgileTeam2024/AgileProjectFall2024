@@ -123,7 +123,7 @@ class ProductManager:
 
         # Execute the query and get results.
         products = query.all()
-        products_as_dicts = [product.to_dict() for product in products if not product['is_banned']]
+        products_as_dicts = [product.to_dict() for product in products if not product.is_banned]
 
         return flask.jsonify({"products": products_as_dicts}), backend.initializers.settings.HTTPStatus.OK.value
 

@@ -31,6 +31,7 @@ class ProductManagerTest(absltest.TestCase):
         self.user1 = backend.models.user.User(username='seller1', email='seller@email.com')
         self.product4 = backend.models.product.Product(id=4, name='Apple Watch Series 6', price=399.99, status='sold',
                                                        user_username='seller1')
+        self.product5 = backend.models.product.Product(id=5, name='Laptop Asus', price=399.99, status='for sale')
 
     def tearDown(self) -> None:
         self.mock_db_session.stop()
@@ -111,6 +112,21 @@ class ProductManagerTest(absltest.TestCase):
                                                                     self.product1.id, "dummy")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
         self.assertEqual(response.json, {'message': 'The reported product does not exist.'})
+
+    def test_edit_product_success(self):
+        """Test successful editing of a product."""
+        self.mock_product_query.filter_by.return_value.first.return_value = self.product5
+        self.mock_user_query.get.return_value = self.user1
+        product_data = {
+            'name': 'Laptop Lenovo',
+            'price': 499.99,
+            'description': 'Updated description',
+            'status': 'for sale',
+            'category': 'Digital & Electronics',
+        }
+        response, status_code = self.product_manager.edit_product(self.product1.id, product_data)
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {'message': 'Product is edited successfully.'})
 
 
 if __name__ == "__main__":
