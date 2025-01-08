@@ -146,7 +146,7 @@ class ProductManagerTest(absltest.TestCase):
             'category': 'Digital & Electronics',
         }
         with mock.patch("flask_jwt_extended.get_jwt_identity", return_value='current_user'):
-            response, status_code = self.product_manager.edit_product(self.user1.username, self.product1.id, product_data)
+            response, status_code = self.product_manager.edit_product(self.user2.username, self.product1.id, product_data)
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value)
         self.assertEqual(response.json, {'You do not have access to edit this product.'})
 
@@ -163,6 +163,7 @@ class ProductManagerTest(absltest.TestCase):
         self.assertIn(self.product6.id, product_ids)
         self.assertIn(self.product7.id, product_ids)
         self.assertIn(self.product8.id, product_ids)
+
 
 if __name__ == "__main__":
     backend.initializers.test_util.pass_flags_as_parsed()
