@@ -34,7 +34,7 @@ class RouterService {
       ShellRoute(
         navigatorKey: _shellNavKey,
         builder: (context, state, child) {
-          print('${state.fullPath} ${state.pathParameters} ${state.extra}');
+          // print('${state.fullPath} ${state.pathParameters} ${state.extra}');
           return Scaffold(
             floatingActionButton: ['/create-product', '/product/:id/edit']
                     .contains(state.fullPath)

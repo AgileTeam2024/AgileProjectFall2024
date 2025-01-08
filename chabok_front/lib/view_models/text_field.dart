@@ -134,6 +134,8 @@ class OptionsTextFieldViewModel extends TextFieldViewModel {
     super.error,
     super.label,
     required super.required,
-    super.readOnly,
-  });
+    super.readOnly
+  }) {
+    controller.text = options[0];
+  }
 }

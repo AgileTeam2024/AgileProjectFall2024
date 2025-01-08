@@ -6,8 +6,19 @@ import 'package:flutter_dropzone/flutter_dropzone.dart';
 
 class UploadFileWidget extends StatelessWidget {
   Map<String, Uint8List> files;
-
   final void Function(Map<String, Uint8List> files) onFilesChange;
+
+  FilePicker? _filePicker;
+
+  set filePicker(FilePicker? value) {
+    // print('UploadFileWidget.set filePicker $value');
+    _filePicker = value ?? FilePicker.platform;
+  }
+
+  FilePicker get filePicker {
+    // print('UploadFileWidget.get filePicker $_filePicker');
+    return _filePicker!;
+  }
 
   final int minimumFiles;
   final int? maximumFiles;
@@ -155,8 +166,9 @@ class UploadFileWidget extends StatelessWidget {
   }
 
   Future<void> _openFileExplorer() async {
-    final result = await FilePicker.platform
-        .pickFiles(type: FileType.image, allowMultiple: true);
+    // print('UploadFileWidget._openFileExplorer $filePicker');
+    final result =
+        await filePicker.pickFiles(type: FileType.image, allowMultiple: true);
     if (result == null) return;
     _addFiles(result.files.asMap().map((_, e) => MapEntry(e.name, e.bytes!)));
   }

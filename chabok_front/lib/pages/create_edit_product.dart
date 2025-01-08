@@ -180,6 +180,7 @@ class _CreateEditProductPageState extends State<CreateEditProductPage> {
   }
 
   void submit() {
+    // print('_CreateEditProductPageState.submit ${images.length}');
     if (images.isEmpty) {
       CustomToast.showToast(
         context,
@@ -190,6 +191,9 @@ class _CreateEditProductPageState extends State<CreateEditProductPage> {
       );
       return;
     }
+    // print(
+    // '_CreateEditProductPageState.submit ${fields.map((k, v) => MapEntry(k, v.text))}');
+    // '_CreateEditProductPageState.submit ${fields.keys}');
     if (formKey.currentState?.validate() ?? false) {
       widget.submit(context, fields: fields, images: images);
     }
@@ -197,9 +201,7 @@ class _CreateEditProductPageState extends State<CreateEditProductPage> {
 }
 
 class CreateProductPage extends CreateEditProductPage {
-  CreateProductPage({super.key}) {
-    fields['status']?.readOnly = true;
-  }
+  CreateProductPage({super.key});
 
   @override
   String get action => 'Create Product';
@@ -210,6 +212,7 @@ class CreateProductPage extends CreateEditProductPage {
     required Map<String, TextFieldViewModel> fields,
     Map<String, Uint8List?>? images,
   }) async {
+    // print('CreateProductPage.submit $fields ${images?.length}');
     ProductService.instance.createProduct(
       fields.map((k, vm) {
         var text = vm.controller.text;
