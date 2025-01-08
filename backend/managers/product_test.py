@@ -148,7 +148,7 @@ class ProductManagerTest(absltest.TestCase):
         with mock.patch("flask_jwt_extended.get_jwt_identity", return_value='current_user'):
             response, status_code = self.product_manager.edit_product(self.user2.username, self.product1.id, product_data)
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value)
-        self.assertEqual(response.json, {'You do not have access to edit this product.'})
+        self.assertEqual(response.json, {'message': 'You do not have access to edit this product.'})
 
     def test_get_products_success(self):
         """Test retrieving a list of products for a user."""
