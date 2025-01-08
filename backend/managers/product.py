@@ -8,6 +8,7 @@ import backend.initializers.database
 import backend.initializers.settings
 import backend.models.user
 import backend.models.report
+import flask_jwt_extended
 
 
 class ProductManager:
@@ -165,7 +166,18 @@ class ProductManager:
             response (flask.Response): A Flask response object containing successfully deleted a user.
             status_code (int): HTTP status code indicating successful delete (204).
         """
-
+        product = backend.models.product.Product.query.filter_by(id=product_id).first()
+        if not product:
+            return (
+                flask.jsonify({'message': {'Product does not exist.'}}),
+                backend.initializers.settings.HTTPStatus.NOT_FOUND.value
+            )
+        username = flask_jwt_extended.get_jwt_identity()
+        if product.user_username != username:
+            return (
+                flask.jsonify({'message': {'You do not have access to edit this product.'}}),
+                backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
+            )
         product_pictures = backend.models.product.Picture.query.filter_by(product_id=product_id).all()
         for picture in product_pictures:
             backend.initializers.database.DB.session.delete(picture)
@@ -186,11 +198,22 @@ class ProductManager:
             product_id (int): The id of the product.
             product_data (dict): A dictionary containing the updated info of the product.
         Returns:
-            response (flask.Response): A Flask response object containing successfully deleted a user.
+            response (flask.Response): A Flask response object containing successfully editing a product.
             status_code (int): HTTP status code indicating success (200).
         """
 
         product = backend.models.product.Product.query.filter_by(id=product_id).first()
+        if not product:
+            return (
+                flask.jsonify({'message': {'Product does not exist.'}}),
+                backend.initializers.settings.HTTPStatus.NOT_FOUND.value
+            )
+        username = flask_jwt_extended.get_jwt_identity()
+        if product.user_username != username:
+            return (
+                flask.jsonify({'message': {'You do not have access to edit this product.'}}),
+                backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
+            )
         product.name = product_data.get('name', product.name)
         product.price = product_data.get('price', product.price)
         product.city_name = product_data.get('city_name', product.city_name)
@@ -253,7 +276,7 @@ class ProductManager:
         return flask.jsonify(
             {"message": "Product is reported successfully."}), backend.initializers.settings.HTTPStatus.OK.value
 
-    def get_products_on_sale(self, user_username: str) -> (flask.Flask, int):
+    def get_products(self, user_username: str) -> (flask.Flask, int):
         """
         Returns a list of products belonging to a user that are on sale.
 
@@ -263,26 +286,16 @@ class ProductManager:
             response (flask.Response): A Flask response object containing successfully returning a list.
             status_code (int):
                 200: successful search
-                404: no products found
         """
         products = backend.models.product.Product.query.filter_by(
             user_username=user_username,
-            status='for sale'
         ).all()
-
-        if not products:
-            return (
-                {"message": "No products found for this user."},
-                backend.initializers.settings.HTTPStatus.NOT_FOUND.value
-            )
-
         products_as_dicts = [product.to_dict() for product in products]
-
         return flask.jsonify({"products": products_as_dicts}), backend.initializers.settings.HTTPStatus.OK.value
 
     def ban_product(self, product_id: int) -> (flask.Flask, int):
         """
-        Changes the status of a product to banned.
+        Changes the status of a product to ban.
 
         Args:
             product_id (int): the id of the product to be banned.
@@ -299,6 +312,7 @@ class ProductManager:
                 backend.initializers.settings.HTTPStatus.NOT_FOUND.value
             )
         product.is_banned = True
+        backend.initializers.database.DB.session.add(product)
         backend.initializers.database.DB.session.commit()
         return (
             flask.jsonify({"message": "Product successfully banned."}),
