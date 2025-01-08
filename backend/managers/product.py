@@ -229,19 +229,20 @@ class ProductManager:
             os.remove(picture.filename)
 
         # Adding new pictures
-        for file, filename in zip(product_data['images'], product_data['images_path']):
-            # Generate a new filename by appending a timestamp to avoid duplicate name.
-            base, extension = os.path.splitext(filename)
-            timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-            new_filename = f"{base}_{timestamp}{extension}"
-            file_path = f"./backend/{flask.current_app.config['UPLOAD_FOLDER']}{new_filename}"
-            file.save(file_path)
-            # Create a new Picture instance associated with the newly created product.
-            new_picture = backend.models.product.Picture(
-                filename=new_filename,
-                product_id=product_id,
-            )
-            backend.initializers.database.DB.session.add(new_picture)
+        if 'images' in product_data.keys():
+            for file, filename in zip(product_data['images'], product_data['images_path']):
+                # Generate a new filename by appending a timestamp to avoid duplicate name.
+                base, extension = os.path.splitext(filename)
+                timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                new_filename = f"{base}_{timestamp}{extension}"
+                file_path = f"./backend/{flask.current_app.config['UPLOAD_FOLDER']}{new_filename}"
+                file.save(file_path)
+                # Create a new Picture instance associated with the newly created product.
+                new_picture = backend.models.product.Picture(
+                    filename=new_filename,
+                    product_id=product_id,
+                )
+                backend.initializers.database.DB.session.add(new_picture)
 
         backend.initializers.database.DB.session.commit()
 
