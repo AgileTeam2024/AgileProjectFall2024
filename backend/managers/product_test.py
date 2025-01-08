@@ -29,9 +29,16 @@ class ProductManagerTest(absltest.TestCase):
         self.product3 = backend.models.product.Product(id=3, name='Apple Watch Series 6', price=399.99, status='sold')
 
         self.user1 = backend.models.user.User(username='seller1', email='seller@email.com')
+        self.user2 = backend.models.user.User(username='seller2', email='seller2@email.com')
         self.product4 = backend.models.product.Product(id=4, name='Apple Watch Series 6', price=399.99, status='sold',
                                                        user_username='seller1')
         self.product5 = backend.models.product.Product(id=5, name='Laptop Asus', price=399.99, status='for sale', user_username='seller1')
+        self.product6 = backend.models.product.Product(id=6, name='Red Phone', price=399.99, status='for sale',
+                                                       user_username='seller2')
+        self.product7 = backend.models.product.Product(id=7, name='Blue Phone', price=400.99, status='for sale',
+                                                       user_username='seller2')
+        self.product8 = backend.models.product.Product(id=8, name='Pink Phone', price=367.99, status='sold',
+                                                       user_username='seller2')
 
     def tearDown(self) -> None:
         self.mock_db_session.stop()
@@ -128,6 +135,34 @@ class ProductManagerTest(absltest.TestCase):
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
         self.assertEqual(response.json, {'message': 'Product edited successfully.'})
 
+    def test_edit_product_unauthorized(self):
+        """Test unauthorized edit attempt by a non-owner."""
+        self.mock_product_query.filter_by.return_value.first.return_value = self.product5
+        product_data = {
+            'name': 'Laptop unauthorized',
+            'price': 500.99,
+            'description': 'Updated description',
+            'status': 'for sale',
+            'category': 'Digital & Electronics',
+        }
+        with mock.patch("flask_jwt_extended.get_jwt_identity", return_value='current_user'):
+            response, status_code = self.product_manager.edit_product(self.user1.username, self.product1.id, product_data)
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value)
+        self.assertEqual(response.json, {'You do not have access to edit this product.'})
+
+    def test_get_products_success(self):
+        """Test retrieving a list of products for a user."""
+        self.mock_product_query.filter_by.return_value.all.return_value = [
+            self.product6, self.product7, self.product8
+        ]
+        with mock.patch("flask_jwt_extended.get_jwt_identity", return_value='seller2'):
+            response, status_code = self.product_manager.get_products('seller2')
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(len(response.json['products']), 3)
+        product_ids = [product['id'] for product in response.json['products']]
+        self.assertIn(self.product6.id, product_ids)
+        self.assertIn(self.product7.id, product_ids)
+        self.assertIn(self.product8.id, product_ids)
 
 if __name__ == "__main__":
     backend.initializers.test_util.pass_flags_as_parsed()
