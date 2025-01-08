@@ -53,7 +53,6 @@ void main() {
 
       when(mockFilePicker.pickFiles(type: FileType.image, allowMultiple: true))
           .thenAnswer((_) async {
-        // print('mockFilePicker.pickFiles');
         return FilePickerResult([
           PlatformFile(
             name: filename,

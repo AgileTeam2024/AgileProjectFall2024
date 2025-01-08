@@ -74,7 +74,6 @@ void main() {
 
     when(mockFilePicker.pickFiles(type: FileType.image, allowMultiple: true))
         .thenAnswer((_) async {
-      // print('mockFilePicker.pickFiles');
       final name = 'assets/sample_images/product_img0.jpg';
       final bytes = File(name).readAsBytesSync();
       return FilePickerResult([

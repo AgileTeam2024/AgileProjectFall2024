@@ -10,15 +10,10 @@ class UploadFileWidget extends StatelessWidget {
 
   FilePicker? _filePicker;
 
-  set filePicker(FilePicker? value) {
-    // print('UploadFileWidget.set filePicker $value');
-    _filePicker = value ?? FilePicker.platform;
-  }
+  set filePicker(FilePicker? value) =>
+      _filePicker = value ?? FilePicker.platform;
 
-  FilePicker get filePicker {
-    // print('UploadFileWidget.get filePicker $_filePicker');
-    return _filePicker!;
-  }
+  FilePicker get filePicker => _filePicker!;
 
   final int minimumFiles;
   final int? maximumFiles;
@@ -166,7 +161,6 @@ class UploadFileWidget extends StatelessWidget {
   }
 
   Future<void> _openFileExplorer() async {
-    // print('UploadFileWidget._openFileExplorer $filePicker');
     final result =
         await filePicker.pickFiles(type: FileType.image, allowMultiple: true);
     if (result == null) return;
