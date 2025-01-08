@@ -22,10 +22,16 @@ class NetworkService {
   // static const host = 'pre-loved.ir';
   static const port = 80;
 
-  Map<String, String>? get authHeader {
+  Map<String, String>? get authHeaderAccess {
     final authService = AuthService.instance;
     if (authService.accessToken == null) return null;
     return {'Authorization': 'Bearer ${authService.accessToken}'};
+  }
+
+  Map<String, String>? get authHeaderRefresh {
+    final authService = AuthService.instance;
+    if (authService.accessToken == null) return null;
+    return {'Authorization': 'Bearer ${authService.refreshToken}'};
   }
 
   Uri _buildUrl(
@@ -52,7 +58,7 @@ class NetworkService {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        ...?authHeader
+        ...?authHeaderAccess
       },
       body: jsonEncode(body),
     );
@@ -75,15 +81,11 @@ class NetworkService {
       ),
     );
 
-    request.headers.putIfAbsent(
-      'Accept',
-      () => 'application/json',
-    );
-    request.headers.putIfAbsent(
-      'Content-Type',
-      () => 'application/form-data',
-    );
-    if (authHeader != null) request.headers.addAll(authHeader!);
+    request.headers.addAll({
+      'Accept': 'application/json',
+      'Content-Type': 'application/form-data',
+      ...?authHeaderAccess
+    });
 
     final response = await request.send();
     return ServerResponse.visualize(
@@ -98,7 +100,13 @@ class NetworkService {
   }) async {
     final response = await http.get(
       _buildUrl(path, query),
-      headers: {'Accept': 'application/json', ...?authHeader},
+      headers: {
+        'Accept': 'application/json',
+        if (path == '/user/refresh')
+          ...?authHeaderRefresh
+        else
+          ...?authHeaderAccess,
+      },
     );
     return ServerResponse.visualize(response.body, response.statusCode);
   }
@@ -112,7 +120,7 @@ class NetworkService {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        ...?authHeader
+        ...?authHeaderAccess
       },
     );
     return ServerResponse.visualize(response.body, response.statusCode);
@@ -122,7 +130,7 @@ class NetworkService {
     final url = useOurServer ? _buildUrl(path, {}, '') : Uri.parse(path);
     final response = await http.get(
       url,
-      headers: {'Accept': 'image/*', ...?authHeader},
+      headers: {'Accept': 'image/*', ...?authHeaderAccess},
     );
     return response.bodyBytes;
   }

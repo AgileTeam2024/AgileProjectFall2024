@@ -105,7 +105,7 @@ class UserProfilePage extends StatelessWidget {
                     ListTile(
                       leading: Icon(Icons.delete, color: Colors.red),
                       title: Text('Delete Account'),
-                      onTap: _deleteAccount,
+                      onTap: () => _deleteAccount(context),
                     ),
                   ],
                 ),
@@ -117,8 +117,10 @@ class UserProfilePage extends StatelessWidget {
     );
   }
 
-  void _deleteAccount() {
-    // todo connect to back
+  Future<void> _deleteAccount(BuildContext context) async {
+    final response = await _authService.deleteAccount();
+    CustomToast.showToast(context, response);
+    if (response.isOk) RouterService.go('/');
   }
 
   void _goToEditProfile() => RouterService.go('/edit-profile');

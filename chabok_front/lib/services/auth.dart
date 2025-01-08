@@ -56,4 +56,22 @@ class AuthService {
         }
         return response;
       });
+
+  Future<ServerResponse> deleteAccount() =>
+      _networkService.get('/user/delete').then((response) {
+        if (response.isOk) {
+          accessToken = null;
+          refreshToken = null;
+        }
+        return response;
+      });
+
+  Future<ServerResponse> refreshAccount() =>
+      _networkService.get('/user/refresh', ).then((response) {
+        if (response.isOk) {
+          accessToken = null;
+          refreshToken = null;
+        }
+        return response;
+      });
 }
