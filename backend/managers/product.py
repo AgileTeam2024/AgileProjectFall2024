@@ -170,12 +170,12 @@ class ProductManager:
         product = backend.models.product.Product.query.filter_by(id=product_id).first()
         if not product:
             return (
-                flask.jsonify({'message': {'Product does not exist.'}}),
+                flask.jsonify({'message': 'Product does not exist.'}),
                 backend.initializers.settings.HTTPStatus.NOT_FOUND.value
             )
         if product.user_username != username:
             return (
-                flask.jsonify({'message': {'You do not have access to edit this product.'}}),
+                flask.jsonify({'message': 'You do not have access to edit this product.'}),
                 backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
             )
         product_pictures = backend.models.product.Picture.query.filter_by(product_id=product_id).all()
@@ -206,12 +206,12 @@ class ProductManager:
         product = backend.models.product.Product.query.filter_by(id=product_id).first()
         if not product:
             return (
-                flask.jsonify({'message': {'Product does not exist.'}}),
+                flask.jsonify({'message': 'Product does not exist.'}),
                 backend.initializers.settings.HTTPStatus.NOT_FOUND.value
             )
         if product.user_username != username:
             return (
-                flask.jsonify({'message': {'You do not have access to edit this product.'}}),
+                flask.jsonify({'message': 'You do not have access to edit this product.'}),
                 backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
             )
         product.name = product_data.get('name', product.name)
