@@ -542,7 +542,7 @@ def report_product() -> (flask.Flask, int):
 
 @product_bp.route('/product_list', methods=['GET'])
 @flask_jwt_extended.jwt_required()
-def get_products_on_sale() -> (flask.Flask, int):
+def get_products() -> (flask.Flask, int):
     """
     API for returning a list of products that are on sale for a user.
     ---

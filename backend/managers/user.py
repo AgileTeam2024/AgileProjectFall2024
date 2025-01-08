@@ -219,8 +219,8 @@ class UserManager:
             status_code (int): HTTP status code indicating success (200).
         """
         user = backend.models.user.User.query.filter_by(username=username).first()
-        user.email = info.get('email', user.email)
         user.phone_number = info.get('phone_number', user.phone_number)
+        user.address = info.get('address', user.address)
         user.first_name = info.get('first_name', user.first_name)
         user.last_name = info.get('last_name', user.last_name)
 
