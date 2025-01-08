@@ -7,7 +7,8 @@ class TextFieldViewModel {
   final TextEditingController controller;
   final IconData icon;
   final String? helper, hint, error, label, initialText;
-  final bool required, readOnly;
+  final bool required;
+  bool readOnly;
   final int? maxLines;
 
   TextInputType type = TextInputType.text;
@@ -15,6 +16,8 @@ class TextFieldViewModel {
   bool obscureText;
 
   String get text => controller.text;
+
+  set text(String newText) => controller.text = newText;
 
   TextSelection get selection => controller.selection;
 

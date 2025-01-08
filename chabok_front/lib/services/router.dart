@@ -95,7 +95,7 @@ class RouterService {
           GoRoute(
             path: '/create-product',
             redirect: (context, state) {
-              // todo redirect to login page if not logged in
+              if (!AuthService.instance.isLoggedIn) return '/login';
             },
             pageBuilder: (context, state) => NoTransitionPage(
               child: CreateProductPage(),

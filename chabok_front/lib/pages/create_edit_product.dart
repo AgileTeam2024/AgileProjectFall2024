@@ -5,6 +5,7 @@ import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/services/network.dart';
 import 'package:chabok_front/services/product.dart';
+import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/view_models/text_field.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/main_fab.dart';
@@ -26,14 +27,20 @@ class CreateEditProductPage extends StatefulWidget {
       required: true,
       label: 'Category',
       options: [
-        'Real-Estate',
+        'Real estate',
         'Automobile',
         'Digital & Electronics',
         'Kitchenware',
         'Personal Items',
         'Entertainment',
-        'Others'
+        'Others',
       ],
+    ),
+    'status': OptionsTextFieldViewModel(
+      icon: Icons.production_quantity_limits,
+      required: true,
+      label: 'Status',
+      options: ['for sale', 'sold', 'reserved'],
     ),
     'city_name': TextFieldViewModel(
       icon: Icons.pin_drop,
@@ -66,7 +73,8 @@ class CreateEditProductPage extends StatefulWidget {
   @override
   State<CreateEditProductPage> createState() => _CreateEditProductPageState();
 
-  void submit({
+  void submit(
+    BuildContext context, {
     required Map<String, TextFieldViewModel> fields,
     Map<String, Uint8List?>? images,
   }) {
@@ -180,26 +188,43 @@ class _CreateEditProductPageState extends State<CreateEditProductPage> {
       return;
     }
     if (formKey.currentState?.validate() ?? false) {
-      widget.submit(fields: fields, images: images);
+      widget.submit(context, fields: fields, images: images);
     }
   }
 }
 
 class CreateProductPage extends CreateEditProductPage {
-  CreateProductPage({super.key});
+  CreateProductPage({super.key})
+      : super(fieldsInitialValues: {
+          'status': 'for sale',
+          'name': 'product.name',
+          'category': 'Others',
+          'city_name': 'product.location',
+          'price': '12321876312',
+          'description': 'product.description',
+        }) {
+    fields['status']?.readOnly = true;
+  }
 
   @override
-  void submit({required Map<String, TextFieldViewModel> fields, Map<String, Uint8List?>? images}) {
-    final productService = ProductService.instance;
-    productService.createProduct(
+  Future<void> submit(
+    BuildContext context, {
+    required Map<String, TextFieldViewModel> fields,
+    Map<String, Uint8List?>? images,
+  }) async {
+    ProductService.instance.createProduct(
       fields.map((k, vm) {
         var text = vm.controller.text;
         if (k == 'price') text = text.replaceAll(',', '');
         return MapEntry(k, text);
-      })
-        ..putIfAbsent('status', () => 'for sale'),
+      }),
       images,
-    );
+    ).then((response) {
+      if (response.isOk) {
+        CustomToast.showToast(context, response);
+        RouterService.go('/');
+      }
+    });
   }
 }
 
@@ -212,14 +237,19 @@ class EditProductPage extends CreateEditProductPage {
             'name': product.name,
             'category': product.category,
             'city_name': product.location,
-            'price': product.price?.toString(),
+            'price': product.price.toString(),
             'description': product.description,
+            'status': product.status,
           },
           images: product.imageUrls.asMap().map((_, im) => MapEntry(im, null)),
         );
 
   @override
-  void submit({required Map<String, TextFieldViewModel> fields, Map<String, Uint8List?>? images}) {
+  void submit(
+    BuildContext context, {
+    required Map<String, TextFieldViewModel> fields,
+    Map<String, Uint8List?>? images,
+  }) {
     // todo edit product in back
   }
 }

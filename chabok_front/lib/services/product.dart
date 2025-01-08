@@ -1,4 +1,5 @@
 import 'package:chabok_front/models/product.dart';
+import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/services/network.dart';
 import 'package:chabok_front/view_models/text_field.dart';
 import 'package:flutter/foundation.dart';
@@ -52,19 +53,17 @@ class ProductService {
     return list.where((p) => p.id == id).first;
   }
 
-  Future<bool> createProduct(
+  Future<ServerResponse> createProduct(
     Map<String, dynamic> fields,
     Map<String, Uint8List?>? images,
   ) async {
-    // fields['category'] = 'Other';
     images?.removeWhere((path, bytes) => bytes == null);
-    final response = await _networkService.postFormData(
+    return await _networkService.postFormData(
       '/product/create',
       fields,
       files: {
         'picture': images?.map((k, v) => MapEntry(k, v!)) ?? {},
       },
     );
-    return response.isOk;
   }
 }
