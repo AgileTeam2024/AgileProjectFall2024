@@ -13,6 +13,10 @@ class NetworkService {
     return _instance!;
   }
 
+  static set instance(NetworkService value) {
+    _instance = value;
+  }
+
   // static const host = '127.0.0.1';
   // static const port = 8000;
   static const scheme = 'http';

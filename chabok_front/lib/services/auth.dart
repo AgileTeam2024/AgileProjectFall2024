@@ -32,7 +32,7 @@ class AuthService {
   @visibleForTesting
   static set instance(AuthService value) => _instance = value;
 
-  final _networkService = NetworkService.instance;
+  NetworkService get _networkService => NetworkService.instance;
 
   bool get isLoggedIn => accessToken != null;
 
