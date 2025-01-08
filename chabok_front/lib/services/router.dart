@@ -9,6 +9,7 @@ import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/pages/profile.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/services/product.dart';
+import 'package:chabok_front/services/user.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:chabok_front/widgets/main_fab.dart';
 import 'package:flutter/material.dart';
@@ -141,12 +142,14 @@ class RouterService {
               return null;
             },
             pageBuilder: (context, state) => NoTransitionPage(
-              child: EditProfilePage(
-                user: User(
-                  username: 'username',
-                  email: 'email@gmail.com',
-                  phoneNumber: '+9939232965',
-                ),
+              child: FutureBuilder<User?>(
+                future: UserService.instance.ownProfile,
+                builder: (context, snapshot) {
+                  if (snapshot.data == null) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  return EditProfilePage(user: snapshot.data!);
+                },
               ),
             ),
           ),
