@@ -4,6 +4,7 @@ import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/services/product.dart';
+import 'package:chabok_front/services/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -33,6 +34,19 @@ class MockProductService extends Mock implements ProductService {
   }
 }
 
+class MockUserService extends Mock implements UserService {
+  final bool viewerIsSeller;
+
+  MockUserService(this.viewerIsSeller);
+
+  @override
+  Future<User?> get ownProfile async => User(
+        username: viewerIsSeller ? 'imseller' : 'imnotseller',
+        email: 'imseller@gmail.com',
+        phoneNumber: '09121234567',
+      );
+}
+
 void main() {
   setUpAll(() {
     HttpOverrides.global = null;
@@ -40,8 +54,9 @@ void main() {
   });
 
   Widget createWidgetUnderTest(int id, bool viewerIsSeller) {
+    UserService.instance = MockUserService(viewerIsSeller);
     return MaterialApp(
-      home: ProductViewPage(id, viewerIsSeller: viewerIsSeller),
+      home: ProductViewPage(id),
     );
   }
 

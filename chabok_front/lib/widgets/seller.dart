@@ -16,6 +16,7 @@ class SellerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      spacing: 5,
       children: [
         _SellerPfpWidget(seller.profilePicture),
         Expanded(child: _SellerUsernameWidget(seller.username)),
@@ -23,11 +24,11 @@ class SellerWidget extends StatelessWidget {
           Spacer(),
           Button.icon(
             icon: Icons.phone,
-            onPressed: seller.phoneNumber.copy,
+            onPressed: seller.phoneNumber?.copy,
           ),
           Button.icon(
             icon: Icons.email,
-            onPressed: seller.email.copy,
+            onPressed: seller.email?.copy,
           ),
         ],
       ],

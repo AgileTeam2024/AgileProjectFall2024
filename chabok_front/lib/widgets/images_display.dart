@@ -1,11 +1,11 @@
+import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:flutter/material.dart';
 
 class ImagesDisplayWidget extends StatefulWidget {
   final List<String> imageUrls;
 
-  ImagesDisplayWidget(this.imageUrls, {super.key})
-      : assert(imageUrls.isNotEmpty);
+  const ImagesDisplayWidget(this.imageUrls, {super.key});
 
   @override
   State<ImagesDisplayWidget> createState() => _ImagesDisplayWidgetState();
@@ -17,6 +17,12 @@ class _ImagesDisplayWidgetState extends State<ImagesDisplayWidget> {
   @override
   Widget build(BuildContext context) {
     final imageUrls = widget.imageUrls;
+    if (imageUrls.isEmpty) {
+      return ErrorPage(
+        errorCode: 404,
+        message: 'No images :(',
+      );
+    }
     final isBigScreen = MediaQuery.sizeOf(context).width > 1000;
 
     return Flex(

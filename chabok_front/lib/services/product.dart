@@ -1,4 +1,7 @@
 import 'package:chabok_front/models/product.dart';
+import 'package:chabok_front/models/server_response.dart';
+import 'package:chabok_front/services/network.dart';
+import 'package:chabok_front/services/user.dart';
 import 'package:flutter/foundation.dart';
 
 class ProductService {
@@ -14,37 +17,91 @@ class ProductService {
     _instance = value;
   }
 
-  Future<List<Product>> get suggestions {
-    // todo get from back
-    return Future.value(List.generate(
-        30,
-        (i) => {
-              "id": i,
-              "name":
-                  "Custom Wooden Guitar Picks Box,Personalized Guitar Pick Holder Storage,Wood Guitar Plectrum Organizer Case,Music Gift for Guitarist Musician",
-              "seller": {
-                "id": 2,
-                "username": "CraftsByAden",
-                "profilePicture": "assets/sample_images/seller_pfp.jpg",
-                "email": "CraftsByAden@gmail.com",
-                "phoneNumber": "09121234567",
-              },
-              "imageUrls": List.generate(
-                10,
-                (i) => "assets/sample_images/product_img$i.jpg",
-              ),
-              "category": "Entertainment",
-              "location": "Manchester, United Kingdom",
-              "status": "Available for sale",
-              "description":
-                  "【Product Details】Box Size: 40 x 40 x 29mm / 1.57 x 1.57 x 1.14 inch( L x W x H ), Material of box: walnut.\n\n【Unique Design】The color, texture, and wood grain of any natural wood product will vary from piece to piece, but this is what makes this guitar pick holder unique. Our pick case are crafted from high quality, sturdy wood. The edge treatment of the product is very meticulously smooth, and the box will keep your picks safe and protected.\n\n【Convenient Storage and Display】With this pick container, you can keep your guitar picks organized and easily accessible. The case is compact and lightweight, making it portable for gigs, rehearsals, or traveling. Additionally, the lid is held closed by a strong magnet lock, which protects the guitar picks from damage or from falling out.\n\n【Free Engraving】There are 18 fonts/patterns to be selected from, you can customize your the guitar box case with someone name, initials, letter combination, special date! It will be a unique Christmas/Birthday/Anniversary Gifts for Friends, lover, Husband, Boyfriends, Musicians and Guitarists to express your encouragement or love for them.\n\n【Please Note】Due to wood’s natural texture and color, the item may not be exactly as the pictures show. Some wood is a little bit dark and some wood may have some spots. If you are not satisfied or have any questions, please feel free to contact us to get a satisfied solution. We will be happy to assist you and reply within 24 hours.",
-              "price": i % 5 * 1_000_000
-            }).map(Product.fromJson).toList());
-  }
+  final _networkService = NetworkService.instance;
+  final _userService = UserService.instance;
+
+  Future<List<Product>> get homePageProducts =>
+      searchProducts(sortCreatedAt: 'asc');
 
   Future<Product> getProductById(int id) async {
-    // todo send request to back
-    final list = await suggestions;
-    return list.where((p) => p.id == id).first;
+    final response = await _networkService
+        .get('/product/get_product_by_id', query: {'product_id': '$id'});
+    final product = response.bodyJson['product'];
+    return Product.fromJson(product);
+  }
+
+  Future<ServerResponse> createProduct(
+    Map<String, dynamic> fields,
+    Map<String, Uint8List?>? images,
+  ) {
+    images?.removeWhere((path, bytes) => bytes == null);
+    return _networkService.postFormData(
+      '/product/create',
+      fields,
+      files: {
+        'picture': images?.map((k, v) => MapEntry(k, v!)) ?? {},
+      },
+    );
+  }
+
+  Future<ServerResponse> editProduct(
+    int productId,
+    Map<String, dynamic> fields,
+    Map<String, Uint8List?>? images,
+  ) {
+    images?.removeWhere((path, bytes) => bytes == null);
+    return _networkService.postFormData(
+      '/product/edit_product',
+      fields..putIfAbsent('id', () => productId),
+      files: {
+        'picture': images?.map((k, v) => MapEntry(k, v!)) ?? {},
+      },
+    );
+  }
+
+  Future<ServerResponse> deleteProduct(int id) =>
+      _networkService.delete('/product/delete', query: {'id': id});
+
+  Future<List<Product>> searchProducts({
+    String? name,
+    double? minPrice,
+    double? maxPrice,
+    String? status,
+    String? sortCreatedAt,
+    String? sortPrice,
+  }) async {
+    final response = await _networkService.get(
+      '/product/search',
+      query: {
+        if (name != null) 'name': name,
+        if (minPrice != null) 'min_price': minPrice,
+        if (maxPrice != null) 'max_price': maxPrice,
+        if (status != null) 'status': status,
+        if (sortCreatedAt != null) 'sort_created_at': sortCreatedAt,
+        if (sortPrice != null) 'sort_price': sortPrice,
+      },
+    );
+    if (!response.isOk) return [];
+    final products = await getProductsSellers(
+      response.bodyJson['products'].cast<Map<String, dynamic>>(),
+    );
+    return products;
+  }
+
+  Future<List<Product>> getProductsSellers(
+    List<Map<String, dynamic>> products,
+  ) {
+    return Future.wait(
+      products.map(
+        (product) async {
+          return (await getProductById(product['id'] as int));
+          // todo
+          // if (!product.containsKey('seller')) {
+          //   // _userService
+          // }
+          // return product;
+        },
+      ),
+    );
   }
 }

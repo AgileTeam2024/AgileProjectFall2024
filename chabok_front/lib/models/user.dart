@@ -2,10 +2,10 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'user.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class User {
-  final String username, email, phoneNumber;
-  final String? firstName, lastName;
+  final String username;
+  final String? firstName, lastName, email, phoneNumber;
   final String? profilePicture;
   final String? address;
 
@@ -23,5 +23,8 @@ class User {
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
 
-  bool get hasBeenEditedBefore => ![firstName, lastName].contains(null);
+  String get fullName {
+    if ((firstName ?? lastName) == null) return 'Stranger';
+    return '$firstName $lastName';
+  }
 }
