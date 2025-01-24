@@ -6,6 +6,7 @@ from absl.testing import absltest
 
 import backend.managers.admin
 import backend.models.report
+import backend.models.user
 import backend.initializers.settings
 import backend.initializers.test_util
 
@@ -23,11 +24,13 @@ class UserManagerTest(absltest.TestCase):
         # Mock query on models.
         self.mock_product_report_query = mock.patch("backend.models.report.ProductReport.query").start()
         self.mock_user_report_query = mock.patch("backend.models.report.UserReport.query").start()
+        self.mock_user_query = mock.patch("backend.models.user.User.query").start()
 
     def tearDown(self) -> None:
         self.mock_db_session.stop()
         self.mock_product_report_query.stop()
         self.mock_user_report_query.stop()
+        self.mock_user_query.stop()
         super().tearDown()
 
     def test_get_product_report_list(self) -> None:
@@ -93,6 +96,19 @@ class UserManagerTest(absltest.TestCase):
                 ]
             }
         )
+
+    def test_ban_user(self) -> None:
+        """Test banning user successfully."""
+        user = backend.models.user.User(
+            username="username",
+            password="password",
+            is_banned=False
+        )
+        self.mock_user_query.filter_by.return_value.first.return_value = user
+        response, status_code = self.admin_manager.ban_user(username=user.username)
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {"message": "User banned successfully."})
+        self.assertTrue(user.is_banned)
 
 
 if __name__ == "__main__":
