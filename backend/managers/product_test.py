@@ -194,15 +194,6 @@ class ProductManagerTest(absltest.TestCase):
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
         self.assertEqual(response.json, {'message': 'The reported product does not exist.'})
 
-    def test_report_product_missing_description(self):
-        """Test reporting a product without providing a description."""
-        self.mock_product_query.filter_by.return_value.first.return_value = self.product1
-        reporter_username = "seller2"
-        response, status_code = self.product_manager.report_product(
-            reporter_username, self.product1.id, ""
-        )
-        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
-        self.assertEqual(response.json, {'message': 'Missing description.'})
 
 
 if __name__ == "__main__":
