@@ -164,6 +164,46 @@ class ProductManagerTest(absltest.TestCase):
         self.assertIn(self.product7.id, product_ids)
         self.assertIn(self.product8.id, product_ids)
 
+    def test_get_products_no_products(self):
+        """Test retrieving products when no products exist for a user."""
+        self.mock_product_query.filter_by.return_value.all.return_value = []
+        with mock.patch("flask_jwt_extended.get_jwt_identity", return_value='empty_user'):
+            response, status_code = self.product_manager.get_products('empty_user')
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json['products'], [])
+
+    def test_report_product_success(self):
+        """Test successfully reporting a product."""
+        self.mock_product_query.filter_by.return_value.first.return_value = self.product7
+        reporter_username = "seller1"
+        report_description = "This product violates policies."
+        response, status_code = self.product_manager.report_product(
+            reporter_username, self.product1.id, report_description
+        )
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {'message': 'Product is reported successfully.'})
+
+    def test_report_product_not_found(self):
+        """Test reporting a non-existent product."""
+        self.mock_product_query.filter_by.return_value.first.return_value = None
+        reporter_username = "seller1"
+        report_description = "This product violates policies."
+        response, status_code = self.product_manager.report_product(
+            reporter_username, 999, report_description
+        )
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
+        self.assertEqual(response.json, {'message': 'The reported product does not exist.'})
+
+    def test_report_product_missing_description(self):
+        """Test reporting a product without providing a description."""
+        self.mock_product_query.filter_by.return_value.first.return_value = self.product1
+        reporter_username = "seller2"
+        response, status_code = self.product_manager.report_product(
+            reporter_username, self.product1.id, ""
+        )
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
+        self.assertEqual(response.json, {'message': 'Missing description.'})
+
 
 if __name__ == "__main__":
     backend.initializers.test_util.pass_flags_as_parsed()
