@@ -53,6 +53,10 @@ class User(backend.initializers.database.DB.Model):
         backend.initializers.database.DB.Boolean,
         default=False
     )
+    is_verified = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.Boolean,
+        default=False
+    )
 
     def __repr__(self) -> str:
         """
@@ -70,6 +74,8 @@ class User(backend.initializers.database.DB.Model):
             'profile_picture': self.profile_picture,
             'is_banned': self.is_banned,
             'email': self.email,
+            'is_admin': self.is_admin,
+            'is_verified': self.is_verified
         }
 
 
