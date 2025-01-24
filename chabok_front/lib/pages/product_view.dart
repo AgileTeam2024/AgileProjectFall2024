@@ -1,9 +1,14 @@
+import 'package:chabok_front/models/pair.dart';
 import 'package:chabok_front/models/product.dart';
+import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/product.dart';
+import 'package:chabok_front/services/router.dart';
+import 'package:chabok_front/services/user.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/images_display.dart';
 import 'package:chabok_front/widgets/seller.dart';
+import 'package:chabok_front/widgets/toast.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter/material.dart';
 
@@ -12,9 +17,8 @@ final scrollableKey = GlobalKey();
 
 class ProductViewPage extends StatefulWidget {
   final int id;
-  final bool viewerIsSeller;
 
-  const ProductViewPage(this.id, {super.key, required this.viewerIsSeller});
+  const ProductViewPage(this.id, {super.key});
 
   @override
   State<ProductViewPage> createState() => _ProductViewPageState();
@@ -22,6 +26,7 @@ class ProductViewPage extends StatefulWidget {
 
 class _ProductViewPageState extends State<ProductViewPage> {
   final _productService = ProductService.instance;
+  final _userService = UserService.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -31,16 +36,25 @@ class _ProductViewPageState extends State<ProductViewPage> {
     final isBigScreen = MediaQuery.sizeOf(context).width > 1000;
 
     return CardWidget(
-      child: FutureBuilder<Product>(
-          future: _productService.getProductById(widget.id),
+      child: FutureBuilder<Pair<Product, User?>>(
+          future: Future.wait([
+            _productService.getProductById(widget.id),
+            _userService.ownProfile,
+          ]).then((list) => Pair(list[0] as Product, list[1] as User?)),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               // todo error page
               return Container();
             }
-            if (!snapshot.hasData) return CircularProgressIndicator();
+            if (!snapshot.hasData) {
+              return Center(child: CircularProgressIndicator());
+            }
 
-            final product = snapshot.data!;
+            final pair = snapshot.data!;
+            final product = pair.first;
+            final ownUsername = pair.second?.username;
+            final viewerIsSeller = product.seller.username == ownUsername;
+
             return Flex(
               crossAxisAlignment: isBigScreen
                   ? CrossAxisAlignment.stretch
@@ -71,7 +85,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
                           spacing: 5,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            if (widget.viewerIsSeller) ...[
+                            if (viewerIsSeller) ...[
                               Button.icon(
                                 onPressed: onEditProduct,
                                 icon: Icons.edit,
@@ -80,7 +94,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
                                 onPressed: onDeleteProduct,
                                 icon: Icons.delete,
                               ),
-                            ] else
+                            ] else if (ownUsername != null)
                               Button.icon(
                                 onPressed: onReport,
                                 icon: Icons.report,
@@ -143,12 +157,13 @@ class _ProductViewPageState extends State<ProductViewPage> {
     // todo send request to backend
   }
 
-  void onEditProduct() {
-    // todo send request to backend
-  }
+  Future<void> onEditProduct() async =>
+      RouterService.go('/product/${widget.id}/edit');
 
-  void onDeleteProduct() {
-    // todo send request to backend
+  Future<void> onDeleteProduct() async {
+    final response = await _productService.deleteProduct(widget.id);
+    CustomToast.showToast(context, response);
+    if (response.isOk) RouterService.go('/');
   }
 
   String formatPrice(double price) {

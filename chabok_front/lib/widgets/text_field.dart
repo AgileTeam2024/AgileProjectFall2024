@@ -18,10 +18,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
     if (viewModel is OptionsTextFieldViewModel) {
       return DropdownButtonFormField(
-        onChanged: (selected) => viewModel.controller.text = selected ?? '',
+        onChanged: viewModel.readOnly
+            ? null
+            : (selected) => viewModel.text = selected?.toString() ?? '',
         items: viewModel.options
             .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
             .toList(),
+        value: viewModel.text.isNotEmpty ? viewModel.text : null,
         decoration: InputDecoration(
           helperText: viewModel.helper,
           hintText: viewModel.hint,

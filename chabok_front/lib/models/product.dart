@@ -9,9 +9,11 @@ class Product {
   final String name;
   final String description;
   final User seller;
+  @JsonKey(name: 'pictures')
   final List<String> imageUrls;
   final String category;
   final double price;
+  @JsonKey(name: 'city_name')
   final String? location;
   final String status;
 

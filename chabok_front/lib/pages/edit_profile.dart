@@ -4,10 +4,12 @@ import 'package:chabok_front/models/pair.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/network.dart';
 import 'package:chabok_front/services/router.dart';
+import 'package:chabok_front/services/user.dart';
 import 'package:chabok_front/view_models/text_field.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/text_field.dart';
+import 'package:chabok_front/widgets/toast.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -22,8 +24,9 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final _networkService = NetworkService.instance;
+  final _userService = UserService.instance;
 
-  Pair<String, Uint8List?>? profilePicture;
+  Pair<String, Uint8List>? profilePicture;
   late final List<TextFieldViewModel> fieldViewModels;
   final formKey = GlobalKey<FormState>();
 
@@ -33,30 +36,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void initState() {
     super.initState();
     fieldViewModels = [
-      if (!user.hasBeenEditedBefore) ...[
-        TextFieldViewModel(
-          icon: Icons.abc,
-          required: true,
-          label: 'First name',
-          initialText: user.firstName,
-        ),
-        TextFieldViewModel(
-          icon: Icons.abc,
-          required: true,
-          label: 'Last name',
-          initialText: user.lastName,
-        )
-      ],
+      TextFieldViewModel(
+        icon: Icons.abc,
+        required: true,
+        label: 'First name',
+        initialText: user.firstName,
+      ),
+      TextFieldViewModel(
+        icon: Icons.abc,
+        required: true,
+        label: 'Last name',
+        initialText: user.lastName,
+      ),
       TextFieldViewModel(
         icon: Icons.phone,
         required: true,
         label: 'Phone Number',
         initialText: user.phoneNumber,
-      ),
-      PasswordTextFieldViewModel(
-        icon: Icons.password,
-        required: true,
-        label: 'Password',
       ),
       TextFieldViewModel(
         icon: Icons.pin_drop,
@@ -95,7 +91,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         radius: 75,
                         foregroundImage: profilePicture?.second == null
                             ? null
-                            : MemoryImage(profilePicture!.second!),
+                            : MemoryImage(profilePicture!.second),
                       ),
                       Positioned(
                         right: 0,
@@ -122,25 +118,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         child: Button.text(
                           icon: Icons.cancel_outlined,
                           text: 'Discard changes',
-                          onPressed: () => RouterService.pop(),
+                          onPressed: () => RouterService.go('/profile'),
                         ),
                       ),
                       Expanded(
                         child: Button.filled(
                           icon: Icons.check,
                           text: 'Save changes',
-                          onPressed: () {
-                            if (formKey.currentState?.validate() ?? false) {
-                              fieldViewModels.asMap().map(
-                                    (_, e) => MapEntry(
-                                        e.label
-                                            ?.replaceAll(' ', '_')
-                                            .toLowerCase(),
-                                        e.text),
-                                  );
-                            }
-                            RouterService.pop();
-                          },
+                          onPressed: _submit,
                         ),
                       ),
                     ],
@@ -160,5 +145,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (file == null) return;
     profilePicture = Pair(file.name, file.bytes!);
     setState(() {});
+  }
+
+  Future<void> _submit() async {
+    if (formKey.currentState?.validate() ?? false) {
+      final fields = fieldViewModels.asMap().map(
+            (_, e) => MapEntry(
+              e.label!.replaceAll(' ', '_').toLowerCase(),
+              e.text,
+            ),
+          );
+      final response = await _userService.editProfile(
+        fields,
+        profilePicture,
+      );
+      if (response.isOk) RouterService.go('/profile');
+      CustomToast.showToast(context, response);
+    }
   }
 }

@@ -98,6 +98,12 @@ class UserManager:
                 flask.jsonify({'message': 'Username and password do not match.'}),
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
+        # Check whether user is banned or not.
+        if user.is_banned:
+            return (
+                flask.jsonify({'message': 'You are banned.'}),
+                backend.initializers.settings.HTTPStatus.FORBIDDEN.value
+            )
 
         # Generate new access token and refresh token for the user to access protected APIs.
         access_token = flask_jwt_extended.create_access_token(identity=username)

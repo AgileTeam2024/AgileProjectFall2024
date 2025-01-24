@@ -71,9 +71,11 @@ def create_managers(flask_app: flask.Flask) -> None:
     """
     import backend.managers.user
     import backend.managers.product
+    import backend.managers.admin
 
     backend.managers.user.UserManager(flask_app)
     backend.managers.product.ProductManager(flask_app)
+    backend.managers.admin.AdminManager(flask_app)
 
 
 def register_routes(flask_app: flask.Flask) -> None:
@@ -85,9 +87,11 @@ def register_routes(flask_app: flask.Flask) -> None:
     """
     import backend.routes.user
     import backend.routes.product
+    import backend.routes.admin
 
     flask_app.register_blueprint(backend.routes.user.user_bp, url_prefix='/api/user')
     flask_app.register_blueprint(backend.routes.product.product_bp, url_prefix='/api/product')
+    flask_app.register_blueprint(backend.routes.admin.admin_bp, url_prefix='/api/admin')
     # Create authorize button for protected APIs in swagger.
     SWAGGER_TEMPLATE = {
         "securityDefinitions": {"BearerAuth": {"type": "apiKey", "name": "Authorization", "in": "header"}}
