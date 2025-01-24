@@ -6,6 +6,7 @@ import werkzeug.utils
 import backend.managers.user
 import backend.models.user
 import backend.initializers.settings
+import backend.routes.authorization_utils
 
 user_bp = flask.Blueprint('user', __name__)
 
@@ -74,6 +75,43 @@ def register() -> (flask.Flask, int):
         )
 
     return backend.managers.user.UserManager.instance.register(username, password, email)
+
+
+@user_bp.route('/confirm_email/<token>', methods=['GET'])
+def confirm_email(token) -> (flask.Flask, int):
+    """
+    Confirm Email API.
+    ---
+    tags:
+      - User
+    parameters:
+        - name: token
+          in: path
+          type: string
+          required: true
+          description: The token used for confirming the email address.
+    responses:
+      200:
+        description: Email verified successfully.
+      403:
+        description: Email did not verify.
+    """
+    return backend.managers.user.UserManager.instance.confirm_email(token)
+
+
+@user_bp.route('/resend_email', methods=['GET'])
+@flask_jwt_extended.jwt_required()
+def resend_email() -> (flask.Flask, int):
+    """
+    Resend Email API.
+    ---
+    tags:
+      - User
+    responses:
+      200:
+        description: Email sent successfully.
+    """
+    return backend.managers.user.UserManager.instance.resend_confirmation_email(flask_jwt_extended.get_jwt())
 
 
 @user_bp.route('/login', methods=['POST'])  # Changed to POST
@@ -146,6 +184,7 @@ def logout():
 
 @user_bp.route('/refresh', methods=['GET'])
 @flask_jwt_extended.jwt_required(refresh=True)
+@backend.routes.authorization_utils.valid_user
 def refresh_token() -> (flask.Flask, int):
     """
     Refresh access token API.
@@ -185,6 +224,7 @@ def delete_user() -> (flask.Flask, int):
 
 @user_bp.route('/get_profile_by_username', methods=['GET'])
 @flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.valid_user
 def get_profile_by_username() -> (flask.Flask, int):
     """
     User get profile by username API.
@@ -202,6 +242,7 @@ def get_profile_by_username() -> (flask.Flask, int):
 
 @user_bp.route('/edit_profile', methods=['POST'])
 @flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.valid_user
 def edit() -> (flask.Flask, int):
     """
     User edit profile API.
@@ -274,6 +315,7 @@ def edit() -> (flask.Flask, int):
 
 @user_bp.route('/report_user', methods=['POST'])
 @flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.valid_user
 def report_user() -> (flask.Flask, int):
     """
     Report a user for inappropriate behavior.
