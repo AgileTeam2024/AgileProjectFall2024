@@ -1,14 +1,22 @@
+import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
 import 'package:chabok_front/pages/profile.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/services/router.dart';
+import 'package:chabok_front/services/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 import '../tests_setup_teardown.dart';
+
+class MockUserService extends Mock implements UserService {
+  @override
+  Future<User?> get ownProfile async =>
+      User(username: 'username', email: 'email', phoneNumber: 'phoneNumber');
+}
 
 void main() {
   testWidgets('Navigates to home page', (tester) async {
@@ -63,7 +71,10 @@ void main() {
   });
 
   group('If user is logged in', () {
-    setUp(() => AuthService.instance = MockAuthService(true));
+    setUp(() {
+      AuthService.instance = MockAuthService(true);
+      UserService.instance = MockUserService();
+    });
 
     testWidgets('Redirects to home going to login page', (tester) async {
       setUpWidgetTest(tester);

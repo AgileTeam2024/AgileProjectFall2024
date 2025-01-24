@@ -27,6 +27,14 @@ class UserReport(backend.initializers.database.DB.Model):
         nullable=False
     )
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'reported_user': self.reported_user,
+            'reporter_username': self.reporter_username,
+            'description': self.description
+        }
+
 
 class ProductReport(backend.initializers.database.DB.Model):
     """
@@ -53,3 +61,11 @@ class ProductReport(backend.initializers.database.DB.Model):
         backend.initializers.database.DB.String,
         nullable=False
     )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "reported_product": self.reported_product,
+            "reporter_username": self.reporter_username,
+            "description": self.description
+        }
