@@ -1,5 +1,6 @@
+import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
-import 'package:chabok_front/pages/create_product.dart';
+import 'package:chabok_front/pages/create_edit_product.dart';
 import 'package:chabok_front/pages/edit_profile.dart';
 import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/pages/home.dart';
@@ -7,7 +8,10 @@ import 'package:chabok_front/pages/login_register.dart';
 import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/pages/profile.dart';
 import 'package:chabok_front/services/auth.dart';
+import 'package:chabok_front/services/product.dart';
+import 'package:chabok_front/services/user.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
+import 'package:chabok_front/widgets/main_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -32,6 +36,14 @@ class RouterService {
         builder: (context, state, child) {
           print('${state.fullPath} ${state.pathParameters} ${state.extra}');
           return Scaffold(
+            floatingActionButton: ['/create-product', '/product/:id/edit']
+                    .contains(state.fullPath)
+                ? null
+                : MainFAB(
+                    icon: Icons.add,
+                    label: 'Create Product',
+                    onPressed: () => go('/create-product'),
+                  ),
             appBar: MainAppBar(),
             body: child,
           );
@@ -48,7 +60,7 @@ class RouterService {
           ),
           GoRoute(
             path: '/login',
-            redirect: (context, state) async {
+            redirect: (context, state) {
               if (_authService.isLoggedIn) return '/';
               return null;
             },
@@ -57,7 +69,7 @@ class RouterService {
           ),
           GoRoute(
             path: '/register',
-            redirect: (context, state) async {
+            redirect: (context, state) {
               if (_authService.isLoggedIn) return '/';
               return null;
             },
@@ -69,14 +81,45 @@ class RouterService {
             pageBuilder: (context, state) => NoTransitionPage(
               child: ProductViewPage(
                 int.parse(state.pathParameters['id']!),
-                viewerIsSeller: false,
               ),
             ),
           ),
           GoRoute(
+            path: '/product/:id/edit',
+            redirect: (context, state) {
+              if (!_authService.isLoggedIn) {
+                return '/product/${state.pathParameters['id']}';
+              }
+              return null;
+            },
+            pageBuilder: (context, state) {
+              final productId = int.parse(state.pathParameters['id']!);
+              return NoTransitionPage(
+                child: FutureBuilder<Product>(
+                  future: ProductService.instance.getProductById(productId),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data != null) {
+                        return EditProductPage(snapshot.data!);
+                      }
+                    } else if (snapshot.hasError) {
+                      return ErrorPage(
+                        errorCode: 404,
+                        message: 'Product not found :(',
+                      );
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+          GoRoute(
             path: '/create-product',
             redirect: (context, state) {
-              // todo redirect to login page if not logged in
+              if (!AuthService.instance.isLoggedIn) return '/login';
             },
             pageBuilder: (context, state) => NoTransitionPage(
               child: CreateProductPage(),
@@ -99,12 +142,14 @@ class RouterService {
               return null;
             },
             pageBuilder: (context, state) => NoTransitionPage(
-              child: EditProfilePage(
-                user: User(
-                  username: 'username',
-                  email: 'email@gmail.com',
-                  phoneNumber: '+9939232965',
-                ),
+              child: FutureBuilder<User?>(
+                future: UserService.instance.ownProfile,
+                builder: (context, snapshot) {
+                  if (snapshot.data == null) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  return EditProfilePage(user: snapshot.data!);
+                },
               ),
             ),
           ),

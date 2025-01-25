@@ -5,12 +5,14 @@ import werkzeug.utils
 import backend.managers.product
 import backend.models.product
 import backend.initializers.settings
+import backend.routes.authorization_utils
 
 product_bp = flask.Blueprint('product', __name__)
 
 
 @product_bp.route('/create', methods=['POST'])
 @flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.valid_user
 def create() -> (flask.Flask, int):
     """
     Create a new product.
@@ -323,6 +325,7 @@ def get_product_by_id():
 
 @product_bp.route('/delete', methods=['DELETE'])
 @flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.valid_user
 def delete_product() -> (flask.Flask, int):
     """
     Product delete API.
@@ -361,6 +364,7 @@ def delete_product() -> (flask.Flask, int):
 
 @product_bp.route('/edit_product', methods=['POST'])
 @flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.valid_user
 def edit_product() -> (flask.Flask, int):
     """
     Edit product's properties.
@@ -473,6 +477,7 @@ def edit_product() -> (flask.Flask, int):
 
 @product_bp.route('/report_product', methods=['POST'])
 @flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.valid_user
 def report_product() -> (flask.Flask, int):
     """
     Report a product for inappropriate content.

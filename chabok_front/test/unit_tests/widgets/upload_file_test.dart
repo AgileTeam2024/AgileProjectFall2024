@@ -1,26 +1,20 @@
 import 'dart:io';
 
 import 'package:chabok_front/widgets/upload_file.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-class MockFile extends Mock implements DropzoneFileInterface {
-  final Uint8List bytes;
+import 'upload_file_test.mocks.dart';
 
-  @override
-  String get name => 'assets/sample_images/product_img1.jpg';
-
-  @override
-  int get size => bytes.length;
-
-  MockFile({required this.bytes});
-}
-
+@GenerateNiceMocks([MockSpec<FilePicker>()])
 void main() {
   group('UploadFileWidget', () {
+    late MockFilePicker mockFilePicker;
+
     late Map<String, Uint8List> files;
     late void Function(Map<String, Uint8List>) onFilesChange;
     final filename = 'assets/sample_images/product_img1.jpg';
@@ -30,6 +24,7 @@ void main() {
       HttpOverrides.global = null;
       files = {};
       onFilesChange = (newFiles) => files = newFiles;
+      mockFilePicker = MockFilePicker();
     });
 
     testWidgets('displays initial UI correctly', (tester) async {
@@ -44,20 +39,34 @@ void main() {
       expect(find.byIcon(Icons.image), findsOneWidget);
     });
 
-    testWidgets('adds files by drag and drop', (tester) async {
-      final widget = UploadFileWidget(
-        files: files,
-        onFilesChange: onFilesChange,
-      );
-      await tester.pumpWidget(MaterialApp(home: widget));
-      await tester.pumpAndSettle(Duration(seconds: 5));
+    testWidgets('adds files with file_picker', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: UploadFileWidget(
+          files: files,
+          onFilesChange: onFilesChange,
+        ),
+      ));
 
-      widget.controller!.widget.onDropFiles
-          ?.call([MockFile(bytes: fileBytes), MockFile(bytes: fileBytes)]);
-      await tester.pumpAndSettle();
+      final uploadWidget = find.byType(UploadFileWidget).evaluate().first.widget
+          as UploadFileWidget;
+      uploadWidget.filePicker = mockFilePicker;
+
+      when(mockFilePicker.pickFiles(type: FileType.image, allowMultiple: true))
+          .thenAnswer((_) async {
+        return FilePickerResult([
+          PlatformFile(
+            name: filename,
+            size: fileBytes.lengthInBytes,
+            bytes: fileBytes,
+          )
+        ]);
+      });
+
+      await tester.tap(find.byType(UploadFileWidget));
+      await tester.pump();
 
       expect(files.length, 1);
-    }, skip: true); // todo can not mock :(
+    });
 
     testWidgets('removes a file', (tester) async {
       files = {filename: fileBytes};

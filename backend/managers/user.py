@@ -1,8 +1,10 @@
 import os
 import datetime
+import itsdangerous
 from typing import Optional
 
 import flask
+import flask_mail
 import flask_jwt_extended
 
 import backend.models.user
@@ -19,6 +21,8 @@ class UserManager:
         if not UserManager.instance:
             self.flask_app = flask_app
             self.jwt_manager = flask_jwt_extended.JWTManager(flask_app)
+            self.email_serializer = itsdangerous.URLSafeTimedSerializer(flask_app.config['JWT_SECRET_KEY'])
+            self.mail_service = flask_mail.Mail(flask_app)
             UserManager.instance = self
             # Setup checking revoked tokens.
             import backend.managers.token
@@ -55,6 +59,9 @@ class UserManager:
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
 
+        # Send the confirmation email.
+        self._send_confirmation_email(email)
+
         # Create a new user instance.
         # TODO: Store password as hashed-value.
         new_user = backend.models.user.User(username=username, password=password, email=email)
@@ -65,6 +72,77 @@ class UserManager:
         return (
             flask.jsonify({"message": "User registered successfully."}),
             backend.initializers.settings.HTTPStatus.CREATED.value
+        )
+
+    def _send_confirmation_email(self, email: str) -> None:
+        # Generate confirmation token for verification email.
+        email_token = self.email_serializer.dumps(email, salt='email-confirm')
+        # Generate verification email content.
+        confirm_url = "https://" + self.flask_app.config['SERVER_NAME'] + "/api/user/confirm_email/" + email_token
+        subject = "Pre-Loved verification email"
+        text_body = f'''
+                Thank you for registering. Please confirm your email by clicking the link below:
+
+                {confirm_url}
+
+                If you did not create an account, please ignore this email.
+
+                Best regards,
+                Pre-Loved
+                '''
+        # Create the message.
+        msg = flask_mail.Message(
+            subject,
+            recipients=[email],
+            body=text_body,
+            sender=self.flask_app.config['MAIL_USERNAME']
+        )
+        # Send the email.
+        self.mail_service.send(msg)
+
+    def confirm_email(self, email_token: str) -> (flask.Flask, int):
+        """
+        Confirms the given email verification token and verifies the user.
+        Args:
+            email_token(str): The token to verify the user.
+
+        Returns:
+            tuple: A tuple containing:
+                - A Flask response object with a JSON message indicating success or failure.
+                - An integer representing the HTTP status code (200 or 403).
+        """
+        try:
+            email = self.email_serializer.loads(email_token, salt='email-confirm', max_age=3600)
+        except Exception as e:
+            return (
+                flask.jsonify({"message": "Verification failed.", "error": str(e)}),
+                backend.initializers.settings.HTTPStatus.FORBIDDEN.value
+            )
+        # Verify the user's email by setting 'is_verified' attribute to True.
+        user = backend.models.user.User.query.filter_by(email=email).first()
+        user.is_verified = True
+        backend.initializers.database.DB.session.add(user)
+        backend.initializers.database.DB.session.commit()
+        return (
+            flask.jsonify({"message": "Email verified successfully."}),
+            backend.initializers.settings.HTTPStatus.OK.value
+        )
+
+    def resend_confirmation_email(self, username: str) -> (flask.Flask, int):
+        """
+        Resends the confirmation email to the provided email address.
+        Args:
+            username(str): The user requested for resending the confirmation email.
+
+        Returns:
+            tuple: A tuple containing:
+                - A Flask response object with a JSON message indicating success.
+                - An integer representing the HTTP status code 200.
+        """
+        self._send_confirmation_email(backend.models.user.User.query.filter_by(username=username).first().email)
+        return (
+            flask.jsonify({"message": "Verification email resent."}),
+            backend.initializers.settings.HTTPStatus.OK.value
         )
 
     def login(self, username: str, password: str) -> (flask.Flask, int):
@@ -97,6 +175,12 @@ class UserManager:
             return (
                 flask.jsonify({'message': 'Username and password do not match.'}),
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+            )
+        # Check whether user is banned or not.
+        if user.is_banned:
+            return (
+                flask.jsonify({'message': 'You are banned.'}),
+                backend.initializers.settings.HTTPStatus.FORBIDDEN.value
             )
 
         # Generate new access token and refresh token for the user to access protected APIs.

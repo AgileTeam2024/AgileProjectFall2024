@@ -52,6 +52,31 @@ app_secret_key = flags.DEFINE_string(
     required=True,
 )
 
+# Verification email configs.
+mail_server_host = flags.DEFINE_string(
+    name='mail_server_host',
+    default='smtp.mail.yahoo.com',
+    help='The mail server address.',
+)
+
+mail_server_port = flags.DEFINE_integer(
+    name='mail_server_port',
+    default=587,
+    help='The mail server port.',
+)
+mail_sender_email = flags.DEFINE_string(
+    name='mail_sender_email',
+    default=None,
+    help='The mail sender.',
+    required=True,
+)
+mail_sender_password = flags.DEFINE_string(
+    name='mail_sender_password',
+    default=None,
+    help='The mail sender password.',
+    required=True,
+)
+
 
 class HTTPStatus(enum.Enum):
     """
@@ -62,6 +87,7 @@ class HTTPStatus(enum.Enum):
     NO_CONTENT = 204
     BAD_REQUEST = 400
     UNAUTHORIZED = 401
+    FORBIDDEN = 403
     NOT_FOUND = 404
 
 

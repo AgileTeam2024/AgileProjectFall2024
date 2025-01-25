@@ -148,7 +148,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byType(CustomTextField));
       await tester.pumpAndSettle();
-      expect(find.text('Option1'), findsOneWidget);
+      expect(find.text('Option1'), findsNWidgets(2));
       expect(find.text('Option2'), findsOneWidget);
     });
 
