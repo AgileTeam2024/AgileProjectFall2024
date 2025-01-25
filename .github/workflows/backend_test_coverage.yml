@@ -20,7 +20,7 @@ jobs:
         run: pip install -r backend/requirements.txt
 
       - name: Run test coverage
-        run: cd backend && coverage run -m pytest
+        run: cd backend && coverage run --omit="/usr/lib/*" -m pytest
 
       - name: Generate test coverage report
         run: cd backend && coverage report > backend_coverage_report.txt
@@ -30,5 +30,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add backend/backend_coverage_report.txt
-          git commit -m "Add coverage report" || echo "No changes to commit"
+          git commit -m "feat: Add coverage report" || echo "No changes to commit"
           git push
