@@ -20,10 +20,10 @@ jobs:
         run: pip install -r backend/requirements.txt
 
       - name: Run test coverage
-        run: coverage run -m pytest
+        run: cd backend && coverage run -m pytest
 
       - name: Generate test coverage report
-        run: coverage report > backend_coverage_report.txt
+        run: cd backend && coverage report > backend_coverage_report.txt
 
       - name: Push coverage report
         run: |
