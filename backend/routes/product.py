@@ -63,14 +63,13 @@ def create() -> (flask.Flask, int):
         required: true
         type: string
         enum:
-          - Other
-          - Electronics
-          - Clothing
-          - Home & Garden
-          - Sports & Outdoors
-          - Toys & Games
-          - Automotive  # Corrected spelling from "Automative"
-          - Books & Media
+          - Others
+          - Real-Estate
+          - Automobile
+          - Digital & Electronics
+          - Kitchenware
+          - Entertainment
+          - Personal Items
         description: The category of the product.
       - name: pictures
         in: formData
@@ -80,9 +79,9 @@ def create() -> (flask.Flask, int):
         collectionFormat: multi
         description: Images of the product. You can upload multiple images.
     responses:
-      '201':
+      201:
         description: Product created successfully.
-      '400':
+      400:
         description: Bad Request if any required fields are missing or invalid.
     """
 
@@ -336,10 +335,10 @@ def delete_product() -> (flask.Flask, int):
       - BearerAuth: []
     parameters:
       - name: product_id
-      in: query
-      type: integer
-      required: true
-      description: The ID of the product to delete.
+        in: query
+        type: integer
+        required: true
+        description: The ID of the product to delete.
     responses:
       200:
         description: successful delete
@@ -575,10 +574,10 @@ def ban_product() -> (flask.Flask, int):
       - BearerAuth: []
     parameters:
     - name: product_id
-        in: query
-        type: integer
-        required: true
-        description: The ID of the product to ban.
+      in: query
+      type: integer
+      required: true
+      description: The ID of the product to ban.
     responses:
       200:
         description: Product is banned successfully.

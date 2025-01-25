@@ -110,6 +110,19 @@ class UserManagerTest(absltest.TestCase):
         self.assertEqual(response.json, {"message": "User banned successfully."})
         self.assertTrue(user.is_banned)
 
+    def test_unban_user(self) -> None:
+        """Test unbanning user successfully."""
+        user = backend.models.user.User(
+            username="username",
+            password="password",
+            is_banned=True
+        )
+        self.mock_user_query.filter_by.return_value.first.return_value = user
+        response, status_code = self.admin_manager.unban_user(username=user.username)
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {"message": "User unbanned successfully."})
+        self.assertFalse(user.is_banned)
+
 
 if __name__ == "__main__":
     backend.initializers.test_util.pass_flags_as_parsed()

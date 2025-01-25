@@ -69,8 +69,49 @@ def ban_user():
     responses:
       200:
         description: Successfully banned the user.
+      400:
+        description: Username is missing.
       403:
         description: Only admins have access to this API.
     """
     username = flask.request.form.get('username')
+    if not username:
+        return (
+            flask.jsonify({"message": "Username is missing."}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
     return backend.managers.admin.AdminManager.instance.ban_user(username)
+
+
+@admin_bp.route('/ban_user', methods=['POST'])
+@flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.admin_required
+def unban_user():
+    """
+    Admin Unban User.
+    ---
+    tags:
+      - Admin
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: username
+        in: formData
+        required: true
+        type: string
+        description: The username you want to unban.
+    responses:
+      200:
+        description: Successfully unbanned the user.
+      400:
+        description: Username is missing.
+      403:
+        description: Only admins have access to this API.
+    """
+    username = flask.request.form.get('username')
+    if not username:
+        return (
+            flask.jsonify({"message": "Username is missing."}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    return backend.managers.admin.AdminManager.instance.unban_user(username)
