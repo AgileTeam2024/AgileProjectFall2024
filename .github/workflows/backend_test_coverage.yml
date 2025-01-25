@@ -1,0 +1,30 @@
+name: Backend Test Coverage
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: pip install backend/requirements.txt
+
+      - name: Run test coverage
+        run: coverage run -m pytest
+
+      - name: Generate test coverage report
+        run: coverage report > backend_coverage_report.txt
+
+      - name: Push coverage report
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add coverage_report.txt
+          git commit -m "Add coverage report" || echo "No changes to commit"
+          git push
