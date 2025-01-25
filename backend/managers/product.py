@@ -8,6 +8,7 @@ import backend.initializers.database
 import backend.initializers.settings
 import backend.models.user
 import backend.models.report
+import flask_jwt_extended
 
 
 class ProductManager:
@@ -122,11 +123,9 @@ class ProductManager:
 
         # Execute the query and get results.
         products = query.all()
-        products_as_dicts = [product.to_dict() for product in products]
+        products_as_dicts = [product.to_dict() for product in products if not product.is_banned]
 
         return flask.jsonify({"products": products_as_dicts}), backend.initializers.settings.HTTPStatus.OK.value
-
-    # TODO : Add edit and delete
 
     def get_product(self, product_id: int) -> (flask.Flask, int):
         """
@@ -157,17 +156,28 @@ class ProductManager:
             product_dict['seller'] = seller
         return flask.jsonify({"product": product_dict}), backend.initializers.settings.HTTPStatus.OK.value
 
-    def delete_product(self, product_id) -> (flask.Flask, int):
+    def delete_product(self, username: str, product_id: int) -> (flask.Flask, int):
         """
         Deletes a product.
 
         Args:
             product_id (Integer): The id of the product to be deleted.
+            username (str): The username of the current user.
         Returns:
             response (flask.Response): A Flask response object containing successfully deleted a user.
             status_code (int): HTTP status code indicating successful delete (204).
         """
-
+        product = backend.models.product.Product.query.filter_by(id=product_id).first()
+        if not product:
+            return (
+                flask.jsonify({'message': 'Product does not exist.'}),
+                backend.initializers.settings.HTTPStatus.NOT_FOUND.value
+            )
+        if product.user_username != username:
+            return (
+                flask.jsonify({'message': 'You do not have access to edit this product.'}),
+                backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
+            )
         product_pictures = backend.models.product.Picture.query.filter_by(product_id=product_id).all()
         for picture in product_pictures:
             backend.initializers.database.DB.session.delete(picture)
@@ -180,19 +190,30 @@ class ProductManager:
             backend.initializers.settings.HTTPStatus.NO_CONTENT.value
         )
 
-    def edit_product(self, product_id: int, product_data: dict) -> (flask.Flask, int):
+    def edit_product(self, username: str, product_id: int, product_data: dict) -> (flask.Flask, int):
         """
         Edit product's properties.
 
         Args:
+            username (str): The username of the current user.
             product_id (int): The id of the product.
             product_data (dict): A dictionary containing the updated info of the product.
         Returns:
-            response (flask.Response): A Flask response object containing successfully deleted a user.
+            response (flask.Response): A Flask response object containing successfully editing a product.
             status_code (int): HTTP status code indicating success (200).
         """
 
         product = backend.models.product.Product.query.filter_by(id=product_id).first()
+        if not product:
+            return (
+                flask.jsonify({'message': 'Product does not exist.'}),
+                backend.initializers.settings.HTTPStatus.NOT_FOUND.value
+            )
+        if product.user_username != username:
+            return (
+                flask.jsonify({'message': 'You do not have access to edit this product.'}),
+                backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
+            )
         product.name = product_data.get('name', product.name)
         product.price = product_data.get('price', product.price)
         product.city_name = product_data.get('city_name', product.city_name)
@@ -208,19 +229,20 @@ class ProductManager:
             os.remove(picture.filename)
 
         # Adding new pictures
-        for file, filename in zip(product_data['images'], product_data['images_path']):
-            # Generate a new filename by appending a timestamp to avoid duplicate name.
-            base, extension = os.path.splitext(filename)
-            timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-            new_filename = f"{base}_{timestamp}{extension}"
-            file_path = f"./backend/{flask.current_app.config['UPLOAD_FOLDER']}{new_filename}"
-            file.save(file_path)
-            # Create a new Picture instance associated with the newly created product.
-            new_picture = backend.models.product.Picture(
-                filename=new_filename,
-                product_id=product_id,
-            )
-            backend.initializers.database.DB.session.add(new_picture)
+        if 'images' in product_data.keys():
+            for file, filename in zip(product_data['images'], product_data['images_path']):
+                # Generate a new filename by appending a timestamp to avoid duplicate name.
+                base, extension = os.path.splitext(filename)
+                timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                new_filename = f"{base}_{timestamp}{extension}"
+                file_path = f"./backend/{flask.current_app.config['UPLOAD_FOLDER']}{new_filename}"
+                file.save(file_path)
+                # Create a new Picture instance associated with the newly created product.
+                new_picture = backend.models.product.Picture(
+                    filename=new_filename,
+                    product_id=product_id,
+                )
+                backend.initializers.database.DB.session.add(new_picture)
 
         backend.initializers.database.DB.session.commit()
 
@@ -254,3 +276,46 @@ class ProductManager:
         backend.initializers.database.DB.session.commit()
         return flask.jsonify(
             {"message": "Product is reported successfully."}), backend.initializers.settings.HTTPStatus.OK.value
+
+    def get_products(self, user_username: str) -> (flask.Flask, int):
+        """
+        Returns a list of products belonging to a user that are on sale.
+
+        Args:
+            user_username (str): username of the user
+        Returns:
+            response (flask.Response): A Flask response object containing successfully returning a list.
+            status_code (int):
+                200: successful search
+        """
+        products = backend.models.product.Product.query.filter_by(
+            user_username=user_username,
+        ).all()
+        products_as_dicts = [product.to_dict() for product in products]
+        return flask.jsonify({"products": products_as_dicts}), backend.initializers.settings.HTTPStatus.OK.value
+
+    def ban_product(self, product_id: int) -> (flask.Flask, int):
+        """
+        Changes the status of a product to ban.
+
+        Args:
+            product_id (int): the id of the product to be banned.
+        Returns:
+            response (flask.Response): A Flask response object containing successfully banning a product.
+            status_code (int):
+                200: successful ban
+                404: no products found
+        """
+        product = backend.models.product.Product.query.get(product_id)
+        if not product:
+            return (
+                flask.jsonify({"message": "No product found."}),
+                backend.initializers.settings.HTTPStatus.NOT_FOUND.value
+            )
+        product.is_banned = True
+        backend.initializers.database.DB.session.add(product)
+        backend.initializers.database.DB.session.commit()
+        return (
+            flask.jsonify({"message": "Product successfully banned."}),
+            backend.initializers.settings.HTTPStatus.OK.value
+        )

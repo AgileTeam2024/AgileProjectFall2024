@@ -163,7 +163,7 @@ def login() -> (flask.Flask, int):
     return backend.managers.user.UserManager.instance.login(username, password)
 
 
-@user_bp.route('/logout', methods=['GET'])
+@user_bp.route('/logout', methods=['DELETE'])
 @flask_jwt_extended.jwt_required()
 def logout():
     """
@@ -205,7 +205,7 @@ def refresh_token() -> (flask.Flask, int):
                                                                     flask_jwt_extended.get_jwt_identity())
 
 
-@user_bp.route('/delete', methods=['GET'])
+@user_bp.route('/delete', methods=['DELETE'])
 @flask_jwt_extended.jwt_required()
 def delete_user() -> (flask.Flask, int):
     """
@@ -240,7 +240,7 @@ def get_profile_by_username() -> (flask.Flask, int):
     return backend.managers.user.UserManager.instance.get_profile(flask_jwt_extended.get_jwt_identity())
 
 
-@user_bp.route('/edit_profile', methods=['POST'])
+@user_bp.route('/edit_profile', methods=['PUT'])
 @flask_jwt_extended.jwt_required()
 @backend.routes.authorization_utils.valid_user
 def edit() -> (flask.Flask, int):
@@ -262,16 +262,16 @@ def edit() -> (flask.Flask, int):
         required: false
         type: string
         description: The last name of the user.
-      - name: email
-        in: formData
-        required: false
-        type: string
-        description: The email of the user.
       - name: phone number
         in: formData
         required: false
         type: string
         description: The phone number of the user.
+      - name: address
+        in: formData
+        required: false
+        type: string
+        description: The address of the user.
       - name: profile_picture
         in: formData
         type: file
@@ -289,20 +289,12 @@ def edit() -> (flask.Flask, int):
     last_name = flask.request.form.get('last_name')
     if last_name:
         info['last_name'] = last_name
-    email = flask.request.form.get('email')
-    if email:
-        # Validate the email.
-        try:
-            email_validator.validate_email(email)
-        except email_validator.EmailNotValidError as e:
-            return (
-                flask.jsonify({'message': 'Email is invalid.'}),
-                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-            )
-        info['email'] = email
     phone_number = flask.request.form.get('phone_number')
     if phone_number:
         info['phone_number'] = phone_number
+    address = flask.request.form.get('address')
+    if address:
+        info['address'] = address
     # Get the new profile picture.
     profile_picture = flask.request.files.get('profile_picture')
     if (profile_picture and '.' in profile_picture.filename and

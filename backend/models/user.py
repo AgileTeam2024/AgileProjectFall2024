@@ -45,6 +45,10 @@ class User(backend.initializers.database.DB.Model):
         backend.initializers.database.DB.String,
         nullable=True
     )
+    address = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.String,
+        nullable=True
+    )
     profile_picture = backend.initializers.database.DB.Column(
         backend.initializers.database.DB.String,
         nullable=True

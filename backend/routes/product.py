@@ -332,6 +332,14 @@ def delete_product() -> (flask.Flask, int):
     ---
     tags:
       - Product
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: product_id
+      in: query
+      type: integer
+      required: true
+      description: The ID of the product to delete.
     responses:
       200:
         description: successful delete
@@ -339,15 +347,11 @@ def delete_product() -> (flask.Flask, int):
         description: bad request
       401:
         description: unauthorized user access
+      404:
+        description: product with this id doesn't exist.
     """
-    username = flask.request.args.get('user_username')
-    user = flask_jwt_extended.get_jwt_identity()
-    if username != user:
-        return (
-            flask.jsonify({'message': 'You cannot delete this product.'}),
-            backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value
-        )
-    product_id = flask.request.args.get('id')
+    user_username = flask_jwt_extended.get_jwt_identity()
+    product_id = flask.request.args.get('product_id')
     if not product_id:
         return (
             flask.jsonify({'message': 'Missing product ID.'}),
@@ -359,10 +363,10 @@ def delete_product() -> (flask.Flask, int):
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
 
-    return backend.managers.product.ProductManager.instance.delete_product(product_id)
+    return backend.managers.product.ProductManager.instance.delete_product(user_username, product_id)
 
 
-@product_bp.route('/edit_product', methods=['POST'])
+@product_bp.route('/edit_product', methods=['PUT'])
 @flask_jwt_extended.jwt_required()
 @backend.routes.authorization_utils.valid_user
 def edit_product() -> (flask.Flask, int):
@@ -371,7 +375,14 @@ def edit_product() -> (flask.Flask, int):
     ---
     tags:
       - Product
+    security:
+      - BearerAuth: []
     parameters:
+      - name: product_id
+        in: query
+        type: integer
+        required: true
+        description: The ID of the product to edit.
       - name: name
         in: formData
         required: true
@@ -407,14 +418,13 @@ def edit_product() -> (flask.Flask, int):
         required: true
         type: string
         enum:
-          - Other
-          - Electronics
-          - Clothing
-          - Home & Garden
-          - Sports & Outdoors
-          - Toys & Games
-          - Automotive  # Corrected spelling from "Automative"
-          - Books & Media
+          - Others
+          - Digital & Electronics
+          - Automobile
+          - Kitchenware
+          - Real-Estate
+          - Personal Items
+          - Entertainment
         description: The category of the product.
       - name: pictures
         in: formData
@@ -424,14 +434,23 @@ def edit_product() -> (flask.Flask, int):
         collectionFormat: multi
         description: Images of the product. You can upload multiple images.
     responses:
-      '201':
-        description: Product created successfully.
-      '400':
+      200:
+        description: Product edited successfully.
+      400:
         description: Bad Request if any required fields are missing or invalid.
+      401:
+        description: This user cannot edit this product.
+      404:
+        description: Not found if the product with the provided id doesn't exist.
     """
     user_username = flask_jwt_extended.get_jwt_identity()
     data = {}
-    product_id = flask.request.form.get('id')
+    product_id = flask.request.form.get('product_id')
+    if not product_id:
+        return (
+            flask.jsonify({'message': 'Product id is required'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
     product_name = flask.request.form.get('name')
     if product_name:
         data['name'] = product_name
@@ -439,7 +458,7 @@ def edit_product() -> (flask.Flask, int):
     if product_price:
         try:
             price = float(product_price)
-            data['price'] = product_price
+            data['price'] = price
         except ValueError:
             return (
                 flask.jsonify({'message': 'Price must be a valid float number.'}),
@@ -472,7 +491,7 @@ def edit_product() -> (flask.Flask, int):
     data['images_path'] = images_path
     data['user_username'] = user_username
 
-    return backend.managers.product.ProductManager.instance.edit_product(product_id, data)
+    return backend.managers.product.ProductManager.instance.edit_product(user_username, product_id, data)
 
 
 @product_bp.route('/report_product', methods=['POST'])
@@ -524,3 +543,60 @@ def report_product() -> (flask.Flask, int):
         )
     return backend.managers.product.ProductManager.instance.report_product(reporter_username, reported_product,
                                                                            description)
+
+
+@product_bp.route('/product_list', methods=['GET'])
+@flask_jwt_extended.jwt_required()
+def get_products() -> (flask.Flask, int):
+    """
+    API for returning a list of products that are on sale for a user.
+    ---
+    tags:
+      - product
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Products are returned successfully.
+    """
+    username = flask_jwt_extended.get_jwt_identity()
+    return backend.managers.product.ProductManager.instance.get_products(username)
+
+
+@product_bp.route('/ban_product', methods=['PUT'])
+@flask_jwt_extended.jwt_required()
+def ban_product() -> (flask.Flask, int):
+    """
+    Product ban API.
+    ---
+    tags:
+      - product
+    security:
+      - BearerAuth: []
+    parameters:
+    - name: product_id
+        in: query
+        type: integer
+        required: true
+        description: The ID of the product to ban.
+    responses:
+      200:
+        description: Product is banned successfully.
+      401:
+        description: User must be admin.
+      404:
+        description: No products found with this id.
+    """
+    product_id = flask.request.args.get('product_id')
+    # Check if product ID is missing
+    if not product_id:
+        return (
+            flask.jsonify({'message': 'Missing product ID.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    if not product_id.isdigit():
+        return (
+            flask.jsonify({'message': 'Product ID must be an integer.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    return backend.managers.product.ProductManager.instance.ban_product(product_id)

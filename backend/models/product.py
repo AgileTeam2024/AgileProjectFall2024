@@ -16,7 +16,7 @@ class Product(backend.initializers.database.DB.Model):
     STATUS_OPTIONS = ['for sale', 'sold', 'reserved']
     # Categories : real estate, automobile, digital & electronics , kitchenware, personal items, entertainment, others
     CATEGORY_OPTIONS = [
-        'Others', 'Real estate', 'Automobile', 'Digital & Electronics', 'Kitchenware', 'Entertainment',
+        'Others', 'Real-Estate', 'Automobile', 'Digital & Electronics', 'Kitchenware', 'Entertainment',
         'Personal Items'
     ]
 
@@ -59,6 +59,10 @@ class Product(backend.initializers.database.DB.Model):
         backend.initializers.database.DB.Enum(*STATUS_OPTIONS, name='status'),
         default='for sale',
         nullable=False
+    )
+    is_banned = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.Boolean,
+        default=False
     )
     # can be defined as a class
     # TODO : check doc
