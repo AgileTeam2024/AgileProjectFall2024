@@ -1,0 +1,21 @@
+Name                        Stmts   Miss  Cover
+-----------------------------------------------
+__init__.py                     0      0   100%
+initializers/__init__.py        0      0   100%
+initializers/database.py        2      0   100%
+initializers/settings.py       23      0   100%
+initializers/test_util.py      11      8    27%
+managers/__init__.py            0      0   100%
+managers/admin.py              25      1    96%
+managers/admin_test.py         47      2    96%
+managers/product.py           102     52    49%
+managers/product_test.py       85      2    98%
+managers/token.py              13      3    77%
+managers/user.py              125     57    54%
+managers/user_test.py          83      2    98%
+models/__init__.py              0      0   100%
+models/product.py              29      2    93%
+models/report.py               17      0   100%
+models/user.py                 33      3    91%
+-----------------------------------------------
+TOTAL                         595    132    78%
