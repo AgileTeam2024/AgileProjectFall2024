@@ -1,5 +1,6 @@
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/server_response.dart';
+import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/network.dart';
 import 'package:chabok_front/services/user.dart';
 import 'package:flutter/foundation.dart';
@@ -30,10 +31,8 @@ class ProductService {
     return Product.fromJson(product);
   }
 
-  Future<ServerResponse> createProduct(
-    Map<String, dynamic> fields,
-    Map<String, Uint8List?>? images,
-  ) {
+  Future<ServerResponse> createProduct(Map<String, dynamic> fields,
+      Map<String, Uint8List?>? images,) {
     images?.removeWhere((path, bytes) => bytes == null);
     return _networkService.postFormData(
       '/product/create',
@@ -44,11 +43,9 @@ class ProductService {
     );
   }
 
-  Future<ServerResponse> editProduct(
-    int productId,
-    Map<String, dynamic> fields,
-    Map<String, Uint8List?>? images,
-  ) {
+  Future<ServerResponse> editProduct(int productId,
+      Map<String, dynamic> fields,
+      Map<String, Uint8List?>? images,) {
     images?.removeWhere((path, bytes) => bytes == null);
     return _networkService.postFormData(
       '/product/edit_product',
@@ -70,6 +67,17 @@ class ProductService {
     String? sortCreatedAt,
     String? sortPrice,
   }) async {
+    return Future.value(List.generate(15, (i) => // todo
+        Product(id: i,
+            name: 'name',
+            description: 'description',
+            seller: User(username: 'username',
+                email: 'email',
+                phoneNumber: 'phoneNumber'),
+            imageUrls: ['assets/sample_images/product_img0.jpg'],
+            category: 'category',
+            price: 1000000,
+            status: 'status')));
     final response = await _networkService.get(
       '/product/search',
       query: {
@@ -89,11 +97,10 @@ class ProductService {
   }
 
   Future<List<Product>> getProductsSellers(
-    List<Map<String, dynamic>> products,
-  ) {
+      List<Map<String, dynamic>> products,) {
     return Future.wait(
       products.map(
-        (product) async {
+            (product) async {
           return (await getProductById(product['id'] as int));
           // todo
           // if (!product.containsKey('seller')) {

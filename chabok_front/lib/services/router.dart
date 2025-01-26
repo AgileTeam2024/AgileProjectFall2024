@@ -7,6 +7,7 @@ import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
 import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/pages/profile.dart';
+import 'package:chabok_front/pages/search.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/user.dart';
@@ -23,6 +24,17 @@ class RouterService {
 
   static void go(String location, {Object? extra}) =>
       GoRouter.of(_shellNavKey.currentContext!).go(location, extra: extra);
+
+  static void goNamed(
+    String location, {
+    Object? extra,
+    Map<String, dynamic>? queryParameters,
+  }) =>
+      GoRouter.of(_shellNavKey.currentContext!).goNamed(
+        location,
+        extra: extra,
+        queryParameters: queryParameters ?? {},
+      );
 
   static void pop() => GoRouter.of(_shellNavKey.currentContext!).pop();
 
@@ -52,6 +64,15 @@ class RouterService {
           GoRoute(
             path: '/',
             redirect: (context, state) => '/home',
+          ),
+          GoRoute(
+            name: 'search',
+            path: '/search',
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: SearchPage(
+                query: state.uri.queryParametersAll['q']?.firstOrNull ?? '',
+              ),
+            ),
           ),
           GoRoute(
             path: '/home',

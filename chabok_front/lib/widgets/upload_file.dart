@@ -13,7 +13,10 @@ class UploadFileWidget extends StatelessWidget {
   set filePicker(FilePicker? value) =>
       _filePicker = value ?? FilePicker.platform;
 
-  FilePicker get filePicker => _filePicker!;
+  FilePicker get filePicker {
+    _filePicker ??= FilePicker.platform;
+    return _filePicker!;
+  }
 
   final int minimumFiles;
   final int? maximumFiles;
