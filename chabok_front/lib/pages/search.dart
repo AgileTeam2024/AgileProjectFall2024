@@ -3,6 +3,7 @@ import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/search_filter.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/widgets/card.dart';
+import 'package:chabok_front/widgets/products.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
@@ -54,14 +55,14 @@ class _SearchPageState extends State<SearchPage> {
     return Padding(
       padding: const EdgeInsets.all(25),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 20,
         children: [
           Expanded(
-            child: CardWidget(
-              margin: EdgeInsets.zero,
-              child: FutureBuilder(
-                future: searchResults,
-                builder: (context, snapshot) => Container(),
+            child: FutureBuilder(
+              future: searchResults,
+              builder: (context, snapshot) => ProductsWidget(
+                snapshot.data ?? [],
               ),
             ),
           ),
@@ -116,6 +117,7 @@ class _FilterWidgetState extends State<FilterWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         FiltersPreview(),
 

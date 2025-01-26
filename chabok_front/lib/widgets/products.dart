@@ -15,47 +15,43 @@ class ProductsWidget extends StatelessWidget {
     if (products.isEmpty) {
       return ErrorPage(errorCode: 404, message: 'No products found :(');
     }
-    return Padding(
-      padding: const EdgeInsets.only(top: 25) +
-          EdgeInsets.symmetric(horizontal: 250),
-      child: GridView.builder(
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 225,
-          childAspectRatio: .75,
-          mainAxisSpacing: 15,
-          crossAxisSpacing: 15,
-        ),
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          final seller = product.seller;
-
-          final displayImage = product.imageUrls.firstOrNull;
-
-          return MaterialButton(
-            onPressed: () => RouterService.go('/product/${product.id}'),
-            color: Colors.white,
-            hoverElevation: 2,
-            focusElevation: 2,
-            elevation: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  _ProductImageWidget(displayImage),
-                  _ProductNameWidget(product.name),
-                  SizedBox(height: 7.5),
-                  _ProductPriceWidget(product.price),
-                  SizedBox(height: 2.5),
-                  SellerWidget(seller),
-                ],
-              ),
-            ),
-          );
-        },
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 225,
+        childAspectRatio: .75,
+        mainAxisSpacing: 15,
+        crossAxisSpacing: 15,
       ),
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        final product = products[index];
+        final seller = product.seller;
+
+        final displayImage = product.imageUrls.firstOrNull;
+
+        return MaterialButton(
+          onPressed: () => RouterService.go('/product/${product.id}'),
+          color: Colors.white,
+          hoverElevation: 2,
+          focusElevation: 2,
+          elevation: 1,
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                _ProductImageWidget(displayImage),
+                _ProductNameWidget(product.name),
+                SizedBox(height: 7.5),
+                _ProductPriceWidget(product.price),
+                SizedBox(height: 2.5),
+                SellerWidget(seller),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
