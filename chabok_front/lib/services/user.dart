@@ -30,7 +30,6 @@ class UserService {
     final response =
         await _networkService.get('/user/get_profile_by_username/$username');
     if (!response.isOk) return null;
-    print(response.body);
     final user = response.bodyJson['profile'];
     return User.fromJson(user);
   }
