@@ -19,12 +19,13 @@ class NetworkService {
 
   // static const host = '127.0.0.1';
   // static const port = 8000;
-  static const scheme = 'http';
-  static const host = '185.231.59.87';
+  // static const scheme = 'http';
+  // static const host = '185.231.59.87';
+  // static const port = 80;
 
-  // static const scheme = 'https';
-  // static const host = 'pre-loved.ir';
-  static const port = 80;
+  static const scheme = 'https';
+  static const host = 'pre-loved.ir';
+  static const port = 443;
 
   Map<String, String>? get authHeaderAccess {
     final authService = AuthService.instance;

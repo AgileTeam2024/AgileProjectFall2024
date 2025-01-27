@@ -1,4 +1,6 @@
+import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/models/product.dart';
+import 'package:chabok_front/models/search_filter.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/pages/create_edit_product.dart';
 import 'package:chabok_front/pages/edit_profile.dart';
@@ -68,11 +70,21 @@ class RouterService {
           GoRoute(
             name: 'search',
             path: '/search',
-            pageBuilder: (context, state) => NoTransitionPage(
-              child: SearchPage(
-                query: state.uri.queryParametersAll['q']?.firstOrNull ?? '',
-              ),
-            ),
+            pageBuilder: (context, state) {
+              final queryParams = state.uri.queryParametersAll;
+              final query = queryParams['q']?.firstOrNull ?? '';
+              final catIdx = queryParams['cat']?.firstOrNull;
+              return NoTransitionPage(
+                child: SearchPage(
+                  filter: SearchFilter(
+                    query: query,
+                    categories: int.tryParse(catIdx ?? '') == null
+                        ? ProductCategory.values
+                        : [ProductCategory.values[int.parse(catIdx!)]],
+                  ),
+                ),
+              );
+            },
           ),
           GoRoute(
             path: '/home',

@@ -1,54 +1,27 @@
+import 'package:chabok_front/enums/product_category.dart';
+import 'package:chabok_front/enums/sort_type.dart';
 import 'package:flutter/material.dart';
 
 class SearchFilter {
-  final List<String> _categories;
+  final List<ProductCategory> _categories;
   RangeValues? priceRange;
   bool showAvailableProducts;
   bool showReservedProducts;
   String? query;
   SortType sortType;
 
-  List<String> get categories => List.unmodifiable(_categories);
+  List<ProductCategory> get categories => List.unmodifiable(_categories);
 
   SearchFilter({
-    List<String>? categories,
+    List<ProductCategory>? categories,
     this.priceRange,
     this.showAvailableProducts = true,
     this.showReservedProducts = true,
     this.query,
     this.sortType = SortType.createdASC,
-  }) : _categories = categories ?? [];
+  }) : _categories = List.of(categories ?? []);
 
-  void deleteCategory(String category) => _categories.remove(category);
+  void deleteCategory(ProductCategory category) => _categories.remove(category);
 
-  void addCategory(String category) => _categories.add(category);
-}
-
-enum SortType {
-  priceASC,
-  priceDSC,
-  createdASC,
-  createdDSC;
-
-  String? get priceSort =>
-      ![priceASC, priceDSC].contains(this) ? null : '$this'.substring(4);
-
-  String? get createdSort =>
-      ![createdASC, createdDSC].contains(this) ? null : '$this'.substring(6);
-
-  @override
-  String toString() => super.toString().split('.')[1];
-
-  String toStringDisplay() {
-    switch (this) {
-      case SortType.priceASC:
-        return 'Price - Cheap first';
-      case SortType.priceDSC:
-        return 'Price - Most Expensive first';
-      case SortType.createdASC:
-        return 'Create Date - Newest first';
-      case SortType.createdDSC:
-        return 'Create Date - Oldest first';
-    }
-  }
+  void addCategory(ProductCategory category) => _categories.add(category);
 }

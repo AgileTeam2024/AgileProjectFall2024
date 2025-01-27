@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:chabok_front/enums/product_category.dart';
+import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/extensions/list.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/server_response.dart';
@@ -26,21 +28,13 @@ class CreateEditProductPage extends StatefulWidget {
       icon: Icons.category,
       required: true,
       label: 'Category',
-      options: [
-        'Real estate',
-        'Automobile',
-        'Digital & Electronics',
-        'Kitchenware',
-        'Personal Items',
-        'Entertainment',
-        'Others',
-      ],
+      options: ProductCategory.values.map((e) => '$e').toList(),
     ),
     'status': OptionsTextFieldViewModel(
       icon: Icons.production_quantity_limits,
       required: true,
       label: 'Status',
-      options: ['for sale', 'sold', 'reserved'],
+      options: ProductStatus.values.map((e) => e.toStringDisplay()).toList(),
     ),
     'city_name': TextFieldViewModel(
       icon: Icons.pin_drop,
@@ -61,7 +55,7 @@ class CreateEditProductPage extends StatefulWidget {
 
   CreateEditProductPage({
     super.key,
-    Map<String, String?>? fieldsInitialValues,
+    Map<String, dynamic>? fieldsInitialValues,
     this.images,
   }) {
     if (fieldsInitialValues != null) {
@@ -191,6 +185,10 @@ class _CreateEditProductPageState extends State<CreateEditProductPage> {
       return;
     }
     if (formKey.currentState?.validate() ?? false) {
+      fields['status']!.text = ProductStatus.values
+          .where((v) => v.toStringDisplay() == fields['status']!.text)
+          .first
+          .toString();
       widget.submit(context, fields: fields, images: images);
     }
   }

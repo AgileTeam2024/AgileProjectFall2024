@@ -1,3 +1,4 @@
+import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/models/pair.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
@@ -119,7 +120,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
                                   fontSize: textStyleBold.fontSize! * 2),
                             ),
                             Text(
-                              product.status,
+                              product.status.toStringDisplay(),
                               style: textStyle?.copyWith(
                                   // todo set color for status
                                   ),
@@ -173,7 +174,6 @@ class _ProductViewPageState extends State<ProductViewPage> {
         );
   }
 
-  void _goToCategorySearchPage(String category) {
-    // todo
-  }
+  void _goToCategorySearchPage(ProductCategory category) =>
+      RouterService.goNamed('search', queryParameters: {'cat': category.index});
 }

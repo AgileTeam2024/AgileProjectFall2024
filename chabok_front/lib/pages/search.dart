@@ -1,5 +1,8 @@
 import 'dart:math';
 
+import 'package:chabok_front/enums/button_type.dart';
+import 'package:chabok_front/enums/product_category.dart';
+import 'package:chabok_front/enums/sort_type.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/search_filter.dart';
 import 'package:chabok_front/services/product.dart';
@@ -9,9 +12,9 @@ import 'package:chabok_front/widgets/products.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
-  final String query;
+  final SearchFilter filter;
 
-  const SearchPage({super.key, required this.query});
+  const SearchPage({super.key, required this.filter});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -19,6 +22,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final _productService = ProductService.instance;
+
   late SearchFilter filter;
 
   RangeValues? priceRangeMinMax;
@@ -26,7 +30,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-    filter = SearchFilter(query: widget.query);
+    filter = widget.filter;
     searchResults.then((results) {
       final prices = results.map((p) => p.price);
       priceRangeMinMax = RangeValues(prices.reduce(min), prices.reduce(max));
@@ -150,7 +154,7 @@ class _FilterWidgetState extends State<FilterWidget> {
 
   String get query => widget.filter.query ?? '';
 
-  List<String> get categories => widget.filter.categories;
+  List<ProductCategory> get categories => widget.filter.categories;
 
   bool get showReserved => widget.filter.showReservedProducts;
 
@@ -248,19 +252,11 @@ class _FilterWidgetState extends State<FilterWidget> {
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: ListBody(
-            children: [
-              'Real estate',
-              'Automobile',
-              'Digital & Electronics',
-              'Kitchenware',
-              'Personal Items',
-              'Entertainment',
-              'Others',
-            ].map(
+            children: ProductCategory.values.map(
               (cat) {
                 final selected = filter.categories.contains(cat);
                 return CheckboxListTile(
-                  title: Text(cat),
+                  title: Text('$cat'),
                   value: selected,
                   onChanged: (newValue) {
                     (newValue!
@@ -279,10 +275,6 @@ class _FilterWidgetState extends State<FilterWidget> {
 
   String formatPrice(double price) {
     if (widget.priceRangeMinMax == null) return '';
-
-    final result =
-        '${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ",")} ᴵᴿᴿ';
-    print('$price $result');
-    return result;
+    return '${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ",")} ᴵᴿᴿ';
   }
 }

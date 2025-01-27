@@ -1,3 +1,5 @@
+import 'package:chabok_front/enums/product_category.dart';
+import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -11,11 +13,11 @@ class Product {
   final User seller;
   @JsonKey(name: 'pictures')
   final List<String> imageUrls;
-  final String category;
+  final ProductCategory category;
   final double price;
   @JsonKey(name: 'city_name')
   final String? location;
-  final String status;
+  final ProductStatus status;
 
   Product({
     required this.id,

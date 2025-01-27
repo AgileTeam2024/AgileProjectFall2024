@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:chabok_front/enums/product_category.dart';
+import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/models/user.dart';
@@ -77,9 +79,9 @@ class ProductService {
                 email: 'email',
                 phoneNumber: 'phoneNumber'),
             imageUrls: ['assets/sample_images/product_img0.jpg'],
-            category: 'category',
+            category: ProductCategory.others,
             price: Random().nextInt(100000000).toDouble(),
-            status: 'status')));
+            status: ProductStatus.reserved)));
     final response = await _networkService.get(
       '/product/search',
       query: {
