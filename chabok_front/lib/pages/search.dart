@@ -4,7 +4,7 @@ import 'package:chabok_front/enums/button_type.dart';
 import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/enums/sort_type.dart';
 import 'package:chabok_front/models/product.dart';
-import 'package:chabok_front/models/search_filter.dart';
+import 'package:chabok_front/view_models/search_filter.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';

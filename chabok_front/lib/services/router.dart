@@ -1,6 +1,6 @@
 import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/models/product.dart';
-import 'package:chabok_front/models/search_filter.dart';
+import 'package:chabok_front/view_models/search_filter.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/pages/create_edit_product.dart';
 import 'package:chabok_front/pages/edit_profile.dart';
