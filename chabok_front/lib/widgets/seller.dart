@@ -28,7 +28,7 @@ class SellerWidget extends StatelessWidget {
           ),
           Button.icon(
             icon: Icons.email,
-            onPressed: seller.email?.copy,
+            onPressed: seller.email.copy,
           ),
         ],
       ],

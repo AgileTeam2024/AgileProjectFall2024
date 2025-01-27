@@ -17,7 +17,7 @@ class SearchFilter {
     this.showReservedProducts = true,
     this.query,
     this.sortType = SortType.createdASC,
-  })  : _categories = categories ?? [];
+  }) : _categories = categories ?? [];
 
   void deleteCategory(String category) => _categories.remove(category);
 
@@ -38,4 +38,17 @@ enum SortType {
 
   @override
   String toString() => super.toString().split('.')[1];
+
+  String toStringDisplay() {
+    switch (this) {
+      case SortType.priceASC:
+        return 'Price - Cheap first';
+      case SortType.priceDSC:
+        return 'Price - Most Expensive first';
+      case SortType.createdASC:
+        return 'Create Date - Newest first';
+      case SortType.createdDSC:
+        return 'Create Date - Oldest first';
+    }
+  }
 }

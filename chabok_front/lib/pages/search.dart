@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/search_filter.dart';
 import 'package:chabok_front/services/product.dart';
+import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/products.dart';
 import 'package:flutter/material.dart';
@@ -69,16 +70,43 @@ class _SearchPageState extends State<SearchPage> {
         spacing: 20,
         children: [
           Expanded(
-            child: FutureBuilder(
-              future: searchResults,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                return ProductsWidget(snapshot.data!);
-              },
+            child: Column(
+              spacing: 15,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  spacing: 10,
+                  children: [
+                    Text(
+                      'Sort by: ',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    ...SortType.values.map((sort) {
+                      return Button(
+                        type: filter.sortType == sort
+                            ? ButtonType.outlined
+                            : ButtonType.text,
+                        text: sort.toStringDisplay(),
+                        onPressed: () => setState(() => filter.sortType = sort),
+                      );
+                    })
+                  ],
+                ),
+                Expanded(
+                  child: FutureBuilder(
+                    future: searchResults,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      return ProductsWidget(snapshot.data!);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(

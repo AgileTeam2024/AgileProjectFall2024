@@ -175,7 +175,7 @@ class UserInfoWidget extends StatelessWidget {
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   Text(
-                    'Email: ${profile.email ?? "-"}',
+                    'Email: ${profile.email}',
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   Text(
@@ -243,7 +243,7 @@ class ProductsListWidget extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
-                  product.description!,
+                  product.description,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
