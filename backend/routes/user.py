@@ -222,12 +222,12 @@ def delete_user() -> (flask.Flask, int):
     return backend.managers.user.UserManager.instance.delete_account(flask_jwt_extended.get_jwt_identity())
 
 
-@user_bp.route('/get_profile_by_username', methods=['GET'])
+@user_bp.route('/get_profile', methods=['GET'])
 @flask_jwt_extended.jwt_required()
 @backend.routes.authorization_utils.valid_user
-def get_profile_by_username() -> (flask.Flask, int):
+def get_profile() -> (flask.Flask, int):
     """
-    User get profile by username API.
+    User get own profile API.
     ---
     tags:
       - User
@@ -235,9 +235,24 @@ def get_profile_by_username() -> (flask.Flask, int):
       - BearerAuth: []
     responses:
       200:
-        description: Successfully get profile by username.
+        description: Successfully get own profile.
     """
     return backend.managers.user.UserManager.instance.get_profile(flask_jwt_extended.get_jwt_identity())
+
+
+@user_bp.route('/get_profile_by_username', methods=['GET'])
+def get_profile_by_username() -> (flask.Flask, int):
+    """
+    User get profile by username API.
+    ---
+    tags:
+      - User
+    responses:
+      200:
+        description: Successfully get profile by username.
+    """
+    username = flask.request.args.get('username')
+    return backend.managers.user.UserManager.instance.get_profile(username)
 
 
 @user_bp.route('/edit_profile', methods=['PUT'])
