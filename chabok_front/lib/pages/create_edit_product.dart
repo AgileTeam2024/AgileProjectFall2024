@@ -59,8 +59,13 @@ class CreateEditProductPage extends StatefulWidget {
     this.images,
   }) {
     if (fieldsInitialValues != null) {
-      fieldsInitialValues
-          .forEach((k, v) => fields[k]?.controller.text = v ?? '');
+      fieldsInitialValues.forEach((k, v) {
+        fields[k]?.controller.text = v is ProductCategory
+            ? '$v'
+            : v is ProductStatus
+                ? v.toStringDisplay()
+                : v ?? '';
+      });
     }
   }
 

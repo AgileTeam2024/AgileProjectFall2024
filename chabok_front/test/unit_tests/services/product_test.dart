@@ -24,9 +24,7 @@ void main() {
       'id': 1,
       'name': 'Test Product',
       'description': 'Test Product Description',
-      'seller': {
-        'username': 'user1',
-      },
+      'seller': {'username': 'user1', 'email': 'user1@gmail.com'},
       'pictures': [],
       'category': 'Others',
       'price': 1000,
@@ -87,7 +85,7 @@ void main() {
       final result = {
         ...e,
         'description': 'Test Product Description',
-        'seller': {'username': 'user1'},
+        'seller': {'username': 'user1', 'email': 'user1@gmail.com'},
         'pictures': [],
         'category': 'Others',
         'price': 1000,

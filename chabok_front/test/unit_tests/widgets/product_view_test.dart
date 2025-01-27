@@ -1,7 +1,10 @@
 import 'dart:io';
 
+import 'package:chabok_front/enums/product_category.dart';
+import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/user.dart';
@@ -21,9 +24,9 @@ class MockProductService extends Mock implements ProductService {
       name: 'Test Product',
       imageUrls:
           List.generate(3, (i) => 'https://placehold.co/${(i + 1) * 100}'),
-      category: 'Test Category',
+      category: ProductCategory.others,
       price: 1000.0,
-      status: 'Available',
+      status: ProductStatus.available,
       seller: User(
         username: 'imseller',
         email: 'imseller@gmail.com',
@@ -66,7 +69,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Test Product'), findsOneWidget);
-    expect(find.text('Test Category Category'), findsOneWidget);
+    expect(find.text('Others Category'), findsOneWidget);
     expect(find.text('1,000 ᴵᴿᴿ'), findsOneWidget);
     expect(find.text('Available'), findsOneWidget);
     // expect( todo fix test
@@ -99,11 +102,14 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets('displays error container on error', (tester) async {
-    await tester.pumpWidget(createWidgetUnderTest(3, false));
-    await tester.pumpAndSettle();
-    expect(find.byType(Container), findsOneWidget);
-  }, skip: true); // todo skip until ErrorWidget is added
+  testWidgets(
+    'displays error on error',
+    (tester) async {
+      await tester.pumpWidget(createWidgetUnderTest(3, false));
+      await tester.pumpAndSettle();
+      expect(find.byType(ErrorPage), findsOneWidget);
+    },
+  );
 
   testWidgets('responsive layout changes based on screen size', (tester) async {
     await tester.pumpWidget(createWidgetUnderTest(1, false));

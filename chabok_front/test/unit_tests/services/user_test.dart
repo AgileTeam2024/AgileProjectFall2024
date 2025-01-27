@@ -23,7 +23,7 @@ void main() {
 
   test('returns User on successful ownProfile fetch', () async {
     final userJson = {
-      'profile': {'username': 'test_user'}
+      'profile': {'username': 'test_user', 'email': 'test_user@gmail.com'}
     };
     when(mockNetworkService.get('/user/get_profile_by_username'))
         .thenAnswer((_) async => ServerResponse(jsonEncode(userJson), 200));

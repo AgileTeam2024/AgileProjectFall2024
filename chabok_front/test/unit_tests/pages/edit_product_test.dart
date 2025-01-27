@@ -42,7 +42,7 @@ void main() {
       'category': 'Others',
       'city_name': 'Test Location',
       'price': 1000,
-      'seller': {'username': 'seller'},
+      'seller': {'username': 'seller', 'email': 'seller@gmail.com'},
       'description': 'Test Description',
       'status': 'for sale',
       'pictures': ['assets/sample_images/product_img0.jpg'],
@@ -58,7 +58,7 @@ void main() {
     expect(find.text('Test Location'), findsOneWidget);
     expect(find.text('1000.0'), findsOneWidget);
     expect(find.text('Test Description'), findsOneWidget);
-    expect(find.text('for sale'), findsOneWidget);
+    expect(find.text('Available'), findsOneWidget);
   });
 
   testWidgets('submits edited product successfully', (tester) async {
@@ -69,7 +69,7 @@ void main() {
       'category': 'Others',
       'city_name': 'Test Location',
       'price': 1000,
-      'seller': {'username': 'seller'},
+      'seller': {'username': 'seller', 'email': 'seller@gmail.com'},
       'description': 'Test Description',
       'status': 'for sale',
       'pictures': ['assets/sample_images/product_img0.jpg'],
@@ -114,7 +114,7 @@ void main() {
       'category': 'Others',
       'city_name': 'Test Location',
       'price': 1000,
-      'seller': {'username': 'seller'},
+      'seller': {'username': 'seller', 'email': 'seller@gmail.com'},
       'description': 'Test Description',
       'status': 'for sale',
       'pictures': [],

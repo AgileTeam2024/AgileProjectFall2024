@@ -2,6 +2,7 @@ import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/models/pair.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/services/user.dart';
@@ -44,8 +45,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
           ]).then((list) => Pair(list[0] as Product, list[1] as User?)),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              // todo error page
-              return Container();
+              return ErrorPage(message: snapshot.error.toString());
             }
             if (!snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
