@@ -23,9 +23,10 @@ class ProductService {
   Future<List<Product>> get homePageProducts =>
       searchProducts(sortCreatedAt: 'asc');
 
-  Future<Product> getProductById(int id) async {
+  Future<Product?> getProductById(int id) async {
     final response = await _networkService
         .get('/product/get_product_by_id', query: {'product_id': '$id'});
+    if (!response.isOk) return null;
     final product = response.bodyJson['product'];
     return Product.fromJson(product);
   }
@@ -84,26 +85,27 @@ class ProductService {
       },
     );
     if (!response.isOk) return [];
-    final products = await getProductsSellers(
-      response.bodyJson['products'].cast<Map<String, dynamic>>(),
-    );
-    return products;
+    final productsJson =
+        (response.bodyJson['products'] as List).cast<Map<String, dynamic>>();
+    return await getProductsSellers(productsJson);
   }
 
   Future<List<Product>> getProductsSellers(
-    List<Map<String, dynamic>> products,
-  ) {
+      List<Map<String, dynamic>> products) {
+    final users = {};
     return Future.wait(
-      products.map(
-        (product) async {
-          return (await getProductById(product['id'] as int));
-          // todo
-          // if (!product.containsKey('seller')) {
-          //   // _userService
-          // }
-          // return product;
-        },
-      ),
+      products.map((product) async {
+        final sellerUsername = product['user_username'];
+        if (product.containsKey('seller')) return Product.fromJson(product);
+        if (!users.containsKey(sellerUsername)) {
+          users[sellerUsername] = await _userService.getProfile(sellerUsername);
+        }
+        final product2 = {
+          ...product,
+          'seller': users[sellerUsername]?.toJson()
+        };
+        return Product.fromJson(product2);
+      }),
     );
   }
 }

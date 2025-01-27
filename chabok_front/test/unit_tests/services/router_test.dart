@@ -9,6 +9,7 @@ import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
 import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/pages/profile.dart';
+import 'package:chabok_front/pages/search.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/router.dart';
@@ -59,7 +60,7 @@ class MockProductService extends Mock implements ProductService {
 }
 
 void main() {
-  setUp(() => ProductService.instance = MockProductService());
+  setUpAll(() => ProductService.instance = MockProductService());
 
   testWidgets('Navigates to home page', (tester) async {
     setUpWidgetTest(tester);
@@ -258,6 +259,32 @@ void main() {
 
     expect(find.byType(ErrorPage), findsOneWidget);
     expect(find.text('Page not found :('), findsOneWidget);
+    tearDownWidgetTest(tester);
+  });
+
+  testWidgets('Navigates to search page with query parameters', (tester) async {
+    setUpWidgetTest(tester, Size(2500, 2500));
+    final router = RouterService.router;
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+    RouterService.goNamed('search', queryParameters: {'q': 'test', 'cat': '1'});
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SearchPage), findsOneWidget);
+    tearDownWidgetTest(tester);
+  });
+
+  testWidgets('Navigates to search page with invalid category index',
+      (tester) async {
+    setUpWidgetTest(tester, Size(2500, 2500));
+    final router = RouterService.router;
+    await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+    RouterService.goNamed('search',
+        queryParameters: {'q': 'test', 'cat': 'invalid'});
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SearchPage), findsOneWidget);
     tearDownWidgetTest(tester);
   });
 }

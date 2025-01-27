@@ -1,6 +1,5 @@
 import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/models/product.dart';
-import 'package:chabok_front/view_models/search_filter.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/pages/create_edit_product.dart';
 import 'package:chabok_front/pages/edit_profile.dart';
@@ -13,6 +12,7 @@ import 'package:chabok_front/pages/search.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/user.dart';
+import 'package:chabok_front/view_models/search_filter.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:chabok_front/widgets/main_fab.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +70,19 @@ class RouterService {
           GoRoute(
             name: 'search',
             path: '/search',
+            redirect: (context, state) {
+              final queryParams = state.uri.queryParametersAll;
+              final query = queryParams['q']?.firstOrNull ?? '';
+              final catIdx = queryParams['cat']?.firstOrNull;
+
+              if (catIdx == null ||
+                  int.tryParse(catIdx) == null ||
+                  int.parse(catIdx) < 0 ||
+                  int.parse(catIdx) >= ProductCategory.values.length) {
+                if (query.isEmpty) return '/';
+                return '/search?q=$query';
+              }
+            },
             pageBuilder: (context, state) {
               final queryParams = state.uri.queryParametersAll;
               final query = queryParams['q']?.firstOrNull ?? '';
@@ -128,7 +141,7 @@ class RouterService {
             pageBuilder: (context, state) {
               final productId = int.parse(state.pathParameters['id']!);
               return NoTransitionPage(
-                child: FutureBuilder<Product>(
+                child: FutureBuilder<Product?>(
                   future: ProductService.instance.getProductById(productId),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {

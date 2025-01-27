@@ -33,9 +33,10 @@ class _SearchPageState extends State<SearchPage> {
     filter = widget.filter;
     searchResults.then((results) {
       final prices = results.map((p) => p.price);
-      priceRangeMinMax = RangeValues(prices.reduce(min), prices.reduce(max));
-      print(priceRangeMinMax);
-      setState(() {});
+      if (prices.isNotEmpty) {
+        priceRangeMinMax = RangeValues(prices.reduce(min), prices.reduce(max));
+        setState(() {});
+      }
     });
   }
 

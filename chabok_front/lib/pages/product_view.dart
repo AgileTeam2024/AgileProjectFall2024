@@ -175,5 +175,8 @@ class _ProductViewPageState extends State<ProductViewPage> {
   }
 
   void _goToCategorySearchPage(ProductCategory category) =>
-      RouterService.goNamed('search', queryParameters: {'cat': category.index});
+      RouterService.goNamed(
+        'search',
+        queryParameters: {'cat': '${category.index}'},
+      );
 }

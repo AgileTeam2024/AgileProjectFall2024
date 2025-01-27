@@ -25,7 +25,7 @@ void main() {
     final userJson = {
       'profile': {'username': 'test_user', 'email': 'test_user@gmail.com'}
     };
-    when(mockNetworkService.get('/user/get_profile_by_username'))
+    when(mockNetworkService.get('/user/get_profile'))
         .thenAnswer((_) async => ServerResponse(jsonEncode(userJson), 200));
 
     final user = await userService.ownProfile;
@@ -35,7 +35,7 @@ void main() {
   });
 
   test('returns null on failed ownProfile fetch', () async {
-    when(mockNetworkService.get('/user/get_profile_by_username'))
+    when(mockNetworkService.get('/user/get_profile'))
         .thenAnswer((_) async => ServerResponse(jsonEncode({}), 401));
 
     final user = await userService.ownProfile;
