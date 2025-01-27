@@ -63,14 +63,13 @@ def create() -> (flask.Flask, int):
         required: true
         type: string
         enum:
-          - Other
-          - Electronics
-          - Clothing
-          - Home & Garden
-          - Sports & Outdoors
-          - Toys & Games
-          - Automotive  # Corrected spelling from "Automative"
-          - Books & Media
+          - Others
+          - Real-Estate
+          - Automobile
+          - Digital & Electronics
+          - Kitchenware
+          - Entertainment
+          - Personal Items
         description: The category of the product.
       - name: pictures
         in: formData
