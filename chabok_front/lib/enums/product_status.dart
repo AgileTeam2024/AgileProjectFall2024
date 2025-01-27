@@ -1,11 +1,6 @@
-import 'package:json_annotation/json_annotation.dart';
-
 enum ProductStatus {
-  @JsonValue('for sale')
   available,
-  @JsonValue('reserved')
   reserved,
-  @JsonValue('sold')
   sold;
 
   static fromJson(String json) => values.firstWhere((e) => '$e' == json);
