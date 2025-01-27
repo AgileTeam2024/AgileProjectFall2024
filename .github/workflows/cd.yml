@@ -31,11 +31,12 @@ jobs:
             cd AgileProjectFall2024 &&
             docker-compose down --rmi all -v --remove-orphans
           "
+        continue-on-error: true
 
       - name: Remove previous codes
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "
-            find AgileProjectFall2024 -mindepth 1 ! -path 'AgileProjectFall2024/backend/migrations*' ! -path 'AgileProjectFall2024/backend/uploads*' -exec rm -rf {} +
+            find AgileProjectFall2024 -mindepth 1 \( -path 'AgileProjectFall2024/backend/migrations' -o -path 'AgileProjectFall2024/backend/uploads' \) -prune -o -exec rm -rf {} +
           "
 
       - name: Copy code and .env file to server
