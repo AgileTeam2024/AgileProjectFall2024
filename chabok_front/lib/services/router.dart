@@ -1,3 +1,4 @@
+import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/pages/create_edit_product.dart';
@@ -7,9 +8,11 @@ import 'package:chabok_front/pages/home.dart';
 import 'package:chabok_front/pages/login_register.dart';
 import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/pages/profile.dart';
+import 'package:chabok_front/pages/search.dart';
 import 'package:chabok_front/services/auth.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/user.dart';
+import 'package:chabok_front/view_models/search_filter.dart';
 import 'package:chabok_front/widgets/main_app_bar.dart';
 import 'package:chabok_front/widgets/main_fab.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +26,17 @@ class RouterService {
 
   static void go(String location, {Object? extra}) =>
       GoRouter.of(_shellNavKey.currentContext!).go(location, extra: extra);
+
+  static void goNamed(
+    String location, {
+    Object? extra,
+    Map<String, dynamic>? queryParameters,
+  }) =>
+      GoRouter.of(_shellNavKey.currentContext!).goNamed(
+        location,
+        extra: extra,
+        queryParameters: queryParameters ?? {},
+      );
 
   static void pop() => GoRouter.of(_shellNavKey.currentContext!).pop();
 
@@ -52,6 +66,38 @@ class RouterService {
           GoRoute(
             path: '/',
             redirect: (context, state) => '/home',
+          ),
+          GoRoute(
+            name: 'search',
+            path: '/search',
+            redirect: (context, state) {
+              final queryParams = state.uri.queryParametersAll;
+              final query = queryParams['q']?.firstOrNull ?? '';
+              final catIdx = queryParams['cat']?.firstOrNull;
+
+              if (catIdx == null ||
+                  int.tryParse(catIdx) == null ||
+                  int.parse(catIdx) < 0 ||
+                  int.parse(catIdx) >= ProductCategory.values.length) {
+                if (query.isEmpty) return '/';
+                return '/search?q=$query';
+              }
+            },
+            pageBuilder: (context, state) {
+              final queryParams = state.uri.queryParametersAll;
+              final query = queryParams['q']?.firstOrNull ?? '';
+              final catIdx = queryParams['cat']?.firstOrNull;
+              return NoTransitionPage(
+                child: SearchPage(
+                  filter: SearchFilter(
+                    query: query,
+                    categories: int.tryParse(catIdx ?? '') == null
+                        ? ProductCategory.values
+                        : [ProductCategory.values[int.parse(catIdx!)]],
+                  ),
+                ),
+              );
+            },
           ),
           GoRoute(
             path: '/home',
@@ -95,7 +141,7 @@ class RouterService {
             pageBuilder: (context, state) {
               final productId = int.parse(state.pathParameters['id']!);
               return NoTransitionPage(
-                child: FutureBuilder<Product>(
+                child: FutureBuilder<Product?>(
                   future: ProductService.instance.getProductById(productId),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {

@@ -10,4 +10,13 @@ extension FinderImageExt on CommonFinders {
       return image.assetName == assetName;
     });
   }
+
+  Finder byNetworkImagePath(String url) {
+    return byWidgetPredicate((widget) {
+      if (widget is! Image) return false;
+      final image = widget.image;
+      if (image is! NetworkImage) return false;
+      return image.url == url;
+    });
+  }
 }

@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final ProductService _productService = ProductService.instance;
+  ProductService get _productService => ProductService.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,11 @@ class _HomePageState extends State<HomePage> {
           return Center(child: CircularProgressIndicator());
         }
         final data = snapshot.data ?? [];
-        return ProductsWidget(data);
+        return Padding(
+          padding: const EdgeInsets.only(top: 25) +
+              EdgeInsets.symmetric(horizontal: 250),
+          child: ProductsWidget(data),
+        );
       },
     );
   }

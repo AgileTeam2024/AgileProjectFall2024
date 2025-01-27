@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chabok_front/enums/toast_type.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/widgets/toast.dart';
 import 'package:flutter/material.dart';

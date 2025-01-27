@@ -24,9 +24,7 @@ void main() {
       'id': 1,
       'name': 'Test Product',
       'description': 'Test Product Description',
-      'seller': {
-        'username': 'user1',
-      },
+      'seller': {'username': 'user1', 'email': 'user1@gmail.com'},
       'pictures': [],
       'category': 'Others',
       'price': 1000,
@@ -38,7 +36,7 @@ void main() {
 
     final product = await productService.getProductById(1);
 
-    expect(product.id, 1);
+    expect(product!.id, 1);
     expect(product.name, 'Test Product');
   });
 
@@ -87,28 +85,84 @@ void main() {
       final result = {
         ...e,
         'description': 'Test Product Description',
-        'seller': {'username': 'user1'},
+        'seller': {'username': 'user1', 'email': 'user1@gmail.com'},
         'pictures': [],
         'category': 'Others',
         'price': 1000,
         'status': 'for sale',
+        'user_username': 'user1',
       };
       return result;
     }).toList();
     when(mockNetworkService.get('/product/search', query: anyNamed('query')))
         .thenAnswer((_) async =>
             ServerResponse(jsonEncode({'products': productsJson}), 200));
-    when(mockNetworkService.get('/product/get_product_by_id',
-            query: anyNamed('query')))
-        .thenAnswer((inv) async {
-      final id = int.parse(inv.namedArguments.values.toList()[0]['product_id']);
-      return ServerResponse(jsonEncode({'product': productsJson[id - 1]}), 200);
-    });
 
     final products = await productService.searchProducts(name: 'Product');
 
     expect(products.length, 2);
     expect(products[0].name, 'Product 1');
     expect(products[1].name, 'Product 2');
+  });
+
+  test('returns null if product not found by id', () async {
+    when(mockNetworkService.get(any, query: anyNamed('query'))).thenAnswer(
+      (_) async => ServerResponse(
+          jsonEncode({"message": "No product found with the provided ID."}),
+          404),
+    );
+
+    final product = await productService.getProductById(999);
+
+    expect(product, isNull);
+  });
+
+  test('fails to create product with invalid data', () async {
+    final responseJson = {'success': false, 'error': 'Invalid data'};
+    when(mockNetworkService.postFormData(any, any, files: anyNamed('files')))
+        .thenAnswer(
+      (_) async => ServerResponse(jsonEncode(responseJson), 400),
+    );
+
+    final response = await productService.createProduct({'name': ''}, null);
+
+    expect(response.bodyJson['success'], false);
+    expect(response.bodyJson['error'], 'Invalid data');
+  });
+
+  test('fails to edit non-existent product', () async {
+    final responseJson = {'success': false, 'error': 'Product not found'};
+    when(mockNetworkService.postFormData(any, any, files: anyNamed('files')))
+        .thenAnswer(
+      (_) async => ServerResponse(jsonEncode(responseJson), 404),
+    );
+
+    final response = await productService.editProduct(
+        999, {'name': 'Updated Product'}, null);
+
+    expect(response.bodyJson['success'], false);
+    expect(response.bodyJson['error'], 'Product not found');
+  });
+
+  test('fails to delete non-existent product', () async {
+    final responseJson = {'success': false, 'error': 'Product not found'};
+    when(mockNetworkService.delete(any, query: anyNamed('query'))).thenAnswer(
+      (_) async => ServerResponse(jsonEncode(responseJson), 404),
+    );
+
+    final response = await productService.deleteProduct(999);
+
+    expect(response.bodyJson['success'], false);
+    expect(response.bodyJson['error'], 'Product not found');
+  });
+
+  test('searches products with no results', () async {
+    when(mockNetworkService.get('/product/search', query: anyNamed('query')))
+        .thenAnswer(
+            (_) async => ServerResponse(jsonEncode({'products': []}), 200));
+
+    final products = await productService.searchProducts(name: 'NonExistent');
+
+    expect(products.length, 0);
   });
 }

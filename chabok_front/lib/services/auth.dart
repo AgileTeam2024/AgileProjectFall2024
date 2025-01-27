@@ -67,7 +67,7 @@ class AuthService {
       });
 
   Future<ServerResponse> refreshAccount() =>
-      _networkService.get('/user/refresh', ).then((response) {
+      _networkService.get('/user/refresh').then((response) {
         if (response.isOk) {
           accessToken = null;
           refreshToken = null;
