@@ -1,5 +1,3 @@
-
-
 enum ProductCategory {
   realEstate,
   automobile,
@@ -9,10 +7,9 @@ enum ProductCategory {
   entertainment,
   others;
 
-  String toJson() => toString();
+  static fromJson(String json) => values.firstWhere((e) => '$e' == json);
 
-  factory ProductCategory.fromJson(String json) =>
-      values.where((v) => '$v' == json).first;
+  static String toJson(ProductCategory category) => category.toString();
 
   @override
   String toString() => [

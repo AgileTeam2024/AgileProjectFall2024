@@ -12,13 +12,14 @@ class Product {
   final String name;
   final String description;
   final User seller;
-
   @JsonKey(name: 'pictures')
   final List<String> imageUrls;
+  @JsonKey(fromJson: ProductCategory.fromJson, toJson: ProductCategory.toJson)
   final ProductCategory category;
   final double price;
   @JsonKey(name: 'city_name')
   final String? location;
+  @JsonKey(fromJson: ProductStatus.fromJson, toJson: ProductStatus.toJson)
   final ProductStatus status;
 
   Product({

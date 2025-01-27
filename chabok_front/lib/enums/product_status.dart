@@ -3,10 +3,9 @@ enum ProductStatus {
   reserved,
   sold;
 
-  String toJson() => toString();
+  static fromJson(String json) => values.firstWhere((e) => '$e' == json);
 
-  factory ProductStatus.fromJson(String json) =>
-      values.where((v) => '$v' == json).first;
+  static String toJson(ProductStatus status) => status.toString();
 
   @override
   String toString() => ['for sale', 'reserved', 'sold'][index];
