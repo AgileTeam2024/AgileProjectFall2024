@@ -12,6 +12,7 @@ COPY pubspec.yaml ./pubspec.yaml
 RUN flutter pub get
 
 # Copy model files
+COPY lib/enums ./lib/enums
 COPY lib/models ./lib/models
 RUN dart run build_runner build --delete-conflicting-outputs
 
