@@ -84,7 +84,8 @@ class UserManagerTest(absltest.TestCase):
         """Test that login fails when the password is incorrect."""
         self.mock_user_query.filter_by.return_value.first.return_value = backend.models.user.User(
             username="user",
-            password="password123"
+            password="password123",
+            is_verified=True
         )
         response, status_code = self.user_manager.login("user", "invalid_password")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
@@ -94,7 +95,8 @@ class UserManagerTest(absltest.TestCase):
         """Test that login succeeds."""
         self.mock_user_query.filter_by.return_value.first.return_value = backend.models.user.User(
             username="user",
-            password="password123"
+            password="password123",
+            is_verified=True
         )
         response, status_code = self.user_manager.login("user", "password123")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)

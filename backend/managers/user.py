@@ -182,6 +182,12 @@ class UserManager:
                 flask.jsonify({'message': 'You are banned.'}),
                 backend.initializers.settings.HTTPStatus.FORBIDDEN.value
             )
+        # Check whether user verified his/her email or not.
+        if not user.is_verified:
+            return (
+                flask.jsonify({'message': 'You should verify your email first.'}),
+                backend.initializers.settings.HTTPStatus.FORBIDDEN.value
+            )
 
         # Generate new access token and refresh token for the user to access protected APIs.
         access_token = flask_jwt_extended.create_access_token(identity=username)
