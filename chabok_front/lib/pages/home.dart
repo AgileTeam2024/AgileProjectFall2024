@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final ProductService _productService = ProductService.instance;
+  ProductService get _productService => ProductService.instance;
 
   @override
   Widget build(BuildContext context) {
