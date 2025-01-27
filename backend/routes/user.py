@@ -240,18 +240,23 @@ def get_profile() -> (flask.Flask, int):
     return backend.managers.user.UserManager.instance.get_profile(flask_jwt_extended.get_jwt_identity())
 
 
-@user_bp.route('/get_profile_by_username', methods=['GET'])
-def get_profile_by_username() -> (flask.Flask, int):
+@user_bp.route('/get_profile_by_username/<username>', methods=['GET'])
+def get_profile_by_username(username) -> (flask.Flask, int):
     """
     User get profile by username API.
     ---
     tags:
       - User
+    parameters:
+      - name: username
+        in: path
+        type: string
+        required: true
+        description: Username of user to get profile for.
     responses:
       200:
         description: Successfully get profile by username.
     """
-    username = flask.request.args.get('username')
     return backend.managers.user.UserManager.instance.get_profile(username)
 
 
