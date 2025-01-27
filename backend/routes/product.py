@@ -292,22 +292,24 @@ def search() -> (flask.Flask, int):
         filters['max_price'] = int(filter_max_price)
 
     # Check for sorting options for 'created_at'.
-    if 'sort_created_at' in filters:
-        if filters['sort_created_at'] != 'desc' and filters['sort_created_at'] != 'asc':
+    filter_sort_created_at = flask.request.args.get('sort_created_at')
+    if filter_sort_created_at:
+        if filter_sort_created_at != 'dsc' and filter_sort_created_at != 'asc':
             return (
-                flask.jsonify({'message': 'Sort type of created at must be either asc or desc.'}),
+                flask.jsonify({'message': 'Sort type of created at must be either asc or dsc.'}),
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
-        filters['sort_created_at'] = flask.request.args.get('sort_created_at')
+        filters['sort_created_at'] = filter_sort_created_at
 
     # Check for sorting options for 'price'
-    if 'sort_price' in filters:
-        if filters['sort_price'] != 'desc' and filters['sort_price'] != 'asc':
+    filter_sort_price = flask.request.args.get('sort_price')
+    if filter_sort_price:
+        if filter_sort_price != 'dsc' and filter_sort_price != 'asc':
             return (
-                flask.jsonify({'message': 'Sort type of price must be either asc or desc.'}),
+                flask.jsonify({'message': 'Sort type of price must be either asc or dsc.'}),
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
-        filters['sort_price'] = filters['sort_price']
+        filters['sort_price'] = filter_sort_price
 
     return backend.managers.product.ProductManager.instance.search_product(filters)
 
