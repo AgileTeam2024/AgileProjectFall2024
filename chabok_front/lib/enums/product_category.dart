@@ -1,18 +1,21 @@
-
+import 'package:json_annotation/json_annotation.dart';
 
 enum ProductCategory {
+  @JsonValue('Real-Estate')
   realEstate,
+  @JsonValue('Automobile')
   automobile,
+  @JsonValue('Digital & Electronics')
   digitalAndElectronics,
+  @JsonValue('Kitchenware')
   kitchenware,
+  @JsonValue('Personal Items')
   personalItems,
+  @JsonValue('Entertainment')
   entertainment,
+  @JsonValue('Others')
   others;
 
-  String toJson() => toString();
-
-  factory ProductCategory.fromJson(String json) =>
-      values.where((v) => '$v' == json).first;
 
   @override
   String toString() => [
