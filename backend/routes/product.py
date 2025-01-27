@@ -133,6 +133,11 @@ def create() -> (flask.Flask, int):
             flask.jsonify({'message': 'Missing status.'}),
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
+    if category not in backend.models.product.Product.CATEGORY_OPTIONS:
+        return (
+            flask.jsonify({'message': 'Invalid value for category.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
 
     # Get list of files from the 'pictures' field
     image_files = flask.request.files.getlist('picture')
@@ -191,7 +196,20 @@ def search() -> (flask.Flask, int):
         - for sale
         - reserved
         - sold
-        description: Status of the product (e.g., available, out_of_stock).
+        description: Status of the product.
+      - name: category
+        in: query
+        type: string
+        required: false
+        enum:
+          - Others
+          - Real-Estate
+          - Automobile
+          - Digital & Electronics
+          - Kitchenware
+          - Entertainment
+          - Personal Items
+        description: Status of the product.
       - name: sort_created_at
         in: query
         type: string
@@ -237,6 +255,16 @@ def search() -> (flask.Flask, int):
                 backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
             )
         filters['status'] = filter_status
+
+    # Retrieve and validate the 'category' filter from query parameters.
+    filter_category = flask.request.args.get('category')
+    if filter_category:
+        if filter_category not in backend.models.product.Product.CATEGORY_OPTIONS:
+            return (
+                flask.jsonify({'message': 'Invalid value for filter category.'}),
+                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+            )
+        filters['category'] = filter_category
 
     # Retrieve price range filters from query parameters.
     filter_min_price = flask.request.args.get('min_price')

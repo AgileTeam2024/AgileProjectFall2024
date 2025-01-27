@@ -99,19 +99,38 @@ def confirm_email(token) -> (flask.Flask, int):
     return backend.managers.user.UserManager.instance.confirm_email(token)
 
 
-@user_bp.route('/resend_email', methods=['GET'])
-@flask_jwt_extended.jwt_required()
+@user_bp.route('/resend_email', methods=['POST'])
 def resend_email() -> (flask.Flask, int):
     """
     Resend Email API.
     ---
     tags:
       - User
+    parameters:
+        - name: email
+          in: formData
+          type: string
+          required: true
+          description: The email address to send verification email to.
     responses:
       200:
         description: Email sent successfully.
     """
-    return backend.managers.user.UserManager.instance.resend_confirmation_email(flask_jwt_extended.get_jwt())
+    email = flask.request.form.get('email')
+    if not email:
+        return (
+            flask.jsonify({'message': 'Email is missing.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    # Validate the email.
+    try:
+        email_validator.validate_email(email)
+    except email_validator.EmailNotValidError as e:
+        return (
+            flask.jsonify({'message': 'Email is invalid.'}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    return backend.managers.user.UserManager.instance.resend_confirmation_email(email)
 
 
 @user_bp.route('/login', methods=['POST'])  # Changed to POST

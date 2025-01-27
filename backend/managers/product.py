@@ -79,7 +79,8 @@ class ProductManager:
                 - 'name' (str): A substring to search for in product names.
                 - 'min_price' (float): Minimum price for filtering products.
                 - 'max_price' (float): Maximum price for filtering products.
-                - 'status' (str): Status of the product (e.g., 'for sale', 'sold').
+                - 'status' (str): Status of the product.
+                - 'category' (str): Category of the product (e.g., 'for sale', 'sold').
                 - 'sort_created_at' (str): Sorting order for creation date ('asc' or 'dsc').
                 - 'sort_price' (str): Sorting order for price ('asc' or 'dsc').
 
@@ -106,6 +107,11 @@ class ProductManager:
         if 'status' in filters:
             status_filter = filters['status']
             query = query.filter(backend.models.product.Product.status == status_filter)
+
+        # Check for category in filters.
+        if 'category' in filters:
+            category_filter = filters['category']
+            query = query.filter(backend.models.product.Product.category == category_filter)
 
         # Sort based on created_at time if asked.
         if 'sort_created_at' in filters:
