@@ -1,8 +1,8 @@
-import 'package:chabok_front/models/num_range.dart';
+import 'package:flutter/material.dart';
 
 class SearchFilter {
   final List<String> _categories;
-  NumRange? priceRange;
+  RangeValues? priceRange;
   bool showAvailableProducts;
   bool showReservedProducts;
   String? query;
@@ -17,7 +17,7 @@ class SearchFilter {
     this.showReservedProducts = true,
     this.query,
     this.sortType = SortType.createdASC,
-  }) : _categories = categories ?? [];
+  })  : _categories = categories ?? [];
 
   void deleteCategory(String category) => _categories.remove(category);
 

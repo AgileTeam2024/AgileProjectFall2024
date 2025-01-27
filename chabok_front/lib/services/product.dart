@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/models/user.dart';
@@ -76,7 +78,7 @@ class ProductService {
                 phoneNumber: 'phoneNumber'),
             imageUrls: ['assets/sample_images/product_img0.jpg'],
             category: 'category',
-            price: 1000000,
+            price: Random().nextInt(100000000).toDouble(),
             status: 'status')));
     final response = await _networkService.get(
       '/product/search',

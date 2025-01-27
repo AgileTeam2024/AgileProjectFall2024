@@ -1,4 +1,5 @@
-import 'package:chabok_front/models/num_range.dart';
+import 'dart:math';
+
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/search_filter.dart';
 import 'package:chabok_front/services/product.dart';
@@ -19,18 +20,26 @@ class _SearchPageState extends State<SearchPage> {
   final _productService = ProductService.instance;
   late SearchFilter filter;
 
+  RangeValues? priceRangeMinMax;
+
   @override
   void initState() {
     super.initState();
     filter = SearchFilter(query: widget.query);
+    searchResults.then((results) {
+      final prices = results.map((p) => p.price);
+      priceRangeMinMax = RangeValues(prices.reduce(min), prices.reduce(max));
+      print(priceRangeMinMax);
+      setState(() {});
+    });
   }
 
   Future<List<Product>> get searchResults async {
     final available = filter.showAvailableProducts
         ? _productService.searchProducts(
             name: filter.query,
-            minPrice: filter.priceRange?.minValue?.toDouble(),
-            maxPrice: filter.priceRange?.maxValue?.toDouble(),
+            minPrice: filter.priceRange?.start,
+            maxPrice: filter.priceRange?.end,
             status: 'for sale',
             sortCreatedAt: filter.sortType.createdSort,
             sortPrice: filter.sortType.priceSort,
@@ -39,15 +48,16 @@ class _SearchPageState extends State<SearchPage> {
     final reserved = filter.showReservedProducts
         ? _productService.searchProducts(
             name: filter.query,
-            minPrice: filter.priceRange?.minValue?.toDouble(),
-            maxPrice: filter.priceRange?.maxValue?.toDouble(),
+            minPrice: filter.priceRange?.start,
+            maxPrice: filter.priceRange?.end,
             status: 'reserved',
             sortCreatedAt: filter.sortType.createdSort,
             sortPrice: filter.sortType.priceSort,
           )
         : Future.value([]);
     final resultsFuture = await Future.wait([available, reserved]);
-    return [...resultsFuture[0], ...resultsFuture[1]];
+    return Future.delayed(
+        Duration(seconds: 1), () => [...resultsFuture[0], ...resultsFuture[1]]);
   }
 
   @override
@@ -61,9 +71,14 @@ class _SearchPageState extends State<SearchPage> {
           Expanded(
             child: FutureBuilder(
               future: searchResults,
-              builder: (context, snapshot) => ProductsWidget(
-                snapshot.data ?? [],
-              ),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return ProductsWidget(snapshot.data!);
+              },
             ),
           ),
           SizedBox(
@@ -74,6 +89,7 @@ class _SearchPageState extends State<SearchPage> {
               child: FilterWidget(
                 filter: filter,
                 setFilter: (newFilter) => setState(() => filter = newFilter),
+                priceRangeMinMax: priceRangeMinMax,
               ),
             ),
           ),
@@ -86,11 +102,13 @@ class _SearchPageState extends State<SearchPage> {
 class FilterWidget extends StatefulWidget {
   final SearchFilter filter;
   final void Function(SearchFilter filter) setFilter;
+  final RangeValues? priceRangeMinMax;
 
   const FilterWidget({
     super.key,
     required this.filter,
     required this.setFilter,
+    this.priceRangeMinMax,
   });
 
   @override
@@ -108,70 +126,135 @@ class _FilterWidgetState extends State<FilterWidget> {
 
   bool get showReserved => widget.filter.showReservedProducts;
 
+  set showReserved(bool newValue) =>
+      setFilter(filter..showReservedProducts = newValue);
+
   bool get showAvailable => widget.filter.showAvailableProducts;
 
-  num? get minPrice => widget.filter.priceRange?.minValue;
+  set showAvailable(bool newValue) =>
+      setFilter(filter..showAvailableProducts = newValue);
 
-  num? get maxPrice => widget.filter.priceRange?.maxValue;
+  RangeValues get priceRange =>
+      widget.filter.priceRange ?? widget.priceRangeMinMax ?? RangeValues(0, 1);
+
+  set priceRange(RangeValues newValue) =>
+      setFilter(filter..priceRange = newValue);
+
+  RangeValues get priceRangeMinMax =>
+      widget.priceRangeMinMax ?? RangeValues(0, 1);
+
+  double get minPrice => priceRange.start;
+
+  double get maxPrice => priceRange.end;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        FiltersPreview(),
+    final textTheme = Theme.of(context).textTheme;
 
+    return ListView(
+      shrinkWrap: true,
+      children: [
+        CheckboxListTile(
+          title: Text(
+            'Show Reserved products',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          value: showReserved,
+          onChanged: (newValue) => showReserved = newValue!,
+        ),
+        CheckboxListTile(
+          title: Text(
+            'Show Available products',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          value: showAvailable,
+          onChanged: (newValue) => showAvailable = newValue!,
+        ),
+        ListTile(
+          title: Text(
+            'Price Range',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              RichText(
+                text: TextSpan(children: [
+                  TextSpan(
+                    text: '  Minimum Price: ',
+                    style: textTheme.labelSmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: formatPrice(minPrice),
+                    style: textTheme.labelSmall,
+                  ),
+                  TextSpan(
+                    text: '\n  Maximum Price: ',
+                    style: textTheme.labelSmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: formatPrice(maxPrice),
+                    style: textTheme.labelSmall,
+                  ),
+                ]),
+              ),
+              RangeSlider(
+                min: priceRangeMinMax.start,
+                max: priceRangeMinMax.end,
+                values: priceRange,
+                labels: RangeLabels(
+                  formatPrice(priceRange.start),
+                  formatPrice(priceRange.end),
+                ),
+                onChanged: (newRange) => priceRange = newRange,
+              ),
+            ],
+          ),
+        ),
+        ListTile(
+          title: Text(
+            'Category',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: ListBody(
+            children: [
+              'Real estate',
+              'Automobile',
+              'Digital & Electronics',
+              'Kitchenware',
+              'Personal Items',
+              'Entertainment',
+              'Others',
+            ].map(
+              (cat) {
+                final selected = filter.categories.contains(cat);
+                return CheckboxListTile(
+                  title: Text(cat),
+                  value: selected,
+                  onChanged: (newValue) {
+                    (newValue!
+                        ? filter.addCategory
+                        : filter.deleteCategory)(cat);
+                    setFilter(filter);
+                  },
+                );
+              },
+            ).toList(),
+          ),
+        ),
       ],
     );
   }
 
-  Widget FiltersPreview() {
-    return Wrap(
-      spacing: 5,
-      runSpacing: 5,
-      children: [
-        if (query.isNotEmpty)
-          Chip(
-            avatar: Icon(Icons.abc),
-            label: Text(query),
-            onDeleted: () => setFilter(filter..query = ''),
-          ),
-        if (showReserved)
-          Chip(
-            avatar: Icon(Icons.category),
-            label: Text('Reserved'),
-            onDeleted: () => setFilter(filter..showReservedProducts = false),
-          ),
-        if (showAvailable)
-          Chip(
-            avatar: Icon(Icons.category),
-            label: Text('Available'),
-            onDeleted: () => setFilter(filter..showAvailableProducts = false),
-          ),
-        ...categories.map(
-          (category) => Chip(
-            avatar: Icon(Icons.category),
-            label: Text(category),
-            onDeleted: () => setFilter(filter..deleteCategory(category)),
-          ),
-        ),
-        if (minPrice != null)
-          Chip(
-            avatar: Icon(Icons.money),
-            label: Text('> $minPrice'),
-            onDeleted: () => setFilter(
-              filter..priceRange = NumRange(maxValue: maxPrice),
-            ),
-          ),
-        if (maxPrice != null)
-          Chip(
-            avatar: Icon(Icons.money),
-            label: Text('< $maxPrice'),
-            onDeleted: () => setFilter(
-              filter..priceRange = NumRange(minValue: minPrice),
-            ),
-          ),
-      ],
-    );
+  String formatPrice(double price) {
+    if (widget.priceRangeMinMax == null) return '';
+
+    final result =
+        '${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ",")} ᴵᴿᴿ';
+    print('$price $result');
+    return result;
   }
 }
