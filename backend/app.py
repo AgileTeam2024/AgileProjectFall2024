@@ -136,7 +136,6 @@ def main(_: list[str]) -> None:
     flask_app.config['MAIL_USE_TLS'] = True
     flask_app.config['MAIL_USERNAME'] = backend.initializers.settings.mail_sender_email.value
     flask_app.config['MAIL_PASSWORD'] = backend.initializers.settings.mail_sender_password.value
-    print(flask_app.config['MAIL_PASSWORD'])
     flask_app.config['MAIL_DEFAULT_SENDER'] = backend.initializers.settings.mail_sender_email.value
     # Create application managers.
     create_managers(flask_app)

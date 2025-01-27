@@ -140,7 +140,7 @@ def create() -> (flask.Flask, int):
         )
 
     # Get list of files from the 'pictures' field
-    image_files = flask.request.files.getlist('picture')
+    image_files = flask.request.files.getlist('pictures')
     images = []
     images_path = []
     # Validate files and create path for storing them.
