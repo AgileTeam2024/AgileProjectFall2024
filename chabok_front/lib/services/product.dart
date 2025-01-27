@@ -28,6 +28,9 @@ class ProductService {
         .get('/product/get_product_by_id', query: {'product_id': '$id'});
     if (!response.isOk) return null;
     final product = response.bodyJson['product'];
+    product['pictures'] = product['pictures']
+        .map((img) => _networkService.getAbsoluteFilePath(img))
+        .toList();
     return Product.fromJson(product);
   }
 

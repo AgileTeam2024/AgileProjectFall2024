@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/models/product.dart';
@@ -11,6 +14,7 @@ import 'package:chabok_front/pages/product_view.dart';
 import 'package:chabok_front/pages/profile.dart';
 import 'package:chabok_front/pages/search.dart';
 import 'package:chabok_front/services/auth.dart';
+import 'package:chabok_front/services/network.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/services/user.dart';
@@ -59,8 +63,21 @@ class MockProductService extends Mock implements ProductService {
       );
 }
 
+class MockNetworkService extends Mock implements NetworkService {
+  @override
+  String getAbsoluteFilePath(String? relative) => relative!;
+
+  @override
+  Future<Uint8List> getImage(String path, {bool useOurServer = true}) =>
+      File(path).readAsBytes();
+}
+
 void main() {
-  setUpAll(() => ProductService.instance = MockProductService());
+  setUpAll(() {
+    HttpOverrides.global = null;
+    ProductService.instance = MockProductService();
+    NetworkService.instance = MockNetworkService();
+  });
 
   testWidgets('Navigates to home page', (tester) async {
     setUpWidgetTest(tester);
