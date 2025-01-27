@@ -66,7 +66,7 @@ class _ProductImageWidget extends StatelessWidget {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(5),
-        child: image == null ? Container() : Image(image: AssetImage(image!)),
+        child: image == null ? Container() : Image.network(image!),
       ),
     );
   }
@@ -90,7 +90,7 @@ class _ProductNameWidget extends StatelessWidget {
 }
 
 class _ProductPriceWidget extends StatelessWidget {
-  final double? price;
+  final double price;
 
   const _ProductPriceWidget(this.price);
 
@@ -98,7 +98,7 @@ class _ProductPriceWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return Text(
-      price != null ? '${price!.compact} ᴵᴿᴿ' : 'Negotiated Price',
+      '${price.compact} ᴵᴿᴿ',
       style: textTheme.labelMedium?.copyWith(
         fontWeight: FontWeight.bold,
         color: Colors.black87,
