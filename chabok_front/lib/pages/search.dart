@@ -4,8 +4,8 @@ import 'package:chabok_front/enums/button_type.dart';
 import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/enums/sort_type.dart';
 import 'package:chabok_front/models/product.dart';
-import 'package:chabok_front/view_models/search_filter.dart';
 import 'package:chabok_front/services/product.dart';
+import 'package:chabok_front/view_models/search_filter.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/products.dart';
@@ -46,6 +46,7 @@ class _SearchPageState extends State<SearchPage> {
             minPrice: filter.priceRange?.start,
             maxPrice: filter.priceRange?.end,
             status: 'for sale',
+            categories: filter.categories.map((cat) => '$cat').toList(),
             sortCreatedAt: filter.sortType.createdSort,
             sortPrice: filter.sortType.priceSort,
           )
@@ -56,6 +57,7 @@ class _SearchPageState extends State<SearchPage> {
             minPrice: filter.priceRange?.start,
             maxPrice: filter.priceRange?.end,
             status: 'reserved',
+            categories: filter.categories.map((cat) => '$cat').toList(),
             sortCreatedAt: filter.sortType.createdSort,
             sortPrice: filter.sortType.priceSort,
           )

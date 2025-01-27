@@ -1,10 +1,5 @@
-import 'dart:math';
-
-import 'package:chabok_front/enums/product_category.dart';
-import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/server_response.dart';
-import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/network.dart';
 import 'package:chabok_front/services/user.dart';
 import 'package:flutter/foundation.dart';
@@ -35,8 +30,10 @@ class ProductService {
     return Product.fromJson(product);
   }
 
-  Future<ServerResponse> createProduct(Map<String, dynamic> fields,
-      Map<String, Uint8List?>? images,) {
+  Future<ServerResponse> createProduct(
+    Map<String, dynamic> fields,
+    Map<String, Uint8List?>? images,
+  ) {
     images?.removeWhere((path, bytes) => bytes == null);
     return _networkService.postFormData(
       '/product/create',
@@ -47,9 +44,11 @@ class ProductService {
     );
   }
 
-  Future<ServerResponse> editProduct(int productId,
-      Map<String, dynamic> fields,
-      Map<String, Uint8List?>? images,) {
+  Future<ServerResponse> editProduct(
+    int productId,
+    Map<String, dynamic> fields,
+    Map<String, Uint8List?>? images,
+  ) {
     images?.removeWhere((path, bytes) => bytes == null);
     return _networkService.postFormData(
       '/product/edit_product',
@@ -68,20 +67,10 @@ class ProductService {
     double? minPrice,
     double? maxPrice,
     String? status,
+    List<String>? categories,
     String? sortCreatedAt,
     String? sortPrice,
   }) async {
-    return Future.value(List.generate(15, (i) => // todo
-        Product(id: i,
-            name: 'name',
-            description: 'description',
-            seller: User(username: 'username',
-                email: 'email',
-                phoneNumber: 'phoneNumber'),
-            imageUrls: ['assets/sample_images/product_img0.jpg'],
-            category: ProductCategory.others,
-            price: Random().nextInt(100000000).toDouble(),
-            status: ProductStatus.reserved)));
     final response = await _networkService.get(
       '/product/search',
       query: {
@@ -91,6 +80,7 @@ class ProductService {
         if (status != null) 'status': status,
         if (sortCreatedAt != null) 'sort_created_at': sortCreatedAt,
         if (sortPrice != null) 'sort_price': sortPrice,
+        if (categories != null) 'categories': categories,
       },
     );
     if (!response.isOk) return [];
@@ -101,10 +91,11 @@ class ProductService {
   }
 
   Future<List<Product>> getProductsSellers(
-      List<Map<String, dynamic>> products,) {
+    List<Map<String, dynamic>> products,
+  ) {
     return Future.wait(
       products.map(
-            (product) async {
+        (product) async {
           return (await getProductById(product['id'] as int));
           // todo
           // if (!product.containsKey('seller')) {
