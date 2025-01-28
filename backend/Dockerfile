@@ -1,4 +1,4 @@
-FROM docker.yektanet.tech/python:3.11-slim
+FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1

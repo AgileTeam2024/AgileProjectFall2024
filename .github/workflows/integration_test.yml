@@ -13,23 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Docker
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo systemctl start docker
-          sudo systemctl enable docker
-
-      - name: Install Docker Compose
-        run: |
-          DOCKER_COMPOSE_VERSION=1.29.2  # Specify the version you want
-          sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-
       - name: Verify Docker Installation
         run: |
           docker --version
-          docker-compose --version
+          docker compose --version
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -37,7 +24,7 @@ jobs:
       - name: Make script executable
         run: chmod +x backend/integration_test/run.sh
 
-      - name: Create .env file from secrets
+      - name: Create .env file from secrets for integration test
         run: |
           echo "MAIL_SENDER_EMAIL=${{ secrets.MAIL_SENDER_EMAIL }}" >> backend/integration_test/.env_integration
           echo "MAIL_SENDER_PASSWORD=${{ secrets.MAIL_SENDER_PASSWORD }}" >> backend/integration_test/.env_integration
@@ -59,4 +46,4 @@ jobs:
       - name: Clean up Docker resources
         if: always()
         run: |
-          docker compose down --rmi all -v --remove-orphans
+          cd backend/integration_test && docker compose down --rmi all -v --remove-orphans

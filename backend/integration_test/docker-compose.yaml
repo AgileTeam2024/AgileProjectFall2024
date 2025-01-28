@@ -14,7 +14,7 @@ services:
 
   flask_db_integration:
     container_name: flask_db_integration
-    image: docker.yektanet.tech/postgres:12
+    image: postgres:12
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
