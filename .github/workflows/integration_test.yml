@@ -31,12 +31,8 @@ jobs:
 
       - name: Create .env file from secrets
         run: |
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-          echo "APP_SECRET_KEY=${{ secrets.APP_SECRET_KEY }}" >> .env
-          echo "MAIL_SENDER_EMAIL=${{ secrets.MAIL_SENDER_EMAIL }}" >> .env
-          echo "MAIL_SENDER_PASSWORD=${{ secrets.MAIL_SENDER_PASSWORD }}" >> .env
-          echo "FLASK_HOST=0.0.0.0" >> .env
-          echo "FLASK_PORT=8000" >> .env
+          echo "MAIL_SENDER_EMAIL=${{ secrets.MAIL_SENDER_EMAIL }}" >> backend/integration_test/.env
+          echo "MAIL_SENDER_PASSWORD=${{ secrets.MAIL_SENDER_PASSWORD }}" >> backend/integration_test/.env
 
       - name: Run integration tests script
         run: |
