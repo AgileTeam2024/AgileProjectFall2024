@@ -35,6 +35,7 @@ jobs:
           echo "MAIL_SENDER_PASSWORD=${{ secrets.MAIL_SENDER_PASSWORD }}" >> backend/integration_test/.env
 
       - name: Run integration tests script
+        id: run_tests
         run: |
           cd backend/integration_test && bash run.sh
           echo "exit_code=$?" >> $GITHUB_OUTPUT
