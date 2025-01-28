@@ -24,11 +24,11 @@ class SellerWidget extends StatelessWidget {
           Spacer(),
           Button.icon(
             icon: Icons.phone,
-            onPressed: seller.phoneNumber?.copy,
+            onPressed: () => seller.phoneNumber?.copy(context),
           ),
           Button.icon(
             icon: Icons.email,
-            onPressed: seller.email.copy,
+            onPressed: () => seller.email.copy(context),
           ),
         ],
       ],

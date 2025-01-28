@@ -1,4 +1,7 @@
+import 'package:chabok_front/enums/product_category.dart';
+import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/models/pair.dart';
+import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/network.dart';
@@ -24,6 +27,28 @@ class UserService {
     if (!response.isOk) return null;
     final user = response.bodyJson['profile'];
     return User.fromJson(user);
+  }
+
+  Future<List<Product>> get ownProducts async {
+    // todo backend
+    return List.generate(
+      5,
+      (i) => Product(
+        id: i,
+        name: 'Product $i',
+        seller: User(
+          username: 'ckdks',
+          phoneNumber: '09121234567',
+          email: 'seller@gmail.com',
+        ),
+        imageUrls: ['assets/sample_images/product_img1.jpg'],
+        category: ProductCategory.others,
+        location: '',
+        status: ProductStatus.reserved,
+        price: 1000,
+        description: 'Description on Product $i',
+      ),
+    );
   }
 
   Future<User?> getProfile(String username) async {

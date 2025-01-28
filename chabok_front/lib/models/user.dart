@@ -9,6 +9,7 @@ class User {
   final String email;
   final String? profilePicture;
   final String? address;
+  final bool isAdmin;
 
   User({
     required this.username,
@@ -18,6 +19,7 @@ class User {
     required this.phoneNumber,
     this.profilePicture,
     this.address,
+    this.isAdmin = false,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
