@@ -90,7 +90,8 @@ class Product(backend.initializers.database.DB.Model):
             'city_name': self.city_name,
             'description': self.description,
             'status': self.status,
-            'category': self.category
+            'category': self.category,
+            'is_banned': self.is_banned,
         }
 
 

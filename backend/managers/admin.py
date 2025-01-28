@@ -29,6 +29,21 @@ class AdminManager:
             backend.initializers.settings.HTTPStatus.OK.value
         )
 
+    def get_banned_product_list(self) -> (flask.Flask, int):
+        """
+        Returns the list of banned products.
+
+        Returns:
+            tuple: A tuple containing:
+                - A Flask response object with a JSON message indicating success with product reports.
+                - An integer representing the HTTP status code indicating success.
+        """
+        banned_products = backend.models.product.Product.query.filter_by(is_banned=True).all()
+        return (
+            flask.jsonify({"banned_products": [p.to_dict() for p in banned_products]}),
+            backend.initializers.settings.HTTPStatus.OK.value
+        )
+
     def get_list_of_reported_users(self) -> (flask.Flask, int):
         """
         Returns the list of reported users.
