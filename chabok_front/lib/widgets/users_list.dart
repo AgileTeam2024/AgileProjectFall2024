@@ -1,4 +1,3 @@
-import 'package:chabok_front/extensions/string.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/button.dart';
@@ -80,11 +79,11 @@ class UsersListWidget extends StatelessWidget {
                       ),
                     Button.icon(
                       icon: Icons.email,
-                      onPressed: ()=> user.email.copy(context),
+                      onPressed: () => user.email.copy(context),
                     ),
                     Button.icon(
                       icon: Icons.phone,
-                      onPressed: ()=> user.phoneNumber?.copy(context),
+                      onPressed: () => user.phoneNumber?.copy(context),
                     ),
                   ],
                 ),
