@@ -49,7 +49,7 @@ class ProductService {
       '/product/create',
       fields,
       files: {
-        'picture': images?.map((k, v) => MapEntry(k, v!)) ?? {},
+        'pictures': images?.map((k, v) => MapEntry(k, v!)) ?? {},
       },
     );
   }
@@ -60,17 +60,17 @@ class ProductService {
     Map<String, Uint8List?>? images,
   ) {
     images?.removeWhere((path, bytes) => bytes == null);
-    return _networkService.postFormData(
+    return _networkService.putFormData(
       '/product/edit_product',
-      fields..putIfAbsent('id', () => productId),
+      fields..putIfAbsent('product_id', () => productId),
       files: {
-        'picture': images?.map((k, v) => MapEntry(k, v!)) ?? {},
+        'pictures': images?.map((k, v) => MapEntry(k, v!)) ?? {},
       },
     );
   }
 
   Future<ServerResponse> deleteProduct(int id) =>
-      _networkService.delete('/product/delete', query: {'id': id});
+      _networkService.delete('/product/delete', query: {'product_id': '$id'});
 
   Future<List<Product>> searchProducts({
     String? name,

@@ -77,8 +77,25 @@ class NetworkService {
     Map<String, dynamic> fields, {
     Map<String, dynamic>? query,
     Map<String, Map<String, Uint8List>>? files,
+  }) =>
+      _formData('POST', path, fields, files: files, query: query);
+
+  Future<ServerResponse> putFormData<T>(
+    String path,
+    Map<String, dynamic> fields, {
+    Map<String, dynamic>? query,
+    Map<String, Map<String, Uint8List>>? files,
+  }) =>
+      _formData('PUT', path, fields, files: files, query: query);
+
+  Future<ServerResponse> _formData(
+    String method,
+    String path,
+    Map<String, dynamic> fields, {
+    Map<String, dynamic>? query,
+    Map<String, Map<String, Uint8List>>? files,
   }) async {
-    final request = http.MultipartRequest('POST', _buildUrl(path, query));
+    final request = http.MultipartRequest(method, _buildUrl(path, query));
     fields.forEach((k, v) => request.fields.putIfAbsent(k, () => '$v'));
     files?.forEach(
       (key, values) => values.forEach(
