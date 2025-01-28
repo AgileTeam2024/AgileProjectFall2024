@@ -39,8 +39,8 @@ jobs:
 
       - name: Create .env file from secrets
         run: |
-          echo "MAIL_SENDER_EMAIL=${{ secrets.MAIL_SENDER_EMAIL }}" >> backend/integration_test/.env
-          echo "MAIL_SENDER_PASSWORD=${{ secrets.MAIL_SENDER_PASSWORD }}" >> backend/integration_test/.env
+          echo "MAIL_SENDER_EMAIL=${{ secrets.MAIL_SENDER_EMAIL }}" >> backend/integration_test/.env_integration
+          echo "MAIL_SENDER_PASSWORD=${{ secrets.MAIL_SENDER_PASSWORD }}" >> backend/integration_test/.env_integration
 
       - name: Run integration tests script
         run: |
