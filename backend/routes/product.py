@@ -190,25 +190,31 @@ def search() -> (flask.Flask, int):
         description: Maximum price of the product.
       - name: status
         in: query
-        type: string
+        type: array
+        collectionFormat: multi
         required: false
-        enum:
-        - for sale
-        - reserved
-        - sold
+        items:
+          type: string
+          enum:
+            - for sale
+            - reserved
+            - sold
         description: Status of the product.
       - name: category
         in: query
-        type: string
+        type: array
+        items:
+          type: string
+          enum:
+            - Others
+            - Real-Estate
+            - Automobile
+            - Digital & Electronics
+            - Kitchenware
+            - Entertainment
+            - Personal Items
+        collectionFormat: multi
         required: false
-        enum:
-          - Others
-          - Real-Estate
-          - Automobile
-          - Digital & Electronics
-          - Kitchenware
-          - Entertainment
-          - Personal Items
         description: Status of the product.
       - name: sort_created_at
         in: query
@@ -247,23 +253,25 @@ def search() -> (flask.Flask, int):
         filters['name'] = filter_name
 
     # Retrieve and validate the 'status' filter from query parameters.
-    filter_status = flask.request.args.get('status')
+    filter_status = flask.request.args.getlist('status')
     if filter_status:
-        if filter_status not in backend.models.product.Product.STATUS_OPTIONS:
-            return (
-                flask.jsonify({'message': 'Invalid value for filter status.'}),
-                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-            )
+        for status in filter_status:
+            if status not in backend.models.product.Product.STATUS_OPTIONS:
+                return (
+                    flask.jsonify({'message': 'Invalid value for filter status.'}),
+                    backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+                )
         filters['status'] = filter_status
 
     # Retrieve and validate the 'category' filter from query parameters.
-    filter_category = flask.request.args.get('category')
+    filter_category = flask.request.args.getlist('category')
     if filter_category:
-        if filter_category not in backend.models.product.Product.CATEGORY_OPTIONS:
-            return (
-                flask.jsonify({'message': 'Invalid value for filter category.'}),
-                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-            )
+        for category in filter_category:
+            if category not in backend.models.product.Product.CATEGORY_OPTIONS:
+                return (
+                    flask.jsonify({'message': 'Invalid value for filter category.'}),
+                    backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+                )
         filters['category'] = filter_category
 
     # Retrieve price range filters from query parameters.

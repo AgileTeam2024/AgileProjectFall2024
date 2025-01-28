@@ -8,6 +8,7 @@ import backend.initializers.settings
 import backend.initializers.test_util
 import backend.managers.product
 import backend.models.product
+import backend.models.user
 
 
 class ProductManagerTest(absltest.TestCase):
@@ -23,16 +24,19 @@ class ProductManagerTest(absltest.TestCase):
         # Mock query on user model.
         self.mock_product_query = mock.patch("backend.models.product.Product.query").start()
         self.mock_user_query = mock.patch("backend.models.user.User.query").start()
-        # Create instances or products for test inputs.
-        self.product1 = backend.models.product.Product(id=1, name='Apple iPhone 13', price=999.99, status='reserved')
-        self.product2 = backend.models.product.Product(id=2, name='Samsung Galaxy S21', price=799.99, status='reserved')
-        self.product3 = backend.models.product.Product(id=3, name='Apple Watch Series 6', price=399.99, status='sold')
-
+        # Create instances of products and users for test inputs.
         self.user1 = backend.models.user.User(username='seller1', email='seller@email.com')
         self.user2 = backend.models.user.User(username='seller2', email='seller2@email.com')
+        self.product1 = backend.models.product.Product(id=1, name='Apple iPhone 13', price=999.99, status='reserved',
+                                                       user_username='seller1')
+        self.product2 = backend.models.product.Product(id=2, name='Samsung Galaxy S21', price=799.99, status='reserved',
+                                                       user_username='seller1')
+        self.product3 = backend.models.product.Product(id=3, name='Apple Watch Series 6', price=399.99, status='sold',
+                                                       user_username='seller1')
         self.product4 = backend.models.product.Product(id=4, name='Apple Watch Series 6', price=399.99, status='sold',
                                                        user_username='seller1')
-        self.product5 = backend.models.product.Product(id=5, name='Laptop Asus', price=399.99, status='for sale', user_username='seller1')
+        self.product5 = backend.models.product.Product(id=5, name='Laptop Asus', price=399.99, status='for sale',
+                                                       user_username='seller1')
         self.product6 = backend.models.product.Product(id=6, name='Red Phone', price=399.99, status='for sale',
                                                        user_username='seller2')
         self.product7 = backend.models.product.Product(id=7, name='Blue Phone', price=400.99, status='for sale',
@@ -54,6 +58,7 @@ class ProductManagerTest(absltest.TestCase):
     def test_search_product_name_filter(self) -> None:
         """Test applying filter on product name."""
         self.mock_product_query.filter.return_value.all.return_value = [self.product1, self.product3]
+        self.mock_user_query.get.return_value = self.user1
         filters = {'name': 'Apple'}
         result_products, result_product_ids, status = self.extract_product_info_for_filters(filters)
 
@@ -66,6 +71,7 @@ class ProductManagerTest(absltest.TestCase):
     def test_search_product_price_range_filter(self) -> None:
         """Test applying filter on product price."""
         self.mock_product_query.filter.return_value.all.return_value = [self.product2, self.product3]
+        self.mock_user_query.get.return_value = self.user1
         filters = {'min_price': 300, 'max_price': 800}
         result_products, result_product_ids, status = self.extract_product_info_for_filters(filters)
 
@@ -78,7 +84,8 @@ class ProductManagerTest(absltest.TestCase):
     def test_search_product_status_filter(self) -> None:
         """Test applying filter on product status."""
         self.mock_product_query.filter.return_value.all.return_value = [self.product3]
-        filters = {'status': 'sold'}
+        self.mock_user_query.get.return_value = self.user1
+        filters = {'status': ['sold']}
         result_products, result_product_ids, status = self.extract_product_info_for_filters(filters)
 
         self.assertEqual(status, backend.initializers.settings.HTTPStatus.OK.value)
@@ -90,9 +97,17 @@ class ProductManagerTest(absltest.TestCase):
     def test_get_product_by_id(self) -> None:
         """Test Retrieving product by id."""
         self.mock_product_query.get.return_value = self.product1
+        self.mock_user_query.get.return_value = self.user1
         result, status = self.product_manager.get_product(1)
         self.assertEqual(status, backend.initializers.settings.HTTPStatus.OK.value)
-        self.assertEqual(self.product1.to_dict(), result.json['product'])
+        expected = {
+            'category': None, 'city_name': None, 'created_at': None, 'description': None, 'id': 1, 'is_banned': None,
+            'name': 'Apple iPhone 13', 'pictures': [], 'price': 999.99,
+            'seller': {
+                'email': 'seller@email.com', 'first_name': None, 'is_admin': None, 'is_banned': None,
+                'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None,
+                'username': 'seller1'}, 'status': 'reserved', 'user_username': 'seller1'}
+        self.assertEqual(expected, result.json['product'])
 
     def test_get_product_by_id_returns_seller_info_too(self) -> None:
         """Test Retrieving product by id."""
@@ -193,7 +208,6 @@ class ProductManagerTest(absltest.TestCase):
         )
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
         self.assertEqual(response.json, {'message': 'The reported product does not exist.'})
-
 
 
 if __name__ == "__main__":
