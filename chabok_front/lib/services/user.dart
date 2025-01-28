@@ -41,7 +41,7 @@ class UserService {
           phoneNumber: '09121234567',
           email: 'seller@gmail.com',
         ),
-        imageUrls: ['assets/sample_images/product_img1.jpg'],
+        imageUrls: [],
         category: ProductCategory.others,
         location: '',
         status: ProductStatus.reserved,
