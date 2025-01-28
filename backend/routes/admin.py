@@ -193,3 +193,37 @@ def unban_user():
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
     return backend.managers.admin.AdminManager.instance.unban_user(username)
+
+
+@admin_bp.route('/unban_product', methods=['POST'])
+@flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.admin_required
+def unban_product():
+    """
+    Admin Unban Product.
+    ---
+    tags:
+      - Admin
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: product_id
+        in: formData
+        required: true
+        type: string
+        description: The product_id you want to unban.
+    responses:
+      200:
+        description: Successfully unbanned the user.
+      400:
+        description: Username is missing.
+      403:
+        description: Only admins have access to this API.
+    """
+    product_id = flask.request.form.get('product_id')
+    if not product_id:
+        return (
+            flask.jsonify({"message": "Product_id is missing."}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    return backend.managers.admin.AdminManager.instance.unban_product(product_id)
