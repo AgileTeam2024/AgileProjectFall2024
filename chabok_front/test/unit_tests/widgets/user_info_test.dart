@@ -3,11 +3,13 @@ import 'package:chabok_front/services/user.dart';
 import 'package:chabok_front/widgets/user_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import '../tests_setup_teardown.dart';
-import 'user_info.mocks.dart';
+import 'user_info_test.mocks.dart';
 
+@GenerateNiceMocks([MockSpec<UserService>()])
 void main() {
   late final MockUserService mockUserService;
 

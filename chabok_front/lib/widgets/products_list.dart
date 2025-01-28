@@ -78,11 +78,13 @@ class ProductsListWidget extends StatelessWidget {
                   children: [
                     if (onBan != null)
                       Button.icon(
+                        key: Key('banProductButton_${product.id}'),
                         icon: Icons.block,
                         onPressed: () => onBan!(product.id),
                       ),
                     if (onUnban != null)
                       Button.icon(
+                        key: Key('unbanProductButton_${product.id}'),
                         icon: Icons.undo,
                         onPressed: () => onUnban!(product.id),
                       ),

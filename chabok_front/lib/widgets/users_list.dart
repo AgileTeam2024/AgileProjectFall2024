@@ -1,4 +1,5 @@
 import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/models/user_report.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:flutter/material.dart';
@@ -58,22 +59,26 @@ class UsersListWidget extends StatelessWidget {
                   user.username,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text(
-                  item.description,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                subtitle: item is UserReport
+                    ? Text(
+                        item.description,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    : null,
                 trailing: Row(
                   spacing: 10,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (onBan != null)
                       Button.icon(
+                        key: Key('banUserButton_${user.username}'),
                         icon: Icons.block,
                         onPressed: () => onBan!(user.username),
                       ),
                     if (onUnban != null)
                       Button.icon(
+                        key: Key('unbanUserButton_${user.username}'),
                         icon: Icons.undo,
                         onPressed: () => onUnban!(user.username),
                       ),

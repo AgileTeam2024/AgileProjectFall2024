@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/product_report.dart';
 import 'package:chabok_front/models/server_response.dart';
@@ -42,7 +44,8 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 return UsersListWidget(
                   title: 'Reported Users',
                   users: reportedUsers,
-                  onBan: _adminService.banUser,
+                  onBan: (username) =>
+                      runAction(_adminService.banUser(username)),
                 );
               },
             ),
@@ -74,7 +77,8 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 return UsersListWidget(
                   title: 'Banned Users',
                   users: bannedUsers,
-                  onBan: _adminService.unbanUser,
+                  onUnban: (username) =>
+                      runAction(_adminService.unbanUser(username)),
                 );
               },
             ),
@@ -102,7 +106,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
 
   Future<void> runAction(Future<ServerResponse> request) async {
     final response = await request;
-    if (response.isOk) {
+    if (response.isOk && !Platform.environment.containsKey('FLUTTER_TEST')) {
       CustomToast.showToast(context, response);
       setState(() {});
     }
