@@ -6,7 +6,7 @@ initializers/database.py        2      0   100%
 initializers/settings.py       23      0   100%
 initializers/test_util.py      11      8    27%
 managers/__init__.py            0      0   100%
-managers/admin.py              55      0   100%
+managers/admin.py              61      4    93%
 managers/admin_test.py        101      2    98%
 managers/product.py           123     48    61%
 managers/product_test.py      140      2    99%
@@ -15,7 +15,7 @@ managers/user.py              129     56    57%
 managers/user_test.py          93      2    98%
 models/__init__.py              0      0   100%
 models/product.py              30      2    93%
-models/report.py               17      0   100%
+models/report.py               19      0   100%
 models/user.py                 34      3    91%
 -----------------------------------------------
-TOTAL                         771    126    84%
+TOTAL                         779    130    83%
