@@ -12,8 +12,7 @@ services:
       - shared_network
     command: python -m backend.app --db_username=postgres --db_host=flask_db --db_port=5432 --db_name=postgres --db_password=${DB_PASSWORD} --app_secret_key=${APP_SECRET_KEY} --app_host=${FLASK_HOST} --app_port=${FLASK_PORT} --mail_sender_email=${MAIL_SENDER_EMAIL} --mail_sender_password=${MAIL_SENDER_PASSWORD}
     volumes:
-      - migrations:/backend/migrations
-      - uploads:/backend/uploads
+      - uploads:/app/backend/uploads
 
   flask_db:
     container_name: flask_db
@@ -56,8 +55,6 @@ networks:
     driver: bridge
 
 volumes:
-  migrations:
-    external: true
   uploads:
     external: true
   postgres:

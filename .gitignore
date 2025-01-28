@@ -19,6 +19,3 @@ __pycache__/
 
 # Media files
 backend/uploads/*
-
-# Migration files
-backend/migrations/versions

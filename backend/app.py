@@ -54,9 +54,6 @@ def connect_to_db(flask_app: flask.Flask) -> None:
             if not os.path.exists(backend.initializers.settings.MIGRATIONS_DIRECTORY):
                 flask_migrate.init(backend.initializers.settings.MIGRATIONS_DIRECTORY)
         with flask_app.app_context():
-            # Generate a migration script if there are changes.
-            flask_migrate.migrate(directory=backend.initializers.settings.MIGRATIONS_DIRECTORY,
-                                  message="Auto-generated migration")
             # Apply any pending migrations.
             flask_migrate.upgrade(directory=backend.initializers.settings.MIGRATIONS_DIRECTORY)
     except Exception as e:
