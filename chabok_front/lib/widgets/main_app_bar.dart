@@ -18,6 +18,7 @@ class MainAppBar extends AppBar {
         child: GestureDetector(
           onTap: () => RouterService.go('/'),
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.heart_broken),
               const Text(APP_NAME),
@@ -50,7 +51,7 @@ class MainAppBar extends AppBar {
         child: SearchBar(
           leading: const Icon(Icons.search),
           hintText: 'Search Products...',
-          backgroundColor: WidgetStateProperty.all(Colors.white),
+          backgroundColor: WidgetStatePropertyAll(Colors.white),
           onSubmitted: _submitSearch,
         ),
       );
@@ -61,7 +62,6 @@ class MainAppBar extends AppBar {
   @override
   double? get leadingWidth => 0;
 
-  void _submitSearch(String search) {
-    // todo
-  }
+  void _submitSearch(String search) =>
+      RouterService.goNamed('search', queryParameters: {'q': search});
 }

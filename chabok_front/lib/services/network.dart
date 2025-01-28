@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/services/auth.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class NetworkService {
@@ -13,18 +14,20 @@ class NetworkService {
     return _instance!;
   }
 
+  @visibleForTesting
   static set instance(NetworkService value) {
     _instance = value;
   }
 
   // static const host = '127.0.0.1';
   // static const port = 8000;
-  static const scheme = 'http';
-  static const host = '185.231.59.87';
+  // static const scheme = 'http';
+  // static const host = '185.231.59.87';
+  // static const port = 80;
 
-  // static const scheme = 'https';
-  // static const host = 'pre-loved.ir';
-  static const port = 80;
+  static const scheme = 'https';
+  static const host = 'pre-loved.ir';
+  static const port = 443;
 
   Map<String, String>? get authHeaderAccess {
     final authService = AuthService.instance;
@@ -129,6 +132,13 @@ class NetworkService {
     );
     return ServerResponse.visualize(response.body, response.statusCode);
   }
+
+  String getAbsoluteFilePath(String? relative) => Uri(
+          scheme: scheme,
+          host: host,
+          port: port,
+          path: 'backend/uploads/$relative')
+      .toString();
 
   Future<Uint8List> getImage(String path, {bool useOurServer = true}) async {
     final url = useOurServer ? _buildUrl(path, {}, '') : Uri.parse(path);

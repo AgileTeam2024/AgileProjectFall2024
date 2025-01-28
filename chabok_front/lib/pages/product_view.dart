@@ -1,6 +1,8 @@
+import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/models/pair.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/pages/error.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/services/user.dart';
@@ -43,8 +45,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
           ]).then((list) => Pair(list[0] as Product, list[1] as User?)),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              // todo error page
-              return Container();
+              return ErrorPage(message: snapshot.error.toString());
             }
             if (!snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
@@ -119,7 +120,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
                                   fontSize: textStyleBold.fontSize! * 2),
                             ),
                             Text(
-                              product.status,
+                              product.status.toStringDisplay(),
                               style: textStyle?.copyWith(
                                   // todo set color for status
                                   ),
@@ -173,7 +174,9 @@ class _ProductViewPageState extends State<ProductViewPage> {
         );
   }
 
-  void _goToCategorySearchPage(String category) {
-    // todo
-  }
+  void _goToCategorySearchPage(ProductCategory category) =>
+      RouterService.goNamed(
+        'search',
+        queryParameters: {'cat': '${category.index}'},
+      );
 }

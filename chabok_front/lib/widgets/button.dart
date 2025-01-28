@@ -1,3 +1,4 @@
+import 'package:chabok_front/enums/button_type.dart';
 import 'package:flutter/material.dart';
 
 class Button extends StatelessWidget {
@@ -77,4 +78,3 @@ class Button extends StatelessWidget {
   }
 }
 
-enum ButtonType { text, outlined, filled, icon }

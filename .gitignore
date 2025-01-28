@@ -17,8 +17,8 @@ __pycache__/
 .idea/
 .DS_Store
 
-# Migration files
-backend/migrations
-
 # Media files
-backend/uploads
+backend/uploads/*
+
+# Migration files
+backend/migrations/versions

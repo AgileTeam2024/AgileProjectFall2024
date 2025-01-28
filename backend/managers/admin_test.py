@@ -25,6 +25,7 @@ class UserManagerTest(absltest.TestCase):
         self.mock_product_report_query = mock.patch("backend.models.report.ProductReport.query").start()
         self.mock_user_report_query = mock.patch("backend.models.report.UserReport.query").start()
         self.mock_user_query = mock.patch("backend.models.user.User.query").start()
+        self.mock_product_query = mock.patch("backend.models.product.Product.query").start()
 
     def tearDown(self) -> None:
         self.mock_db_session.stop()
@@ -109,6 +110,90 @@ class UserManagerTest(absltest.TestCase):
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
         self.assertEqual(response.json, {"message": "User banned successfully."})
         self.assertTrue(user.is_banned)
+
+    def test_ban_user_does_not_exist(self) -> None:
+        """Test non-existent banning user fails."""
+        self.mock_user_query.filter_by.return_value.first.return_value = None
+        response, status_code = self.admin_manager.ban_user('user1')
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.NOT_FOUND.value)
+        self.assertEqual(response.json, {"message": "User not found."})
+
+    def test_ban_product(self) -> None:
+        """Test banning product successfully."""
+        product = backend.models.product.Product(id=1, is_banned=False)
+        self.mock_product_query.filter_by.return_value.first.return_value = product
+        response, status_code = self.admin_manager.ban_product(product.id)
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {"message": "Product banned successfully."})
+        self.assertTrue(product.is_banned)
+
+    def test_ban_product_does_not_exist(self) -> None:
+        """Test non-existent banning product fails."""
+        self.mock_product_query.filter_by.return_value.first.return_value = None
+        response, status_code = self.admin_manager.ban_product(1)
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.NOT_FOUND.value)
+        self.assertEqual(response.json, {"message": "Product not found."})
+
+    def test_successful_unban_user(self) -> None:
+        """Test unbanning user successfully."""
+        user = backend.models.user.User(
+            username="username",
+            password="password",
+            is_banned=True
+        )
+        self.mock_user_query.filter_by.return_value.first.return_value = user
+        response, status_code = self.admin_manager.unban_user(username=user.username)
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {"message": "User unbanned successfully."})
+        self.assertFalse(user.is_banned)
+
+    def test_unban_user_does_not_exist(self) -> None:
+        """Test unbanning non-existent user fails."""
+        self.mock_user_query.filter_by.return_value.first.return_value = None
+        response, status_code = self.admin_manager.unban_user(username='user1')
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.NOT_FOUND.value)
+        self.assertEqual(response.json, {"message": "User not found."})
+
+    def test_successful_unban_product(self) -> None:
+        """Test unbanning product successfully."""
+        product = backend.models.product.Product(id=1, is_banned=True)
+        self.mock_product_query.filter_by.return_value.first.return_value = product
+        response, status_code = self.admin_manager.unban_product(product.id)
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {"message": "Product unbanned successfully."})
+        self.assertFalse(product.is_banned)
+
+    def test_unban_product_does_not_exist(self) -> None:
+        """Test unbanning non-existent product fails."""
+        self.mock_product_query.filter_by.return_value.first.return_value = None
+        response, status_code = self.admin_manager.unban_product(1)
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.NOT_FOUND.value)
+        self.assertEqual(response.json, {"message": "Product not found."})
+
+    def test_get_banned_products_list(self) -> None:
+        """Test get list of banned products."""
+        products = [backend.models.product.Product(id=1, is_banned=True),
+                    backend.models.product.Product(id=2, is_banned=True),
+                    backend.models.product.Product(id=3, is_banned=True)]
+        self.mock_product_query.filter_by.return_value.all.return_value = products
+        response, status_code = self.admin_manager.get_banned_product_list()
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {'banned_products': [{'category': None, 'city_name': None, 'created_at': None, 'description': None, 'id': 1, 'name': None, 'pictures': [], 'price': None, 'status': None, 'user_username': None, 'is_banned': True},
+                                                                     {'category': None, 'city_name': None, 'created_at': None, 'description': None, 'id': 2, 'name': None, 'pictures': [], 'price': None, 'status': None, 'user_username': None, 'is_banned': True},
+                                                                     {'category': None, 'city_name': None, 'created_at': None, 'description': None, 'id': 3, 'name': None, 'pictures': [], 'price': None, 'status': None, 'user_username': None, 'is_banned': True}]})
+
+
+    def test_get_banned_users_list(self) -> None:
+        """Test get list of users products."""
+        users = [backend.models.user.User(username='user1', is_banned=True),
+                 backend.models.user.User(username='user2', is_banned=True),
+                 backend.models.user.User(username='user3', is_banned=True)]
+        self.mock_user_query.filter_by.return_value.all.return_value = users
+        response, status_code = self.admin_manager.get_banned_user_list()
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {'banned_users': [{'email': None, 'first_name': None, 'is_admin': None, 'is_banned': True, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user1'},
+                                                                  {'email': None, 'first_name': None, 'is_admin': None, 'is_banned': True, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user2'},
+                                                                  {'email': None, 'first_name': None, 'is_admin': None, 'is_banned': True, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user3'}]})
 
 
 if __name__ == "__main__":

@@ -17,6 +17,8 @@ jobs:
         run: |
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
           echo "APP_SECRET_KEY=${{ secrets.APP_SECRET_KEY }}" >> .env
+          echo "MAIL_SENDER_EMAIL=${{ secrets.MAIL_SENDER_EMAIL }}" >> .env
+          echo "MAIL_SENDER_PASSWORD=${{ secrets.MAIL_SENDER_PASSWORD }}" >> .env
           echo "FLASK_HOST=0.0.0.0" >> .env
           echo "FLASK_PORT=8000" >> .env
 
@@ -29,11 +31,12 @@ jobs:
             cd AgileProjectFall2024 &&
             docker-compose down --rmi all -v --remove-orphans
           "
+        continue-on-error: true
 
       - name: Remove previous codes
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "
-            find AgileProjectFall2024 -mindepth 1 ! -path 'AgileProjectFall2024/backend/migrations*' ! -path 'AgileProjectFall2024/backend/uploads*' -exec rm -rf {} +
+            find AgileProjectFall2024 -mindepth 1 \( -path 'AgileProjectFall2024/backend/migrations' -o -path 'AgileProjectFall2024/backend/uploads' \) -prune -o -exec rm -rf {} +
           "
 
       - name: Copy code and .env file to server

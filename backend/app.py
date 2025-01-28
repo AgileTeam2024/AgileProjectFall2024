@@ -112,6 +112,8 @@ def main(_: list[str]) -> None:
     flask_app = flask.Flask(__name__, static_folder='uploads', static_url_path='/backend/uploads')
     # Enable CORS for all routes and origins, since frontend would be hosted in different port from backend.
     flask_cors.CORS(flask_app)
+    # Set the server configuration.
+    flask_app.config['SERVER_NAME'] = 'pre-loved.ir'
     # Set secret key used for generating tokens.
     flask_app.config['JWT_SECRET_KEY'] = backend.initializers.settings.app_secret_key.value
     # Add location for storing files like images.
@@ -128,6 +130,13 @@ def main(_: list[str]) -> None:
     # Maximum number of files in a multipart form.
     flask_app.config['MAX_FORM_PARTS'] = 10
     flask_app.config['MAX_FORM_MEMORY_SIZE'] = 50 * 1024 * 1024  # 50 MB
+    # Configure verification email settings.
+    flask_app.config['MAIL_SERVER'] = backend.initializers.settings.mail_server_host.value
+    flask_app.config['MAIL_PORT'] = backend.initializers.settings.mail_server_port.value
+    flask_app.config['MAIL_USE_TLS'] = True
+    flask_app.config['MAIL_USERNAME'] = backend.initializers.settings.mail_sender_email.value
+    flask_app.config['MAIL_PASSWORD'] = backend.initializers.settings.mail_sender_password.value
+    flask_app.config['MAIL_DEFAULT_SENDER'] = backend.initializers.settings.mail_sender_email.value
     # Create application managers.
     create_managers(flask_app)
     # Register routers blueprint.

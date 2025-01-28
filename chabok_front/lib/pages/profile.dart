@@ -1,3 +1,5 @@
+import 'package:chabok_front/enums/product_category.dart';
+import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/auth.dart';
@@ -45,9 +47,9 @@ class UserProfilePage extends StatelessWidget {
                         phoneNumber: '09121234567',
                         email: 'seller@gmail.com'),
                     imageUrls: ['assets/sample_images/product_img1.jpg'],
-                    category: '',
+                    category: ProductCategory.others,
                     location: '',
-                    status: '',
+                    status: ProductStatus.reserved,
                     price: 1000,
                     description: 'Description on Product $i',
                   ),
@@ -66,9 +68,9 @@ class UserProfilePage extends StatelessWidget {
                         phoneNumber: '09121234567',
                         email: 'seller@gmail.com'),
                     imageUrls: ['assets/sample_images/product_img1.jpg'],
-                    category: '',
+                    category: ProductCategory.others,
                     location: '',
-                    status: '',
+                    status: ProductStatus.reserved,
                     price: 1000,
                     description: 'Description on Product $i',
                   ),
@@ -175,7 +177,7 @@ class UserInfoWidget extends StatelessWidget {
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   Text(
-                    'Email: ${profile.email ?? "-"}',
+                    'Email: ${profile.email}',
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   Text(
@@ -243,7 +245,7 @@ class ProductsListWidget extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
-                  product.description!,
+                  product.description,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
