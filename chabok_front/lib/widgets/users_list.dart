@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class UsersListWidget extends StatelessWidget {
   final String title;
-  final List<User> users;
+  final List<dynamic> users;
 
   final void Function(String username)? onBan, onUnban;
 
@@ -39,7 +39,8 @@ class UsersListWidget extends StatelessWidget {
           physics: NeverScrollableScrollPhysics(),
           itemCount: users.length,
           itemBuilder: (context, index) {
-            final user = users[index];
+            final item = users[index];
+            final user = item is User ? item : item.user;
 
             return Card(
               elevation: 3,
@@ -55,11 +56,11 @@ class UsersListWidget extends StatelessWidget {
                       : NetworkImage(user.profilePicture!),
                 ),
                 title: Text(
-                  user.fullName,
+                  user.username,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
-                  '@${user.username}',
+                  item.description,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

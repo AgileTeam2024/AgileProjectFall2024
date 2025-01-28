@@ -2,8 +2,10 @@ import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/product_report.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/models/user_report.dart';
 import 'package:chabok_front/services/network.dart';
 import 'package:chabok_front/services/product.dart';
+import 'package:chabok_front/services/user.dart';
 import 'package:flutter/foundation.dart';
 
 class AdminService {
@@ -19,8 +21,11 @@ class AdminService {
     _instance = value;
   }
 
-  final _networkService = NetworkService.instance;
-  final _productService = ProductService.instance;
+  NetworkService get _networkService => NetworkService.instance;
+
+  ProductService get _productService => ProductService.instance;
+
+  UserService get _userService => UserService.instance;
 
   Future<List<ProductReport>> get reportedProducts async {
     final response = await _networkService.get('/admin/product-reports-list');
@@ -42,12 +47,20 @@ class AdminService {
     return [];
   }
 
-  Future<List<User>> get reportedUsers async {
+  Future<List<UserReport>> get reportedUsers async {
     final response = await _networkService.get('/admin/user-reports-list');
     if (response.isOk) {
-      final body =
-          response.bodyJson['reported_users'] as List<Map<String, dynamic>>;
-      return body.map(User.fromJson).toList();
+      final body = (response.bodyJson['reported_users'] as List)
+          .cast<Map<String, dynamic>>()
+          .toList();
+      return Future.wait(
+        body.map(
+          (report) async {
+            final user = await _userService.getProfile(report['reported_user']);
+            return UserReport.fromJson({...report, 'user': user!.toJson()});
+          },
+        ),
+      );
     }
     return [];
   }
@@ -65,8 +78,8 @@ class AdminService {
   Future<List<User>> get bannedUsers async {
     final response = await _networkService.get('/admin/banned-user-list');
     if (response.isOk) {
-      final body =
-          response.bodyJson['banned_users'] as List<Map<String, dynamic>>;
+      final body = (response.bodyJson['banned_users'] as List)
+          .cast<Map<String, dynamic>>();
       return body.map(User.fromJson).toList();
     }
     return [];

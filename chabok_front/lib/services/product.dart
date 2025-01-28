@@ -17,8 +17,9 @@ class ProductService {
     _instance = value;
   }
 
-  final _networkService = NetworkService.instance;
-  final _userService = UserService.instance;
+  NetworkService get _networkService => NetworkService.instance;
+
+  UserService get _userService => UserService.instance;
 
   Future<List<Product>> get homePageProducts =>
       searchProducts(sortCreatedAt: 'asc');

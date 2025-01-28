@@ -2,6 +2,7 @@ import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/product_report.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/models/user_report.dart';
 import 'package:chabok_front/services/admin.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/products_list.dart';
@@ -29,7 +30,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
             // Admin Info Section
             UserInfoWidget(),
             SizedBox(height: 10),
-            FutureBuilder<List<User>>(
+            FutureBuilder<List<UserReport>>(
               future: _adminService.reportedUsers,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
