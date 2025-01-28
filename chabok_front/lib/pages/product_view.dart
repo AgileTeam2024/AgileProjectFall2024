@@ -1,3 +1,4 @@
+import 'package:chabok_front/dialogs/report.dart';
 import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/models/pair.dart';
 import 'package:chabok_front/models/product.dart';
@@ -30,6 +31,8 @@ class _ProductViewPageState extends State<ProductViewPage> {
   final _productService = ProductService.instance;
   final _userService = UserService.instance;
 
+  late final Product product;
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -39,123 +42,132 @@ class _ProductViewPageState extends State<ProductViewPage> {
 
     return CardWidget(
       child: FutureBuilder<Pair<Product, User?>>(
-          future: Future.wait([
-            _productService.getProductById(widget.id),
-            _userService.ownProfile,
-          ]).then((list) => Pair(list[0] as Product, list[1] as User?)),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return ErrorPage(message: snapshot.error.toString());
-            }
-            if (!snapshot.hasData) {
-              return Center(child: CircularProgressIndicator());
-            }
+        future: Future.wait([
+          _productService.getProductById(widget.id),
+          _userService.ownProfile,
+        ]).then((list) => Pair(list[0] as Product, list[1] as User?)),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return ErrorPage(message: snapshot.error.toString());
+          }
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-            final pair = snapshot.data!;
-            final product = pair.first;
-            final ownUsername = pair.second?.username;
-            final viewerIsSeller = product.seller.username == ownUsername;
+          final pair = snapshot.data!;
+          try {
+            product = pair.first;
+          } catch (LateInitializationError) {}
+          final ownUsername = pair.second?.username;
+          final viewerIsSeller = product.seller.username == ownUsername;
 
-            return Flex(
-              crossAxisAlignment: isBigScreen
-                  ? CrossAxisAlignment.stretch
-                  : CrossAxisAlignment.center,
-              direction: isBigScreen ? Axis.horizontal : Axis.vertical,
-              children: [
-                Expanded(
-                  child: ImagesDisplayWidget(product.imageUrls),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(15),
-                  child: isBigScreen ? VerticalDivider() : Divider(),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    key: scrollableKey,
-                    child: Column(
-                      spacing: 8,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          product.name,
-                          style: textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        Row(
-                          spacing: 5,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            if (viewerIsSeller) ...[
-                              Button.icon(
-                                onPressed: onEditProduct,
-                                icon: Icons.edit,
-                              ),
-                              Button.icon(
-                                onPressed: onDeleteProduct,
-                                icon: Icons.delete,
-                              ),
-                            ] else if (ownUsername != null)
-                              Button.icon(
-                                onPressed: onReport,
-                                icon: Icons.report,
-                              ),
-                            Button.text(
-                              text: '${product.category} Category',
-                              onPressed: () =>
-                                  _goToCategorySearchPage(product.category),
+          return Flex(
+            crossAxisAlignment: isBigScreen
+                ? CrossAxisAlignment.stretch
+                : CrossAxisAlignment.center,
+            direction: isBigScreen ? Axis.horizontal : Axis.vertical,
+            children: [
+              Expanded(
+                child: ImagesDisplayWidget(product.imageUrls),
+              ),
+              Padding(
+                padding: EdgeInsets.all(15),
+                child: isBigScreen ? VerticalDivider() : Divider(),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  key: scrollableKey,
+                  child: Column(
+                    spacing: 8,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.name,
+                        style: textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        spacing: 5,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (viewerIsSeller) ...[
+                            Button.icon(
+                              onPressed: onEditProduct,
+                              icon: Icons.edit,
                             ),
-                          ],
-                        ),
-                        SellerWidget(
-                          product.seller,
-                          showContactInfo: true,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${formatPrice(product.price)} ᴵᴿᴿ',
-                              style: textStyleBold?.copyWith(
-                                  fontSize: textStyleBold.fontSize! * 2),
+                            Button.icon(
+                              onPressed: onDeleteProduct,
+                              icon: Icons.delete,
                             ),
-                            Text(
-                              product.status.toStringDisplay(),
-                              style: textStyle?.copyWith(
-                                  // todo set color for status
-                                  ),
+                          ] else if (ownUsername != null)
+                            Button.icon(
+                              onPressed: onReport,
+                              icon: Icons.report,
                             ),
-                          ],
-                        ),
-                        if (product.location != null)
-                          Row(
-                            children: [
-                              Icon(Icons.pin_drop),
-                              Text(product.location!, style: textStyle),
-                            ],
+                          Button.text(
+                            text: '${product.category} Category',
+                            onPressed: () =>
+                                _goToCategorySearchPage(product.category),
                           ),
-                        Text('Description', style: textStyleBold),
-                        ExpandableText(
-                          product.description,
-                          maxLines: 5,
-                          expandText: 'Show more...',
-                          collapseText: 'Show less...',
-                          linkColor: Colors.blue,
-                          linkEllipsis: false,
-                          style: textStyle,
+                        ],
+                      ),
+                      SellerWidget(
+                        product.seller,
+                        showContactInfo: true,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${formatPrice(product.price)} ᴵᴿᴿ',
+                            style: textStyleBold?.copyWith(
+                                fontSize: textStyleBold.fontSize! * 2),
+                          ),
+                          Text(
+                            product.status.toStringDisplay(),
+                            style: textStyle?.copyWith(
+                                // todo set color for status
+                                ),
+                          ),
+                        ],
+                      ),
+                      if (product.location != null)
+                        Row(
+                          children: [
+                            Icon(Icons.pin_drop),
+                            Text(product.location!, style: textStyle),
+                          ],
                         ),
-                      ],
-                    ),
+                      Text('Description', style: textStyleBold),
+                      ExpandableText(
+                        product.description,
+                        maxLines: 5,
+                        expandText: 'Show more...',
+                        collapseText: 'Show less...',
+                        linkColor: Colors.blue,
+                        linkEllipsis: false,
+                        style: textStyle,
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            );
-          }),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
-  void onReport() {
-    // todo send request to backend
+  Future<void> onReport() async {
+    final String? description = await showDialog(
+      context: context,
+      builder: (context) => ReportProductDialog(context, product: product),
+    );
+    if (description?.isEmpty ?? true) return;
+    final response = await _productService.report(widget.id, description!);
+    CustomToast.showToast(context, response);
   }
 
   Future<void> onEditProduct() async =>

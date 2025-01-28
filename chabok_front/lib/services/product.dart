@@ -28,9 +28,6 @@ class ProductService {
         .get('/product/get_product_by_id', query: {'product_id': '$id'});
     if (!response.isOk) return null;
     final product = response.bodyJson['product'];
-    product['pictures'] = product['pictures']
-        .map((img) => _networkService.getAbsoluteFilePath(img))
-        .toList();
     return Product.fromJson(product);
   }
 
@@ -110,5 +107,13 @@ class ProductService {
         return Product.fromJson(product2);
       }),
     );
+  }
+
+  Future<ServerResponse> report(int productId, String description) async {
+    final response = await _networkService.postFormData(
+      '/product/report_product',
+      {'reported_product': productId, 'description': description},
+    );
+    return response;
   }
 }
