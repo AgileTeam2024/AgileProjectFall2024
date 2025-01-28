@@ -294,6 +294,11 @@ class UserManager:
             status_code (int): HTTP status code indicating success (200).
         """
         user = backend.models.user.User.query.filter_by(username=username).first()
+        if not user:
+            return (
+                flask.jsonify({"message": "User does not exist."}),
+                backend.initializers.settings.HTTPStatus.NOT_FOUND.value
+            )
         return flask.jsonify({"profile": user.to_dict()}), backend.initializers.settings.HTTPStatus.OK.value
 
     def edit_profile(self, username: str, info: dict) -> (flask.Flask, int):
