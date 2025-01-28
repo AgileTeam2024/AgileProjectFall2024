@@ -1,4 +1,7 @@
+import 'package:chabok_front/enums/product_category.dart';
+import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/models/pair.dart';
+import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/network.dart';
@@ -26,6 +29,28 @@ class UserService {
     return User.fromJson(user);
   }
 
+  Future<List<Product>> get ownProducts async {
+    // todo backend
+    return List.generate(
+      5,
+      (i) => Product(
+        id: i,
+        name: 'Product $i',
+        seller: User(
+          username: 'ckdks',
+          phoneNumber: '09121234567',
+          email: 'seller@gmail.com',
+        ),
+        imageUrls: [],
+        category: ProductCategory.others,
+        location: '',
+        status: ProductStatus.reserved,
+        price: 1000,
+        description: 'Description on Product $i',
+      ),
+    );
+  }
+
   Future<User?> getProfile(String username) async {
     final response =
         await _networkService.get('/user/get_profile_by_username/$username');
@@ -51,4 +76,10 @@ class UserService {
     );
     return response;
   }
+
+  Future<ServerResponse> report(String username, String description) =>
+      _networkService.postFormData(
+        '/user/report_user',
+        {'reported_username': username, 'description': description},
+      );
 }

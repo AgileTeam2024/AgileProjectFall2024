@@ -17,8 +17,9 @@ class ProductService {
     _instance = value;
   }
 
-  final _networkService = NetworkService.instance;
-  final _userService = UserService.instance;
+  NetworkService get _networkService => NetworkService.instance;
+
+  UserService get _userService => UserService.instance;
 
   Future<List<Product>> get homePageProducts =>
       searchProducts(sortCreatedAt: 'asc');
@@ -28,9 +29,6 @@ class ProductService {
         .get('/product/get_product_by_id', query: {'product_id': '$id'});
     if (!response.isOk) return null;
     final product = response.bodyJson['product'];
-    product['pictures'] = product['pictures']
-        .map((img) => _networkService.getAbsoluteFilePath(img))
-        .toList();
     return Product.fromJson(product);
   }
 
@@ -111,4 +109,10 @@ class ProductService {
       }),
     );
   }
+
+  Future<ServerResponse> report(int productId, String description) =>
+      _networkService.postFormData(
+        '/product/report_product',
+        {'reported_product': productId, 'description': description},
+      );
 }

@@ -86,7 +86,7 @@ void main() {
           MaterialApp(home: SellerWidget(user, showContactInfo: true)));
 
       await tester.tap(find.byIcon(Icons.phone));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(Duration(seconds: 5));
 
       expect(copiedToClipboard, true);
 
@@ -120,7 +120,7 @@ void main() {
           MaterialApp(home: SellerWidget(user, showContactInfo: true)));
 
       await tester.tap(find.byIcon(Icons.email));
-      await tester.pump();
+      await tester.pumpAndSettle(Duration(seconds: 5));
 
       expect(copiedToClipboard, true);
 

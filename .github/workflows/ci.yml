@@ -57,4 +57,4 @@ jobs:
 
       - name: Run tests
         run: |
-          flutter test test
+          flutter test test --dart-define=testing_mode=true

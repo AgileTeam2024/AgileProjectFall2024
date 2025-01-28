@@ -1,6 +1,7 @@
 import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/pages/admin_profile.dart';
 import 'package:chabok_front/pages/create_edit_product.dart';
 import 'package:chabok_front/pages/edit_profile.dart';
 import 'package:chabok_front/pages/error.dart';
@@ -20,6 +21,8 @@ import 'package:go_router/go_router.dart';
 
 class RouterService {
   static AuthService get _authService => AuthService.instance;
+
+  static UserService get _userService => UserService.instance;
 
   static final _rootNavKey = GlobalKey<NavigatorState>(debugLabel: 'root');
   static final _shellNavKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
@@ -172,13 +175,36 @@ class RouterService {
             ),
           ),
           GoRoute(
+            path: '/profile/:username',
+            pageBuilder: (context, state) => NoTransitionPage(
+              child:
+                  UserProfilePage(username: state.pathParameters['username']),
+            ),
+          ),
+          GoRoute(
             path: '/profile',
-            redirect: (context, state) {
+            redirect: (context, state) async {
               if (!_authService.isLoggedIn) return '/';
+              if ((await _userService.ownProfile)!.isAdmin) {
+                return '/admin-profile';
+              }
               return null;
             },
             pageBuilder: (context, state) => NoTransitionPage(
               child: UserProfilePage(),
+            ),
+          ),
+          GoRoute(
+            path: '/admin-profile',
+            redirect: (context, state) async {
+              if (!_authService.isLoggedIn) return '/';
+              if (!(await _userService.ownProfile)!.isAdmin) {
+                return '/profile';
+              }
+              return null;
+            },
+            pageBuilder: (context, state) => NoTransitionPage(
+              child: AdminProfilePage(),
             ),
           ),
           GoRoute(

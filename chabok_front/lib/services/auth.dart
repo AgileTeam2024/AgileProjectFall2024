@@ -49,7 +49,7 @@ class AuthService {
       _networkService.post('/user/register', body);
 
   Future<ServerResponse> logout() =>
-      _networkService.get('/user/logout').then((response) {
+      _networkService.delete('/user/logout').then((response) {
         if (response.isOk) {
           accessToken = null;
           refreshToken = null;
