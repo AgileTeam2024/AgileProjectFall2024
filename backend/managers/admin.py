@@ -23,7 +23,7 @@ class AdminManager:
                 - A Flask response object with a JSON message indicating success with product reports.
                 - An integer representing the HTTP status code indicating success.
         """
-        reported_products = backend.models.report.ProductReport.query.all()
+        reported_products = backend.models.report.ProductReport.query.filter_by(is_resolved=False).all()
         return (
             flask.jsonify({"reported_products": [p.to_dict() for p in reported_products]}),
             backend.initializers.settings.HTTPStatus.OK.value
@@ -68,7 +68,7 @@ class AdminManager:
                 - A Flask response object with a JSON message indicating success with user reports.
                 - An integer representing the HTTP status code indicating success.
         """
-        reported_users = backend.models.report.UserReport.query.all()
+        reported_users = backend.models.report.UserReport.query.filter_by(is_resolved=False).all()
         return (
             flask.jsonify({"reported_users": [p.to_dict() for p in reported_users]}),
             backend.initializers.settings.HTTPStatus.OK.value
@@ -90,6 +90,10 @@ class AdminManager:
                 flask.jsonify({"message": "User not found."}),
                 backend.initializers.settings.HTTPStatus.NOT_FOUND.value
             )
+
+        for report in backend.models.report.UserReport.query.filter_by(reported_user=username).all():
+            report.is_resolved = True
+            backend.initializers.database.DB.session.add(report)
 
         # Ban user.
         user.is_banned = True
@@ -116,6 +120,10 @@ class AdminManager:
                 flask.jsonify({"message": "Product not found."}),
                 backend.initializers.settings.HTTPStatus.NOT_FOUND.value
             )
+
+        for report in backend.models.report.ProductReport.query.filter_by(reported_product=id).all():
+            report.is_resolved = True
+            backend.initializers.database.DB.session.add(report)
 
         # Ban product.
         product.is_banned = True

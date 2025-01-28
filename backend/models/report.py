@@ -26,13 +26,19 @@ class UserReport(backend.initializers.database.DB.Model):
         backend.initializers.database.DB.String,
         nullable=False
     )
+    is_resolved = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.Boolean,
+        nullable=False,
+        default=False,
+    )
 
     def to_dict(self):
         return {
             'id': self.id,
             'reported_user': self.reported_user,
             'reporter_username': self.reporter_username,
-            'description': self.description
+            'description': self.description,
+            'is_resolved': self.is_resolved
         }
 
 
@@ -61,11 +67,17 @@ class ProductReport(backend.initializers.database.DB.Model):
         backend.initializers.database.DB.String,
         nullable=False
     )
+    is_resolved = backend.initializers.database.DB.Column(
+        backend.initializers.database.DB.Boolean,
+        nullable=False,
+        default=False,
+    )
 
     def to_dict(self):
         return {
             "id": self.id,
             "reported_product": self.reported_product,
             "reporter_username": self.reporter_username,
-            "description": self.description
+            "description": self.description,
+            "is_resolved": self.is_resolved
         }
