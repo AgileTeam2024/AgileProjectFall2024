@@ -36,12 +36,12 @@ class UserManagerTest(absltest.TestCase):
 
     def test_get_product_report_list(self) -> None:
         """Test getting product report list successfully."""
-        self.mock_product_report_query.all.return_value = [
+        self.mock_product_report_query.filter_by.return_value.all.return_value = [
             backend.models.report.ProductReport(
-                id=1, reported_product=1, reporter_username="username1", description="description1"
+                id=1, reported_product=1, reporter_username="username1", description="description1", is_resolved=False
             ),
             backend.models.report.ProductReport(
-                id=2, reported_product=2, reporter_username="username2", description="description2"
+                id=2, reported_product=2, reporter_username="username2", description="description2", is_resolved=False
             )
         ]
         response, status_code = self.admin_manager.get_list_of_reported_products()
@@ -54,13 +54,15 @@ class UserManagerTest(absltest.TestCase):
                         'description': 'description1',
                         'id': 1,
                         'reported_product': 1,
-                        'reporter_username': 'username1'
+                        'reporter_username': 'username1',
+                        'is_resolved': False
                     },
                     {
                         'description': 'description2',
                         'id': 2,
                         'reported_product': 2,
-                        'reporter_username': 'username2'
+                        'reporter_username': 'username2',
+                        'is_resolved': False
                     }
                 ]
             }
@@ -68,12 +70,12 @@ class UserManagerTest(absltest.TestCase):
 
     def test_get_user_report_list(self) -> None:
         """Test getting user report list successfully."""
-        self.mock_user_report_query.all.return_value = [
+        self.mock_user_report_query.filter_by.return_value.all.return_value = [
             backend.models.report.UserReport(
-                id=1, reported_user="username1", reporter_username="username2", description="description1"
+                id=1, reported_user="username1", reporter_username="username2", description="description1", is_resolved=False
             ),
             backend.models.report.UserReport(
-                id=2, reported_user="username3", reporter_username="username4", description="description2"
+                id=2, reported_user="username3", reporter_username="username4", description="description2", is_resolved=False
             )
         ]
         response, status_code = self.admin_manager.get_list_of_reported_users()
@@ -86,13 +88,15 @@ class UserManagerTest(absltest.TestCase):
                         'description': 'description1',
                         'id': 1,
                         'reported_user': "username1",
-                        'reporter_username': 'username2'
+                        'reporter_username': 'username2',
+                        'is_resolved': False
                     },
                     {
                         'description': 'description2',
                         'id': 2,
                         'reported_user': "username3",
-                        'reporter_username': 'username4'
+                        'reporter_username': 'username4',
+                        'is_resolved': False
                     }
                 ]
             }
