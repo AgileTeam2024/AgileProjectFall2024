@@ -1,0 +1,62 @@
+name: Integration Test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
+
+      - name: Install Docker Compose
+        run: |
+          DOCKER_COMPOSE_VERSION=1.29.2  # Specify the version you want
+          sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+
+      - name: Verify Docker Installation
+        run: |
+          docker --version
+          docker-compose --version
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Make script executable
+        run: chmod +x backend/integration_test/run.sh
+
+      - name: Create .env file from secrets
+        run: |
+          echo "MAIL_SENDER_EMAIL=${{ secrets.MAIL_SENDER_EMAIL }}" >> backend/integration_test/.env
+          echo "MAIL_SENDER_PASSWORD=${{ secrets.MAIL_SENDER_PASSWORD }}" >> backend/integration_test/.env
+
+      - name: Run integration tests script
+        run: |
+          bash backend/integration_test/run.sh
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          
+      - name: Check Exit Code
+        run: |
+          if [[ "${{ steps.run_tests.outputs.exit_code }}" != "0" ]]; then
+            echo "Integration tests failed with exit code ${{ steps.run_tests.outputs.exit_code }}"
+            exit 1  # Fail the action if tests did not pass
+          else
+            echo "Integration tests passed successfully!"
+          fi
+
+      - name: Clean up Docker resources
+        if: always()
+        run: |
+          docker compose down --rmi all -v --remove-orphans

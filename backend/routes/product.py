@@ -150,6 +150,11 @@ def create() -> (flask.Flask, int):
             filename = werkzeug.utils.secure_filename(image_file.filename)
             images.append(image_file)
             images_path.append(filename)
+        else:
+            return (
+                flask.jsonify({'message': 'Invalid file extension.'}),
+                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+            )
 
     product_data = {
         'name': name,
@@ -524,6 +529,11 @@ def edit_product() -> (flask.Flask, int):
             filename = werkzeug.utils.secure_filename(image_file.filename)
             images.append(image_file)
             images_path.append(filename)
+        else:
+            return (
+                flask.jsonify({'message': 'Invalid file extension.'}),
+                backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+            )
     data['images'] = images
     data['images_path'] = images_path
     data['user_username'] = user_username
