@@ -107,7 +107,7 @@ def resend_email() -> (flask.Flask, int):
     tags:
       - User
     parameters:
-        - name: email
+        - name: username
           in: formData
           type: string
           required: true
@@ -116,21 +116,13 @@ def resend_email() -> (flask.Flask, int):
       200:
         description: Email sent successfully.
     """
-    email = flask.request.form.get('email')
-    if not email:
+    username = flask.request.form.get('username')
+    if not username:
         return (
-            flask.jsonify({'message': 'Email is missing.'}),
+            flask.jsonify({'message': 'Username is missing.'}),
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
-    # Validate the email.
-    try:
-        email_validator.validate_email(email)
-    except email_validator.EmailNotValidError as e:
-        return (
-            flask.jsonify({'message': 'Email is invalid.'}),
-            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
-        )
-    return backend.managers.user.UserManager.instance.resend_confirmation_email(email)
+    return backend.managers.user.UserManager.instance.resend_confirmation_email(username)
 
 
 @user_bp.route('/login', methods=['POST'])  # Changed to POST

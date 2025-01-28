@@ -128,18 +128,19 @@ class UserManager:
             backend.initializers.settings.HTTPStatus.OK.value
         )
 
-    def resend_confirmation_email(self, email: str) -> (flask.Flask, int):
+    def resend_confirmation_email(self, username: str) -> (flask.Flask, int):
         """
         Resends the confirmation email to the provided email address.
         Args:
-            email(str): The email address to send verification email to.
+            username(str): The username to send verification email to.
 
         Returns:
             tuple: A tuple containing:
                 - A Flask response object with a JSON message indicating success.
                 - An integer representing the HTTP status code 200.
         """
-        self._send_confirmation_email(email)
+        user = backend.models.user.User.query.filter_by(username=username).first()
+        self._send_confirmation_email(user.email)
         return (
             flask.jsonify({"message": "Verification email resent."}),
             backend.initializers.settings.HTTPStatus.OK.value
