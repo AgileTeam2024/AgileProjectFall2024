@@ -59,13 +59,11 @@ class UsersListWidget extends StatelessWidget {
                   user.username,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: item is UserReport
-                    ? Text(
-                        item.description,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    : null,
+                subtitle: Text(
+                  item is UserReport ? item.description : '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 trailing: Row(
                   spacing: 10,
                   mainAxisSize: MainAxisSize.min,
