@@ -104,20 +104,17 @@ void main() {
     await testerSetup(tester);
     await tester.tap(banProductBtn);
     verify(mockAdminService.banProduct(product1.id)).called(1);
-    await tester.pump(Duration(seconds: 5));
   });
 
   testWidgets('Unban user button calls correct method', (tester) async {
     await testerSetup(tester);
     await tester.tap(unbanUserBtn);
     verify(mockAdminService.unbanUser(user2.username)).called(1);
-    await tester.pump(Duration(seconds: 5));
   });
 
   testWidgets('Unban product button calls correct method', (tester) async {
     await testerSetup(tester);
     await tester.tap(unbanProductBtn);
     verify(mockAdminService.unbanProduct(product2.id)).called(1);
-    await tester.pump(Duration(seconds: 5));
   });
 }

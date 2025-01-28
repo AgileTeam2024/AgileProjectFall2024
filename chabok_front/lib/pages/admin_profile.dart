@@ -106,9 +106,9 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
 
   Future<void> runAction(Future<ServerResponse> request) async {
     final response = await request;
-    if (response.isOk && !Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (response.isOk) {
       CustomToast.showToast(context, response);
-      setState(() {});
     }
+    setState(() {});
   }
 }

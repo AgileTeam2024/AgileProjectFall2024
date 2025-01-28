@@ -76,4 +76,10 @@ class UserService {
     );
     return response;
   }
+
+  Future<ServerResponse> report(String username, String description) =>
+      _networkService.postFormData(
+        '/user/report_user',
+        {'reported_username': username, 'description': description},
+      );
 }

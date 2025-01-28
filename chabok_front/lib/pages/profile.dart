@@ -1,3 +1,4 @@
+import 'package:chabok_front/dialogs/report.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/auth.dart';
@@ -12,10 +13,14 @@ import 'package:flutter/material.dart';
 class UserProfilePage extends StatelessWidget {
   final String? username;
 
+  late final User user;
+
   UserProfilePage({super.key, this.username});
 
   final _authService = AuthService.instance;
   final _userService = UserService.instance;
+
+  bool get isOwnProfile => username == null;
 
   @override
   Widget build(BuildContext context) {
@@ -39,20 +44,24 @@ class UserProfilePage extends StatelessWidget {
                         : _userService.getProfile(username!),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) return Container();
-                      return UserInfoWidget(user: snapshot.data);
+                      try {
+                        user = snapshot.data!;
+                      } catch (LateInitializationError) {}
+                      return UserInfoWidget(user: user);
                     },
                   ),
                 ),
               ),
-              FutureBuilder<List<Product>>(
-                future: _userService.ownProducts,
-                builder: (context, snapshot) {
-                  return ProductsListWidget(
-                    title: 'Your Products',
-                    products: snapshot.data ?? [],
-                  );
-                },
-              ),
+              if (isOwnProfile)
+                FutureBuilder<List<Product>>(
+                  future: _userService.ownProducts,
+                  builder: (context, snapshot) {
+                    return ProductsListWidget(
+                      title: 'Your Products',
+                      products: snapshot.data ?? [],
+                    );
+                  },
+                ),
               Text(
                 'Account Actions',
                 style: TextStyle(
@@ -68,23 +77,36 @@ class UserProfilePage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    ListTile(
-                      leading: Icon(Icons.logout, color: Colors.blueAccent),
-                      title: Text('Log Out'),
-                      onTap: () => _logout(context),
-                    ),
-                    Divider(),
-                    ListTile(
-                      leading: Icon(Icons.edit, color: Colors.orange),
-                      title: Text('Edit Profile'),
-                      onTap: _goToEditProfile,
-                    ),
-                    Divider(),
-                    ListTile(
-                      leading: Icon(Icons.delete, color: Colors.red),
-                      title: Text('Delete Account'),
-                      onTap: () => _deleteAccount(context),
-                    ),
+                    if (isOwnProfile) ...[
+                      ListTile(
+                        leading: Icon(Icons.logout, color: Colors.blueAccent),
+                        title: Text('Log Out'),
+                        onTap: () => _logout(context),
+                      ),
+                      Divider(),
+                      ListTile(
+                        leading: Icon(Icons.logout, color: Colors.blueAccent),
+                        title: Text('Log Out'),
+                        onTap: () => _logout(context),
+                      ),
+                      Divider(),
+                      ListTile(
+                        leading: Icon(Icons.edit, color: Colors.orange),
+                        title: Text('Edit Profile'),
+                        onTap: _goToEditProfile,
+                      ),
+                      Divider(),
+                      ListTile(
+                        leading: Icon(Icons.delete, color: Colors.red),
+                        title: Text('Delete Account'),
+                        onTap: () => _deleteAccount(context),
+                      ),
+                    ] else
+                      ListTile(
+                        leading: Icon(Icons.report, color: Colors.red),
+                        title: Text('Report Account'),
+                        onTap: () => _report(context),
+                      ),
                   ],
                 ),
               ),
@@ -107,5 +129,15 @@ class UserProfilePage extends StatelessWidget {
     final response = await _authService.logout();
     CustomToast.showToast(context, response);
     if (response.isOk) RouterService.go('/');
+  }
+
+  Future<void> _report(BuildContext context) async {
+    final String? description = await showDialog(
+      context: context,
+      builder: (context) => ReportUserDialog(context, user: user),
+    );
+    if (description?.isEmpty ?? true) return;
+    final response = await _userService.report(user.username, description!);
+    CustomToast.showToast(context, response);
   }
 }

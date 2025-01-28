@@ -110,11 +110,9 @@ class ProductService {
     );
   }
 
-  Future<ServerResponse> report(int productId, String description) async {
-    final response = await _networkService.postFormData(
-      '/product/report_product',
-      {'reported_product': productId, 'description': description},
-    );
-    return response;
-  }
+  Future<ServerResponse> report(int productId, String description) =>
+      _networkService.postFormData(
+        '/product/report_product',
+        {'reported_product': productId, 'description': description},
+      );
 }

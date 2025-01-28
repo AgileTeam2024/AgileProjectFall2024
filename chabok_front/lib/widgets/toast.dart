@@ -32,6 +32,9 @@ class CustomToast extends StatelessWidget {
   }
 
   static void showToast(BuildContext context, ServerResponse response) {
+    const isTest = bool.fromEnvironment('testing_mode', defaultValue: false);
+    if (isTest) return;
+
     final toast = FToast();
     toast.init(context);
     toast.showToast(
@@ -43,4 +46,3 @@ class CustomToast extends StatelessWidget {
     );
   }
 }
-
