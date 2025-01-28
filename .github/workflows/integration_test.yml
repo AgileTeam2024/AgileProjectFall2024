@@ -40,7 +40,7 @@ jobs:
 
       - name: Run integration tests script
         run: |
-          bash backend/integration_test/run.sh
+          cd backend/integration_test && bash run.sh
           echo "exit_code=$?" >> $GITHUB_OUTPUT
           
       - name: Check Exit Code
