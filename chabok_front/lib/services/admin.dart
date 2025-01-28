@@ -1,6 +1,5 @@
-import 'package:chabok_front/enums/product_category.dart';
-import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/models/product.dart';
+import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/network.dart';
 import 'package:flutter/foundation.dart';
@@ -21,20 +20,6 @@ class AdminService {
   final _networkService = NetworkService.instance;
 
   Future<List<Product>> get reportedProducts async {
-    return List.generate(
-        5,
-        (i) => Product(
-            id: i,
-            name: 'name',
-            description: 'description',
-            seller: User(
-                username: 'username',
-                email: 'email',
-                phoneNumber: 'phoneNumber'),
-            imageUrls: [],
-            category: ProductCategory.values[i % ProductCategory.values.length],
-            price: i * 1000,
-            status: ProductStatus.values[i % ProductStatus.values.length]));
     final response = await _networkService.get('/admin/product-reports-list');
     if (response.isOk) {
       final body =
@@ -45,10 +30,6 @@ class AdminService {
   }
 
   Future<List<User>> get reportedUsers async {
-    return List.generate(
-        3,
-        (i) => User(
-            username: 'username', email: 'email', phoneNumber: 'phoneNumber'));
     final response = await _networkService.get('/admin/user-reports-list');
     if (response.isOk) {
       final body =
@@ -59,50 +40,34 @@ class AdminService {
   }
 
   Future<List<Product>> get bannedProducts async {
-    return List.generate(
-        5,
-        (i) => Product(
-            id: i,
-            name: 'name',
-            description: 'description',
-            seller: User(
-                username: 'username',
-                email: 'email',
-                phoneNumber: 'phoneNumber'),
-            imageUrls: [],
-            category: ProductCategory.values[i % ProductCategory.values.length],
-            price: i * 1000,
-            status: ProductStatus.values[i % ProductStatus.values.length]));
-    // todo send request to back
+    final response = await _networkService.get('/admin/banned-product-list');
+    if (response.isOk) {
+      final body =
+          response.bodyJson['banned_products'] as List<Map<String, dynamic>>;
+      return body.map(Product.fromJson).toList();
+    }
     return [];
   }
 
   Future<List<User>> get bannedUsers async {
-    return List.generate(
-        3,
-        (i) => User(
-            username: 'username', email: 'email', phoneNumber: 'phoneNumber'));
-    // todo send request to back
+    final response = await _networkService.get('/admin/banned-user-list');
+    if (response.isOk) {
+      final body =
+          response.bodyJson['banned_users'] as List<Map<String, dynamic>>;
+      return body.map(User.fromJson).toList();
+    }
     return [];
   }
 
-  Future<bool> banProduct(int id) async {
-    // todo send request to back
-    return false;
-  }
+  Future<ServerResponse> banProduct(int id) =>
+      _networkService.postFormData('/admin/ban_product', {'product_id': id});
 
-  Future<bool> banUser(String username) async {
-    // todo send request to back
-    return false;
-  }
+  Future<ServerResponse> banUser(String username) =>
+      _networkService.postFormData('/admin/ban_user', {'username': username});
 
-  Future<bool> unbanProduct(int id) async {
-    // todo send request to back
-    return false;
-  }
+  Future<ServerResponse> unbanProduct(int id) =>
+      _networkService.postFormData('/admin/unban_product', {'product_id': id});
 
-  Future<bool> unbanUser(String username) async {
-    // todo send request to back
-    return false;
-  }
+  Future<ServerResponse> unbanUser(String username) =>
+      _networkService.postFormData('/admin/unban_user', {'username': username});
 }
