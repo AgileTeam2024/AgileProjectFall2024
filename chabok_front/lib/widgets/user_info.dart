@@ -1,6 +1,5 @@
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/user.dart';
-import 'package:chabok_front/widgets/card.dart';
 import 'package:flutter/material.dart';
 
 class UserInfoWidget extends StatelessWidget {
