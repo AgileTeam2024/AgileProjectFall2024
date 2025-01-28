@@ -25,6 +25,7 @@ class UserManagerTest(absltest.TestCase):
         self.mock_product_report_query = mock.patch("backend.models.report.ProductReport.query").start()
         self.mock_user_report_query = mock.patch("backend.models.report.UserReport.query").start()
         self.mock_user_query = mock.patch("backend.models.user.User.query").start()
+        self.mock_product_query = mock.patch("backend.models.product.Product.query").start()
 
     def tearDown(self) -> None:
         self.mock_db_session.stop()
@@ -109,6 +110,29 @@ class UserManagerTest(absltest.TestCase):
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
         self.assertEqual(response.json, {"message": "User banned successfully."})
         self.assertTrue(user.is_banned)
+
+    def test_ban_user_does_not_exist(self) -> None:
+        """Test non-existent banning user fails."""
+        self.mock_user_query.filter_by.return_value.first.return_value = None
+        response, status_code = self.admin_manager.ban_user('user1')
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.NOT_FOUND.value)
+        self.assertEqual(response.json, {"message": "User not found."})
+
+    def test_ban_product(self) -> None:
+        """Test banning product successfully."""
+        product = backend.models.product.Product(id=1, is_banned=False)
+        self.mock_product_query.filter_by.return_value.first.return_value = product
+        response, status_code = self.admin_manager.ban_product(product.id)
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {"message": "Product banned successfully."})
+        self.assertTrue(product.is_banned)
+
+    def test_ban_product_does_not_exist(self) -> None:
+        """Test non-existent banning product fails."""
+        self.mock_product_query.filter_by.return_value.first.return_value = None
+        response, status_code = self.admin_manager.ban_product(1)
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.NOT_FOUND.value)
+        self.assertEqual(response.json, {"message": "Product not found."})
 
     def test_unban_user(self) -> None:
         """Test unbanning user successfully."""

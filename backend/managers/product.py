@@ -299,29 +299,3 @@ class ProductManager:
         ).all()
         products_as_dicts = [product.to_dict() for product in products]
         return flask.jsonify({"products": products_as_dicts}), backend.initializers.settings.HTTPStatus.OK.value
-
-    def ban_product(self, product_id: int) -> (flask.Flask, int):
-        """
-        Changes the status of a product to ban.
-
-        Args:
-            product_id (int): the id of the product to be banned.
-        Returns:
-            response (flask.Response): A Flask response object containing successfully banning a product.
-            status_code (int):
-                200: successful ban
-                404: no products found
-        """
-        product = backend.models.product.Product.query.get(product_id)
-        if not product:
-            return (
-                flask.jsonify({"message": "No product found."}),
-                backend.initializers.settings.HTTPStatus.NOT_FOUND.value
-            )
-        product.is_banned = True
-        backend.initializers.database.DB.session.add(product)
-        backend.initializers.database.DB.session.commit()
-        return (
-            flask.jsonify({"message": "Product successfully banned."}),
-            backend.initializers.settings.HTTPStatus.OK.value
-        )

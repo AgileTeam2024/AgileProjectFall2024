@@ -128,6 +128,23 @@ class UserManagerTest(absltest.TestCase):
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
         self.assertEqual(response.json, {'message': 'The reported user does not exist.'})
 
+    def test_successful_get_profile(self):
+        """Test successful get_profile_by_username."""
+        self.mock_user_query.filter_by.return_value.first.return_value = backend.models.user.User(
+            username="user1",
+            password="password123"
+        )
+        response, status_code = self.user_manager.get_profile("user1")
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {'profile': {'email': None, 'first_name': None, 'is_admin': None, 'is_banned': None, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user1'}})
+
+    def test_get_profile_does_not_exist(self):
+        """Test non-existent get_profile_by_username."""
+        self.mock_user_query.filter_by.return_value.first.return_value = None
+        response, status_code = self.user_manager.get_profile("user1")
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.NOT_FOUND.value)
+        self.assertEqual(response.json, {'message': 'User does not exist.'})
+
 
 if __name__ == "__main__":
     backend.initializers.test_util.pass_flags_as_parsed()
