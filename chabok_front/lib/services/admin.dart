@@ -1,7 +1,9 @@
 import 'package:chabok_front/models/product.dart';
+import 'package:chabok_front/models/product_report.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/network.dart';
+import 'package:chabok_front/services/product.dart';
 import 'package:flutter/foundation.dart';
 
 class AdminService {
@@ -18,13 +20,24 @@ class AdminService {
   }
 
   final _networkService = NetworkService.instance;
+  final _productService = ProductService.instance;
 
-  Future<List<Product>> get reportedProducts async {
+  Future<List<ProductReport>> get reportedProducts async {
     final response = await _networkService.get('/admin/product-reports-list');
     if (response.isOk) {
-      final body =
-          response.bodyJson['reported_products'] as List<Map<String, dynamic>>;
-      return body.map(Product.fromJson).toList();
+      final body = (response.bodyJson['reported_products'] as List)
+          .cast<Map<String, dynamic>>()
+          .toList();
+      return Future.wait(
+        body.map(
+          (report) async {
+            final product = await _productService
+                .getProductById(report['reported_product']);
+            return ProductReport.fromJson(
+                {...report, 'product': product!.toJson()});
+          },
+        ),
+      );
     }
     return [];
   }
@@ -42,9 +55,9 @@ class AdminService {
   Future<List<Product>> get bannedProducts async {
     final response = await _networkService.get('/admin/banned-product-list');
     if (response.isOk) {
-      final body =
-          response.bodyJson['banned_products'] as List<Map<String, dynamic>>;
-      return body.map(Product.fromJson).toList();
+      final body = (response.bodyJson['banned_products'] as List)
+          .cast<Map<String, dynamic>>();
+      return await _productService.getProductsSellers(body);
     }
     return [];
   }

@@ -26,6 +26,8 @@ class User {
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
 
+  static Map<String, dynamic> staticToJson(User user) => _$UserToJson(user);
+
   String get fullName {
     if ((firstName ?? lastName) == null) return 'Stranger';
     return '$firstName $lastName';

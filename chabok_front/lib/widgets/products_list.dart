@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class ProductsListWidget extends StatelessWidget {
   final String title;
-  final List<Product> products;
+  final List<dynamic> products;
   final void Function(int id)? onBan, onUnban;
 
   const ProductsListWidget({
@@ -37,7 +37,8 @@ class ProductsListWidget extends StatelessWidget {
           physics: NeverScrollableScrollPhysics(),
           itemCount: products.length,
           itemBuilder: (context, index) {
-            final product = products[index];
+            final item = products[index];
+            final product = item is Product ? item : item.product;
 
             return Card(
               elevation: 3,
@@ -67,7 +68,7 @@ class ProductsListWidget extends StatelessWidget {
                   ),
                 ),
                 subtitle: Text(
-                  product.description,
+                  item.description,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
