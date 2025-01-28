@@ -74,4 +74,7 @@ class AuthService {
         }
         return response;
       });
+
+  Future<ServerResponse> resendEmail(String username) => _networkService
+      .postFormData('/user/resend_email', {'username': username});
 }

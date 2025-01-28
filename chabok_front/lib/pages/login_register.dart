@@ -127,6 +127,9 @@ class LoginPage extends LoginRegisterPage {
         RouterService.go('/');
       } else if (context.mounted) {
         CustomToast.showToast(context, response);
+        if (response.is403) {
+          await authService.resendEmail(fieldValues['username']!);
+        }
       }
     }
   }
