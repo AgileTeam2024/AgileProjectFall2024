@@ -581,7 +581,7 @@ def get_products() -> (flask.Flask, int):
     API for returning a list of products that are on sale for a user.
     ---
     tags:
-      - product
+      - Product
     security:
       - BearerAuth: []
     responses:

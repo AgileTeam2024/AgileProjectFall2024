@@ -49,6 +49,46 @@ def get_product_reports_list():
     return backend.managers.admin.AdminManager.instance.get_list_of_reported_products()
 
 
+@admin_bp.route('/banned-product-list', methods=['GET'])
+@flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.admin_required
+def get_banned_product_list():
+    """
+    Admin Get List of banned Products.
+    ---
+    tags:
+      - Admin
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Successfully returned product banned list.
+      403:
+        description: Only admins have access to this API.
+    """
+    return backend.managers.admin.AdminManager.instance.get_banned_product_list()
+
+
+@admin_bp.route('/banned-user-list', methods=['GET'])
+@flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.admin_required
+def get_banned_user_list():
+    """
+    Admin Get List of banned Users.
+    ---
+    tags:
+      - Admin
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: Successfully returned product banned list.
+      403:
+        description: Only admins have access to this API.
+    """
+    return backend.managers.admin.AdminManager.instance.get_banned_user_list()
+
+
 @admin_bp.route('/ban_user', methods=['POST'])
 @flask_jwt_extended.jwt_required()
 @backend.routes.authorization_utils.admin_required
@@ -90,7 +130,7 @@ def ban_user():
 @backend.routes.authorization_utils.admin_required
 def ban_product():
     """
-    Admin Ban User.
+    Admin Ban Product.
     ---
     tags:
       - Admin
@@ -121,7 +161,7 @@ def ban_product():
     return backend.managers.admin.AdminManager.instance.ban_product(product_id)
 
 
-@admin_bp.route('/ban_user', methods=['POST'])
+@admin_bp.route('/unban_user', methods=['POST'])
 @flask_jwt_extended.jwt_required()
 @backend.routes.authorization_utils.admin_required
 def unban_user():
