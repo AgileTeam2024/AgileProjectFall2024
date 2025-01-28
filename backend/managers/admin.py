@@ -70,6 +70,32 @@ class AdminManager:
             backend.initializers.settings.HTTPStatus.OK.value
         )
 
+    def ban_product(self, id: int) -> (flask.Flask, int):
+        """
+        Bans a product.
+
+        Returns:
+            tuple: A tuple containing:
+                - A Flask response object with a JSON message indicating success or failure.
+                - An integer representing the HTTP status code (404 or 200).
+        """
+        # Check whether user exists.
+        product = backend.models.product.Product.query.filter_by(id=id).first()
+        if not product:
+            return (
+                flask.jsonify({"message": "Product not found."}),
+                backend.initializers.settings.HTTPStatus.NOT_FOUND.value
+            )
+
+        # Ban product.
+        product.is_banned = True
+        backend.initializers.database.DB.session.add(product)
+        backend.initializers.database.DB.session.commit()
+        return (
+            flask.jsonify({"message": "Product banned successfully."}),
+            backend.initializers.settings.HTTPStatus.OK.value
+        )
+
     def unban_user(self, username: str) -> (flask.Flask, int):
         """
         Unbans a user.

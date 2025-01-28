@@ -73,6 +73,8 @@ def ban_user():
         description: Username is missing.
       403:
         description: Only admins have access to this API.
+      404:
+        description: User not found.
     """
     username = flask.request.form.get('username')
     if not username:
@@ -81,6 +83,42 @@ def ban_user():
             backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
         )
     return backend.managers.admin.AdminManager.instance.ban_user(username)
+
+
+@admin_bp.route('/ban_product', methods=['POST'])
+@flask_jwt_extended.jwt_required()
+@backend.routes.authorization_utils.admin_required
+def ban_product():
+    """
+    Admin Ban User.
+    ---
+    tags:
+      - Admin
+    security:
+      - BearerAuth: []
+    parameters:
+      - name: product_id
+        in: formData
+        required: true
+        type: string
+        description: The ID of the product you want to ban.
+    responses:
+      200:
+        description: Successfully banned the product.
+      400:
+        description: product_id is missing.
+      403:
+        description: Only admins have access to this API.
+      404:
+        description: Product not found.
+    """
+    product_id = flask.request.form.get('product_id')
+    if not product_id:
+        return (
+            flask.jsonify({"message": "product_id is missing."}),
+            backend.initializers.settings.HTTPStatus.BAD_REQUEST.value
+        )
+    return backend.managers.admin.AdminManager.instance.ban_product(product_id)
 
 
 @admin_bp.route('/ban_user', methods=['POST'])
