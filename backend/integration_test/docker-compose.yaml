@@ -1,0 +1,40 @@
+services:
+  flask_app_integration:
+    container_name: flask_app_integration
+    build:
+      context: ../..
+      dockerfile: backend/Dockerfile
+    depends_on:
+      - flask_db_integration
+    env_file:
+      .env_integration
+    networks:
+      - shared_network
+    command: python -m backend.app --db_username=postgres --db_host=flask_db_integration --db_port=5432 --db_name=test --db_password=postgres --app_secret_key=secret --app_host=0.0.0.0 --app_port=5000 --mail_sender_email=${MAIL_SENDER_EMAIL} --mail_sender_password=${MAIL_SENDER_PASSWORD}
+
+  flask_db_integration:
+    container_name: flask_db_integration
+    image: docker.yektanet.tech/postgres:12
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test
+    networks:
+      - shared_network
+
+  integration_tests:
+    container_name: integration_tests
+    build:
+      context: ../..
+      dockerfile: backend/Dockerfile
+    depends_on:
+      - flask_app_integration
+      - flask_db_integration
+    networks:
+      - shared_network
+    command: python -m pytest backend/integration_test/integration_test.py
+
+networks:
+  shared_network:
+    driver: bridge
+
