@@ -24,6 +24,14 @@ class ProductService {
   Future<List<Product>> get homePageProducts =>
       searchProducts(sortCreatedAt: 'asc');
 
+  Future<List<Product>> get ownProducts async {
+    final response = await _networkService.get('/product/product_list');
+    if (!response.isOk) return [];
+    final products =
+        (response.bodyJson['products'] as List).cast<Map<String, dynamic>>();
+    return getProductsSellers(products);
+  }
+
   Future<Product?> getProductById(int id) async {
     final response = await _networkService
         .get('/product/get_product_by_id', query: {'product_id': '$id'});
