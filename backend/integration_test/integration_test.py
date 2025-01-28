@@ -25,14 +25,14 @@ class IntegrationTest(absltest.TestCase):
 
     def test_register_and_login(self):
         response = requests.post(self.REGISTER_API,
-                                 json={'username': 'username2', 'password': 'password', 'email': 'user2@gmail.com'})
+                                 json={'username': 'username', 'password': 'password', 'email': 'user@gmail.com'})
         self.assertEqual(response.status_code, backend.initializers.settings.HTTPStatus.CREATED.value)
 
         session = self.Session()
-        user = session.query(backend.models.user.User).filter_by(username='username2').first()
+        user = session.query(backend.models.user.User).filter_by(username='username').first()
         # Assert that the user exists in the database.
         self.assertIsNotNone(user)
-        self.assertEqual(user.username, 'username2')
+        self.assertEqual(user.username, 'username')
 
 
 if __name__ == "__main__":

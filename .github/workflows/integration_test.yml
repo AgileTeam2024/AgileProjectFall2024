@@ -13,10 +13,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install docker-compose
+        uses: KengoTODA/actions-setup-docker-compose@v1
+        with:
+          version: '2.14.2'
+
       - name: Verify Docker Installation
         run: |
           docker --version
-          docker compose --version
+          docker-compose --version
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -24,7 +29,7 @@ jobs:
       - name: Make script executable
         run: chmod +x backend/integration_test/run.sh
 
-      - name: Create .env file from secrets for app
+      - name: Create .env file from secrets
         run: |
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
           echo "APP_SECRET_KEY=${{ secrets.APP_SECRET_KEY }}" >> .env
@@ -32,11 +37,6 @@ jobs:
           echo "MAIL_SENDER_PASSWORD=${{ secrets.MAIL_SENDER_PASSWORD }}" >> .env
           echo "FLASK_HOST=0.0.0.0" >> .env
           echo "FLASK_PORT=8000" >> .env
-
-      - name: Create .env file from secrets for integration test
-        run: |
-          echo "MAIL_SENDER_EMAIL=${{ secrets.MAIL_SENDER_EMAIL }}" >> backend/integration_test/.env_integration
-          echo "MAIL_SENDER_PASSWORD=${{ secrets.MAIL_SENDER_PASSWORD }}" >> backend/integration_test/.env_integration
 
       - name: Run integration tests script
         run: |
@@ -55,4 +55,4 @@ jobs:
       - name: Clean up Docker resources
         if: always()
         run: |
-          cd backend/integration_test && docker compose down --rmi all -v --remove-orphans
+          cd backend/integration_test && docker-compose down --rmi all -v --remove-orphans

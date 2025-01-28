@@ -1,18 +1,18 @@
 #!/bin/bash
 
 # Start the database container in detached mode
-docker compose up -d flask_db_integration
+docker-compose up -d flask_db_integration
 
 # Create a database named 'test'
-docker compose exec flask_db_integration psql -U postgres -c "CREATE DATABASE test;"
+docker-compose exec flask_db_integration psql -U postgres -c "CREATE DATABASE test;"
 
 sleep 5
 
 # Now start the Flask application
-docker compose up -d flask_app_integration
+docker-compose up -d flask_app_integration
 
 # Run integration tests
-TEST_RESULT=$(docker compose run --rm integration_tests)
+TEST_RESULT=$(docker-compose run --rm integration_tests)
 
 # Capture the exit code
 EXIT_CODE=$?
@@ -26,7 +26,7 @@ else
 
     # Print logs from the integration_tests container.
     echo "Integration test logs:"
-    docker compose logs integration_tests  # Fetch and print logs for the integration_tests service.
+    docker-compose logs integration_tests  # Fetch and print logs for the integration_tests service.
 fi
 
 exit $EXIT_CODE
