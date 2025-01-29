@@ -136,7 +136,7 @@ class UserManagerTest(absltest.TestCase):
         )
         response, status_code = self.user_manager.get_profile("user1")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
-        self.assertEqual(response.json, {'profile': {'email': None, 'first_name': None, 'is_admin': None, 'is_banned': None, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user1'}})
+        self.assertEqual(response.json, {'profile': {'email': None, 'first_name': None, 'is_admin': None, 'is_banned': None, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user1', 'address': None}})
 
     def test_get_profile_does_not_exist(self):
         """Test non-existent get_profile_by_username."""

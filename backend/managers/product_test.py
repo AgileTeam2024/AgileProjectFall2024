@@ -106,7 +106,7 @@ class ProductManagerTest(absltest.TestCase):
             'seller': {
                 'email': 'seller@email.com', 'first_name': None, 'is_admin': None, 'is_banned': None,
                 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None,
-                'username': 'seller1'}, 'status': 'reserved', 'user_username': 'seller1'}
+                'username': 'seller1', 'address': None}, 'status': 'reserved', 'user_username': 'seller1'}
         self.assertEqual(expected, result.json['product'])
 
     def test_get_product_by_id_returns_seller_info_too(self) -> None:
