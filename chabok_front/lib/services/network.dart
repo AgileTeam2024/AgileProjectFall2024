@@ -64,11 +64,15 @@ class NetworkService {
       body: jsonEncode(body),
     );
 
-    if (response.statusCode == 401 &&
-        path != '/user/refresh' &&
-        authHeaderRefresh != null &&
-        await refreshToken()) {
-      return post(path, body, query: query);
+    if (response.statusCode == 401) {
+      if (path != '/user/refresh' &&
+          authHeaderRefresh != null &&
+          await refreshToken()) {
+        return post(path, body, query: query);
+      } else {
+        AuthService.instance.refreshToken = null;
+        AuthService.instance.accessToken = null;
+      }
     }
 
     return ServerResponse.visualize(response.body, response.statusCode);
@@ -115,11 +119,15 @@ class NetworkService {
 
     final response = await request.send();
 
-    if (response.statusCode == 401 &&
-        path != '/user/refresh' &&
-        authHeaderRefresh != null &&
-        await refreshToken()) {
-      return _formData(method, path, fields, query: query, files: files);
+    if (response.statusCode == 401) {
+      if (path != '/user/refresh' &&
+          authHeaderRefresh != null &&
+          await refreshToken()) {
+        return _formData(method, path, fields, query: query, files: files);
+      } else {
+        AuthService.instance.refreshToken = null;
+        AuthService.instance.accessToken = null;
+      }
     }
 
     return ServerResponse.visualize(
@@ -142,12 +150,18 @@ class NetworkService {
           ...?authHeaderAccess,
       },
     );
-    if (response.statusCode == 401 &&
-        path != '/user/refresh' &&
-        authHeaderRefresh != null &&
-        await refreshToken()) {
-      return get(path, query: query);
+
+    if (response.statusCode == 401) {
+      if (path != '/user/refresh' &&
+          authHeaderRefresh != null &&
+          await refreshToken()) {
+        return get(path, query: query);
+      } else {
+        AuthService.instance.refreshToken = null;
+        AuthService.instance.accessToken = null;
+      }
     }
+
     return ServerResponse.visualize(response.body, response.statusCode);
   }
 
@@ -164,11 +178,15 @@ class NetworkService {
       },
     );
 
-    if (response.statusCode == 401 &&
-        path != '/user/refresh' &&
-        authHeaderRefresh != null &&
-        await refreshToken()) {
-      return delete(path, query: query);
+    if (response.statusCode == 401) {
+      if (path != '/user/refresh' &&
+          authHeaderRefresh != null &&
+          await refreshToken()) {
+        return delete(path, query: query);
+      } else {
+        AuthService.instance.refreshToken = null;
+        AuthService.instance.accessToken = null;
+      }
     }
 
     return ServerResponse.visualize(response.body, response.statusCode);
