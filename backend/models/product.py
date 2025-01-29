@@ -76,7 +76,7 @@ class Product(backend.initializers.database.DB.Model):
         """
         Return a string representation of the Product instance.
         """
-        return f"<Product(id={self.id}, name={self.product_name}, price={self.price}, status={self.status})>"
+        return f"<Product(id={self.id}, name={self.name}, user_username={self.user_username}, price={self.price}, status={self.status})>"
 
     def to_dict(self) -> dict:
         """Convert the Product instance to a dictionary for JSON serialization."""

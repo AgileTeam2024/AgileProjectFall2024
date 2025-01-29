@@ -27,10 +27,16 @@ class UserManagerTest(absltest.TestCase):
         self.flask_app.app_context().push()
         self.user_manager = (backend.managers.user.UserManager.instance or
                              backend.managers.user.UserManager(flask_app=self.flask_app))
+        self.product_manager = backend.managers.product.ProductManager(flask_app=self.flask_app)
         # Mock database session.
         self.mock_db_session = mock.patch("backend.initializers.database.DB.session").start()
         # Mock query on user model.
         self.mock_user_query = mock.patch("backend.models.user.User.query").start()
+        self.mock_product_query = mock.patch("backend.models.product.Product.query").start()
+        self.mock_product_picture_query = mock.patch("backend.models.product.Picture.query").start()
+        self.mock_user_picture_query = mock.patch("backend.models.user.ProfilePicture.query").start()
+        self.mock_product_report_query = mock.patch("backend.models.report.ProductReport.query").start()
+        self.mock_user_report_query = mock.patch("backend.models.report.UserReport.query").start()
 
     def tearDown(self) -> None:
         self.mock_db_session.stop()
@@ -158,6 +164,42 @@ class UserManagerTest(absltest.TestCase):
         response, status_code = self.user_manager.get_profile("user1")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.NOT_FOUND.value)
         self.assertEqual(response.json, {'message': 'User does not exist.'})
+
+
+    def test_delete_account_deletes_other_items_too(self):
+        """Test that deleting a user account removes all associated items."""
+    def test_delete_account_deletes_other_items_too(self):
+        user1 = backend.models.user.User(username='user1', password='pass', email='user1@gmail.com', is_verified=True)
+        user2 = backend.models.user.User(username='user2', password='pass', email='user2@gmail.com', is_verified=True, profile_picture='picture.jpg')
+        user3 = backend.models.user.User(username='user3', password='pass', email='user3@gmail.com', is_verified=True)
+        product = backend.models.product.Product(id=1, user_username=user2.username, name='product', price=10, status='for sale', category='Others')
+        product_picture = backend.models.product.Picture(product_id=product.id, filename='picture.jpg')
+        user_picture = backend.models.user.ProfilePicture(user_username=user2.username, filename='picture.jpg')
+        product_report = backend.models.report.ProductReport(reported_product=product.id, reporter_username=user2.username, description='report')
+        user_report1 = backend.models.report.UserReport(reported_user=user1.username, reporter_username=user2.username, description='report')
+        user_report2 = backend.models.report.UserReport(reported_user=user2.username, reporter_username=user3.username, description='report')
+
+        # self.mock_product_query.filter_by(id=product.id).return_value.first.return_value = product
+        # self.mock_product_query.filter_by(user_username=product.user_username).return_value.all.return_value = [product]
+        self.mock_product_query.filter_by.return_value.all.return_value = [product]
+        self.mock_product_picture_query.filter_by(product_id=product.id).return_value.all.return_value = [product_picture]
+        self.mock_user_picture_query.filter_by(user_username=user2.username).return_value.first.return_value = user_picture
+        self.mock_product_report_query.filter_by(reporter_username=user2.username).return_value.all.return_value = [product_report]
+        self.mock_user_report_query.filter_by(reporter_username=user2.username).return_value.all.return_value = [user_report1]
+        self.mock_user_report_query.filter_by(reported_user=user2.username).return_value.all.return_value = [user_report2]
+
+        with mock.patch("flask_jwt_extended.get_jwt_identity", return_value=user2.username):
+            response, status_code = self.user_manager.delete_account(user2.username)
+
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.NO_CONTENT.value)
+
+        self.mock_product_picture_query.filter_by(product_id=product.id).delete.assert_called_once()
+        self.mock_user_picture_query.filter_by(user_username=user2.username).delete.assert_called_once()
+        self.mock_product_report_query.filter_by(reporter_username=user2.username).delete.assert_called_once()
+        self.mock_product_query.filter_by(id=product.id).delete.assert_called_once()
+        self.mock_user_report_query.filter_by(reporter_username=user2.username).delete.assert_called()
+        self.mock_user_report_query.filter_by(reported_user=user2.username).delete.assert_called()
+        self.mock_user_query.filter_by(username=user2.username).delete.assert_called_once()
 
 
 if __name__ == "__main__":

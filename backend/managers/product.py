@@ -176,12 +176,13 @@ class ProductManager:
             response (flask.Response): A Flask response object containing successfully deleted a user.
             status_code (int): HTTP status code indicating successful delete (204).
         """
-        product = backend.models.product.Product.query.filter_by(id=product_id).first()
-        if not product:
+        product = list(backend.models.product.Product.query.filter_by(id=product_id).all())
+        if len(product) == 0:
             return (
                 flask.jsonify({'message': 'Product does not exist.'}),
                 backend.initializers.settings.HTTPStatus.NOT_FOUND.value
             )
+        product = product[0]
         if product.user_username != username:
             return (
                 flask.jsonify({'message': 'You do not have access to edit this product.'}),
@@ -192,6 +193,8 @@ class ProductManager:
             if os.path.exists(f'backend/uploads/{picture.filename}'):
                 os.remove(f'backend/uploads/{picture.filename}')
         backend.models.product.Picture.query.filter_by(product_id=product_id).delete()
+
+        backend.models.report.ProductReport.query.filter_by(reported_product=product_id).delete()
 
         backend.models.product.Product.query.filter_by(id=product_id).delete()
         backend.initializers.database.DB.session.commit()

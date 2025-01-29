@@ -24,6 +24,9 @@ class ProductManagerTest(absltest.TestCase):
         # Mock query on user model.
         self.mock_product_query = mock.patch("backend.models.product.Product.query").start()
         self.mock_user_query = mock.patch("backend.models.user.User.query").start()
+        self.mock_product_picture_query = mock.patch("backend.models.product.Picture.query").start()
+        self.mock_user_picture_query = mock.patch("backend.models.user.ProfilePicture.query").start()
+        self.mock_product_report_query = mock.patch("backend.models.report.ProductReport.query").start()
         # Create instances of products and users for test inputs.
         self.user1 = backend.models.user.User(username='seller1', email='seller@email.com')
         self.user2 = backend.models.user.User(username='seller2', email='seller2@email.com')
@@ -262,6 +265,24 @@ class ProductManagerTest(absltest.TestCase):
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
         self.assertEqual(response.json, {'message': 'The reported product does not exist.'})
 
+    def test_delete_product_deletes_other_items_too(self):
+        user = backend.models.user.User(username='user', password='pass', email='user@gmail.com', is_verified=True)
+        product = backend.models.product.Product(id=1, user_username=user.username, name='product', price=10, status='for sale', category='Others')
+        product_picture = backend.models.product.Picture(product_id=product.id, filename='picture.jpg')
+        product_report = backend.models.report.ProductReport(reported_product=product.id, reporter_username=user.username, description='report')
+
+        self.mock_user_query.filter_by.return_value.first.return_value = user
+        self.mock_product_query.filter_by.return_value.all.return_value = [product]
+        self.mock_product_picture_query.filter_by.return_value.all.return_value = [product_picture]
+        self.mock_product_report_query.filter_by.return_value.all.return_value = [product_report]
+
+        response, status_code = self.product_manager.delete_product(user.username, product.id)
+
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.NO_CONTENT.value)
+
+        self.mock_product_picture_query.filter_by(product_id=product.id).delete.assert_called_once()
+        self.mock_product_report_query.filter_by(product_id=product.id).delete.assert_called_once()
+        self.mock_product_query.filter_by(id=product.id).delete.assert_called_once()
 
 if __name__ == "__main__":
     backend.initializers.test_util.pass_flags_as_parsed()
