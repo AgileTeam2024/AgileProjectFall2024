@@ -31,7 +31,7 @@ class NetworkService {
 
   Map<String, String>? get authHeaderRefresh {
     final authService = AuthService.instance;
-    if (authService.accessToken == null) return null;
+    if (authService.refreshToken == null) return null;
     return {'Authorization': 'Bearer ${authService.refreshToken}'};
   }
 
@@ -63,6 +63,14 @@ class NetworkService {
       },
       body: jsonEncode(body),
     );
+
+    if (response.statusCode == 401 &&
+        path != '/user/refresh' &&
+        authHeaderRefresh != null &&
+        await refreshToken()) {
+      return post(path, body, query: query);
+    }
+
     return ServerResponse.visualize(response.body, response.statusCode);
   }
 
@@ -106,6 +114,14 @@ class NetworkService {
     });
 
     final response = await request.send();
+
+    if (response.statusCode == 401 &&
+        path != '/user/refresh' &&
+        authHeaderRefresh != null &&
+        await refreshToken()) {
+      return _formData(method, path, fields, query: query, files: files);
+    }
+
     return ServerResponse.visualize(
       await response.stream.bytesToString(),
       response.statusCode,
@@ -126,6 +142,12 @@ class NetworkService {
           ...?authHeaderAccess,
       },
     );
+    if (response.statusCode == 401 &&
+        path != '/user/refresh' &&
+        authHeaderRefresh != null &&
+        await refreshToken()) {
+      return get(path, query: query);
+    }
     return ServerResponse.visualize(response.body, response.statusCode);
   }
 
@@ -141,6 +163,14 @@ class NetworkService {
         ...?authHeaderAccess
       },
     );
+
+    if (response.statusCode == 401 &&
+        path != '/user/refresh' &&
+        authHeaderRefresh != null &&
+        await refreshToken()) {
+      return delete(path, query: query);
+    }
+
     return ServerResponse.visualize(response.body, response.statusCode);
   }
 
@@ -163,5 +193,9 @@ class NetworkService {
       headers: {'Accept': 'image/*', ...?authHeaderAccess},
     );
     return response.bodyBytes;
+  }
+
+  Future<bool> refreshToken() async {
+    return (await get('/user/refresh')).isOk;
   }
 }

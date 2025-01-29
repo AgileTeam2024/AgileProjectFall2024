@@ -92,7 +92,6 @@ class _SearchPageState extends State<SearchPage> {
                   child: FutureBuilder(
                     future: searchResults,
                     builder: (context, snapshot) {
-                      print(snapshot.error);
                       if (snapshot.connectionState == ConnectionState.waiting ||
                           !snapshot.hasData) {
                         return Center(
