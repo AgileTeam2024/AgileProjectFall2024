@@ -235,12 +235,6 @@ class ProductManager:
         product.category = product_data.get('category', product.category)
         product.user_username = product_data.get('user_username', product.user_username)
 
-        # Deleting old pictures
-        product_pictures = backend.models.product.Picture.query.filter_by(id=product.id).all()
-        for picture in product_pictures:
-            backend.initializers.database.DB.session.delete(picture)
-            os.remove(picture.filename)
-
         # Adding new pictures
         if 'images' in product_data.keys():
             # Delete Previous Pictures
