@@ -1,11 +1,11 @@
-import 'dart:io';
-
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/product_report.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/models/user_report.dart';
 import 'package:chabok_front/services/admin.dart';
+import 'package:chabok_front/services/auth.dart';
+import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/card.dart';
 import 'package:chabok_front/widgets/products_list.dart';
 import 'package:chabok_front/widgets/toast.dart';
@@ -20,6 +20,8 @@ class AdminProfilePage extends StatefulWidget {
 
 class _AdminProfilePageState extends State<AdminProfilePage> {
   AdminService get _adminService => AdminService.instance;
+
+  AuthService get _authService => AuthService.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +100,36 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 );
               },
             ),
+
+            Text(
+              'Account Actions',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.redAccent,
+              ),
+            ),
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.logout, color: Colors.blueAccent),
+                    title: Text('Log Out'),
+                    onTap: () => _logout(context),
+                  ),
+                  Divider(),
+                  ListTile(
+                    leading: Icon(Icons.edit, color: Colors.orange),
+                    title: Text('Edit Profile'),
+                    onTap: _goToEditProfile,
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -110,5 +142,13 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
       CustomToast.showToast(context, response);
     }
     setState(() {});
+  }
+
+  void _goToEditProfile() => RouterService.go('/edit-profile');
+
+  Future<void> _logout(BuildContext context) async {
+    final response = await _authService.logout();
+    CustomToast.showToast(context, response);
+    if (response.isOk) RouterService.go('/');
   }
 }
