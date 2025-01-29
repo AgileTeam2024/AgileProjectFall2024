@@ -18,7 +18,7 @@ class SellerWidget extends StatelessWidget {
     return Row(
       spacing: 5,
       children: [
-        _SellerPfpWidget(seller.profilePicture),
+        _SellerPfpWidget(seller.profilePictureAbsolute),
         Expanded(child: _SellerUsernameWidget(seller.username)),
         if (showContactInfo) ...[
           Spacer(),

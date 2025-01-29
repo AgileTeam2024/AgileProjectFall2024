@@ -8,12 +8,12 @@ class User {
   final String username;
   final String? firstName, lastName, phoneNumber;
   final String email;
-  final String? _profilePicture;
+  final String? profilePicture;
   final String? address;
   final bool isAdmin;
 
-  String? get profilePicture =>
-      NetworkService.instance.getAbsoluteFilePath(_profilePicture);
+  String? get profilePictureAbsolute =>
+      NetworkService.instance.getAbsoluteFilePath(profilePicture);
 
   User({
     required this.username,
@@ -21,10 +21,10 @@ class User {
     this.lastName,
     required this.email,
     required this.phoneNumber,
-    String? profilePicture,
+    this.profilePicture,
     this.address,
     this.isAdmin = false,
-  }) : _profilePicture = profilePicture;
+  });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 

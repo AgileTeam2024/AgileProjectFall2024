@@ -90,7 +90,7 @@ void main() {
     authService.accessToken = 'access123';
     authService.refreshToken = 'refresh123';
     final response = ServerResponse(jsonEncode({}), 200);
-    when(mockNetworkService.get(any)).thenAnswer((_) async => response);
+    when(mockNetworkService.delete(any)).thenAnswer((_) async => response);
 
     final result = await authService.deleteAccount();
 
@@ -103,7 +103,7 @@ void main() {
     authService.accessToken = 'access123';
     authService.refreshToken = 'refresh123';
     final response = ServerResponse(jsonEncode({}), 401);
-    when(mockNetworkService.get(any)).thenAnswer((_) async => response);
+    when(mockNetworkService.delete(any)).thenAnswer((_) async => response);
 
     final result = await authService.deleteAccount();
 

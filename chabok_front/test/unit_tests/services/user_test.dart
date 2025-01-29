@@ -73,11 +73,13 @@ void main() {
         'last_name': 'User',
         'email': 'test_user@gmail.com',
         'phone_number': '1234567890',
-        'profile_picture': 'http://example.com/profile.jpg',
+        'profile_picture': 'profile.jpg',
         'address': '123 Test St'
       }
     };
-    when(mockNetworkService.get('/user/get_profile_by_username/test_user'))
+    when(mockNetworkService.getAbsoluteFilePath(any))
+        .thenAnswer((inv) => inv.positionalArguments[0]);
+    when(mockNetworkService.get(any, query: anyNamed('query')))
         .thenAnswer((_) async => ServerResponse(jsonEncode(userJson), 200));
 
     final user = await userService.getProfile('test_user');
@@ -88,7 +90,7 @@ void main() {
     expect(user.lastName, 'User');
     expect(user.email, 'test_user@gmail.com');
     expect(user.phoneNumber, '1234567890');
-    expect(user.profilePicture, 'http://example.com/profile.jpg');
+    expect(user.profilePictureAbsolute, 'profile.jpg');
     expect(user.address, '123 Test St');
   });
 
@@ -104,7 +106,7 @@ void main() {
   test('returns ServerResponse on successful editProfile', () async {
     final fields = {'name': 'new_name'};
     final response = ServerResponse(jsonEncode({}), 200);
-    when(mockNetworkService.postFormData(
+    when(mockNetworkService.putFormData(
       '/user/edit_profile',
       fields,
       files: anyNamed('files'),
@@ -118,7 +120,7 @@ void main() {
   test('returns ServerResponse on failed editProfile', () async {
     final fields = {'name': 'new_name'};
     final response = ServerResponse(jsonEncode({}), 400);
-    when(mockNetworkService.postFormData(
+    when(mockNetworkService.putFormData(
       '/user/edit_profile',
       fields,
       files: anyNamed('files'),
@@ -133,7 +135,7 @@ void main() {
     final fields = {'name': 'new_name'};
     final profilePicture = Pair('profile.jpg', Uint8List(0));
     final response = ServerResponse(jsonEncode({}), 200);
-    when(mockNetworkService.postFormData(
+    when(mockNetworkService.putFormData(
       '/user/edit_profile',
       fields,
       files: {

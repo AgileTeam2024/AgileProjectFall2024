@@ -68,7 +68,7 @@ class MockProductService extends Mock implements ProductService {
 
 class MockNetworkService extends Mock implements NetworkService {
   @override
-  String getAbsoluteFilePath(String? relative) => relative!;
+  String? getAbsoluteFilePath(String? relative) => relative;
 
   @override
   Future<Uint8List> getImage(String path, {bool useOurServer = true}) =>

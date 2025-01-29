@@ -24,9 +24,9 @@ class UserInfoWidget extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 40,
-              backgroundImage: profile.profilePicture == null
+              backgroundImage: profile.profilePictureAbsolute == null
                   ? null
-                  : NetworkImage(profile.profilePicture!),
+                  : NetworkImage(profile.profilePictureAbsolute!),
             ),
             SizedBox(width: 16),
             Column(

@@ -63,7 +63,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
     ];
 
-    final imageAddress = user.profilePicture;
+    final imageAddress = user.profilePictureAbsolute;
     if (imageAddress != null) {
       _networkService
           .getImage(imageAddress)
