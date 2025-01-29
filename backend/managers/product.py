@@ -243,6 +243,13 @@ class ProductManager:
 
         # Adding new pictures
         if 'images' in product_data.keys():
+            # Delete Previous Pictures
+            product_pictures = backend.models.product.Picture.query.filter_by(product_id=product_id).all()
+            for picture in product_pictures:
+                if os.path.exists(f'backend/uploads/{picture.filename}'):
+                    os.remove(f'backend/uploads/{picture.filename}')
+            backend.models.product.Picture.query.filter_by(product_id=product_id).delete()
+
             for file, filename in zip(product_data['images'], product_data['images_path']):
                 # Generate a new filename by appending a timestamp to avoid duplicate name.
                 base, extension = os.path.splitext(filename)
