@@ -193,6 +193,8 @@ class ProductManager:
                 os.remove(f'backend/uploads/{picture.filename}')
         backend.models.product.Picture.query.filter_by(product_id=product_id).delete()
 
+        backend.models.report.ProductReport.query.filter_by(reported_product=product_id).delete()
+
         backend.models.product.Product.query.filter_by(id=product_id).delete()
         backend.initializers.database.DB.session.commit()
         return (
