@@ -9,7 +9,7 @@ managers/__init__.py                0      0   100%
 managers/admin.py                  61      4    93%
 managers/product.py               126     34    73%
 managers/token.py                  13      3    77%
-managers/user.py                  129     39    70%
+managers/user.py                  130     39    70%
 models/__init__.py                  0      0   100%
 models/product.py                  30      2    93%
 models/report.py                   19      0   100%
@@ -20,4 +20,4 @@ routes/authorization_utils.py      25      3    88%
 routes/product.py                 171     20    88%
 routes/user.py                    104      3    97%
 ---------------------------------------------------
-TOTAL                             807    127    84%
+TOTAL                             808    127    84%
