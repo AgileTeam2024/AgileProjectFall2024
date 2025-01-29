@@ -4,23 +4,23 @@ import 'package:test/test.dart';
 void main() {
   group('NumExtension', () {
     test(
-      'compact returns correct format for numbers less than 1000',
-      () => expect(999.compact, '999'),
+      'priceFormat returns correct format for numbers less than 1000',
+      () => expect(999.priceFormat, '999 ᴵᴿᴿ'),
     );
 
     test(
-      'compact returns correct format for numbers in thousands',
-      () => expect(1500.compact, '1.5K'),
+      'priceFormat returns correct format for numbers in thousands',
+      () => expect(1500.priceFormat, '1,500 ᴵᴿᴿ'),
     );
 
     test(
-      'compact returns correct format for numbers in millions',
-      () => expect(2500000.compact, '2.5M'),
+      'priceFormat returns correct format for numbers in millions',
+      () => expect(2500000.priceFormat, '2,500,000 ᴵᴿᴿ'),
     );
 
     test(
-      'compact returns correct format for numbers in billions',
-      () => expect(3500000000.compact, '3.5B'),
+      'priceFormat returns correct format for numbers in billions',
+      () => expect(3500000000.priceFormat, '3,500,000,000 ᴵᴿᴿ'),
     );
 
     test(
@@ -35,7 +35,7 @@ void main() {
 
     test(
       'decimalFormat returns correct format for numbers with decimals',
-      () => expect(1234567.89.decimalFormat, '1,234,567.89'),
+      () => expect(1234567.89.decimalFormat, '1,234,568'),
     );
   });
 }

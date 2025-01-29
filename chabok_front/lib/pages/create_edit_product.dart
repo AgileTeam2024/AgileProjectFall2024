@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/extensions/list.dart';
@@ -14,6 +12,7 @@ import 'package:chabok_front/widgets/main_fab.dart';
 import 'package:chabok_front/widgets/text_field.dart';
 import 'package:chabok_front/widgets/toast.dart';
 import 'package:chabok_front/widgets/upload_file.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CreateEditProductPage extends StatefulWidget {
@@ -240,7 +239,8 @@ class EditProductPage extends CreateEditProductPage {
             'description': product.description,
             'status': product.status,
           },
-          images: product.absoluteImages.asMap().map((_, im) => MapEntry(im, null)),
+          images:
+              product.absoluteImages.asMap().map((_, im) => MapEntry(im, null)),
         );
 
   @override
@@ -252,6 +252,9 @@ class EditProductPage extends CreateEditProductPage {
     required Map<String, TextFieldViewModel> fields,
     Map<String, Uint8List?>? images,
   }) {
+    print(product.absoluteImages);
+    print(images?.keys.toList() ?? []);
+    print(listEquals(product.absoluteImages, images?.keys.toList() ?? []));
     ProductService.instance.editProduct(
       product.id,
       fields.map((k, vm) {
@@ -259,7 +262,7 @@ class EditProductPage extends CreateEditProductPage {
         if (k == 'price') text = text.replaceAll(',', '');
         return MapEntry(k, text);
       }),
-      images,
+      listEquals(product.absoluteImages, images?.keys.toList() ?? []) ? null : images,
     ).then((response) {
       if (response.isOk) {
         CustomToast.showToast(context, response);

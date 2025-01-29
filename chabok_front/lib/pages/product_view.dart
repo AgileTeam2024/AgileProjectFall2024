@@ -1,5 +1,6 @@
 import 'package:chabok_front/dialogs/report.dart';
 import 'package:chabok_front/enums/product_category.dart';
+import 'package:chabok_front/extensions/num.dart';
 import 'package:chabok_front/models/pair.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
@@ -127,7 +128,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${formatPrice(product.price)} ᴵᴿᴿ',
+                            product.price.priceFormat,
                             style: textStyleBold?.copyWith(
                                 fontSize: textStyleBold.fontSize! * 2),
                           ),
@@ -184,13 +185,6 @@ class _ProductViewPageState extends State<ProductViewPage> {
     final response = await _productService.deleteProduct(widget.id);
     CustomToast.showToast(context, response);
     if (response.isOk) RouterService.go('/');
-  }
-
-  String formatPrice(double price) {
-    return price.toStringAsFixed(0).replaceAllMapped(
-          RegExp(r'\B(?=(\d{3})+(?!\d))'),
-          (Match m) => ",",
-        );
   }
 
   void _goToCategorySearchPage(ProductCategory category) =>

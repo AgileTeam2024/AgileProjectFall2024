@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/enums/product_status.dart';
+import 'package:chabok_front/extensions/num.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/pages/error.dart';
@@ -70,7 +71,7 @@ void main() {
 
     expect(find.text('Test Product'), findsOneWidget);
     expect(find.text('Others Category'), findsOneWidget);
-    expect(find.text('1,000 ᴵᴿᴿ'), findsOneWidget);
+    expect(find.text(1000.priceFormat), findsOneWidget);
     expect(find.text('Available'), findsOneWidget);
     // expect( todo fix test
     //   find.descendant(
