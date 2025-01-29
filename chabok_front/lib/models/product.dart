@@ -1,6 +1,7 @@
 import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/enums/product_status.dart';
 import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/services/network.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'product.g.dart';
@@ -21,6 +22,10 @@ class Product {
   final String? location;
   @JsonKey(fromJson: ProductStatus.fromJson, toJson: ProductStatus.toJson)
   final ProductStatus status;
+
+  List<String> get absoluteImages => imageUrls
+      .map((r) => NetworkService.instance.getAbsoluteFilePath(r)!)
+      .toList();
 
   Product({
     required this.id,

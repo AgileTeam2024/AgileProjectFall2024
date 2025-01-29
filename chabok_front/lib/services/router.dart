@@ -176,6 +176,11 @@ class RouterService {
           ),
           GoRoute(
             path: '/profile/:username',
+            redirect: (context, state) {
+              if (state.pathParameters['username'] == 'admin') {
+                return '/admin-profile';
+              }
+            },
             pageBuilder: (context, state) => NoTransitionPage(
               child:
                   UserProfilePage(username: state.pathParameters['username']),

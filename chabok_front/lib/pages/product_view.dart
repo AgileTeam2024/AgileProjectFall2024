@@ -68,7 +68,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
             direction: isBigScreen ? Axis.horizontal : Axis.vertical,
             children: [
               Expanded(
-                child: ImagesDisplayWidget(product.imageUrls),
+                child: ImagesDisplayWidget(product.absoluteImages),
               ),
               Padding(
                 padding: EdgeInsets.all(15),
@@ -112,9 +112,16 @@ class _ProductViewPageState extends State<ProductViewPage> {
                           ),
                         ],
                       ),
-                      SellerWidget(
-                        product.seller,
-                        showContactInfo: true,
+                      MaterialButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        padding: EdgeInsets.all(20),
+                        onPressed: _goToSellerPage,
+                        child: SellerWidget(
+                          product.seller,
+                          showContactInfo: true,
+                        ),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -191,4 +198,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
         'search',
         queryParameters: {'cat': '${category.index}'},
       );
+
+  void _goToSellerPage() =>
+      RouterService.go('/profile/${product.seller.username}');
 }

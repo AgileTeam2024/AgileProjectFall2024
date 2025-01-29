@@ -240,7 +240,7 @@ class EditProductPage extends CreateEditProductPage {
             'description': product.description,
             'status': product.status,
           },
-          images: product.imageUrls.asMap().map((_, im) => MapEntry(im, null)),
+          images: product.absoluteImages.asMap().map((_, im) => MapEntry(im, null)),
         );
 
   @override

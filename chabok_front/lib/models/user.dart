@@ -1,3 +1,4 @@
+import 'package:chabok_front/services/network.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user.g.dart';
@@ -10,6 +11,9 @@ class User {
   final String? profilePicture;
   final String? address;
   final bool isAdmin;
+
+  String? get profilePictureAbsolute =>
+      NetworkService.instance.getAbsoluteFilePath(profilePicture);
 
   User({
     required this.username,

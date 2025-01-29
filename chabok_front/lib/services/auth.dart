@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/services/network.dart';
 import 'package:flutter/material.dart';
@@ -58,10 +60,14 @@ class AuthService {
       });
 
   Future<ServerResponse> deleteAccount() =>
-      _networkService.get('/user/delete').then((response) {
+      _networkService.delete('/user/delete').then((response) {
         if (response.isOk) {
           accessToken = null;
           refreshToken = null;
+          return ServerResponse.visualize(
+            jsonEncode({'message': 'Account Deleted Successfully.'}),
+            200,
+          );
         }
         return response;
       });
@@ -74,4 +80,7 @@ class AuthService {
         }
         return response;
       });
+
+  Future<ServerResponse> resendEmail(String username) => _networkService
+      .postFormData('/user/resend_email', {'username': username});
 }

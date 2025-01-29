@@ -28,9 +28,6 @@ class MockUserService extends Mock implements UserService {
   @override
   Future<User?> get ownProfile async =>
       User(username: 'username', email: 'email', phoneNumber: 'phoneNumber');
-
-  @override
-  Future<List<Product>> get ownProducts async => [];
 }
 
 class MockProductService extends Mock implements ProductService {
@@ -64,11 +61,14 @@ class MockProductService extends Mock implements ProductService {
         price: 10000,
         status: ProductStatus.available,
       );
+
+  @override
+  Future<List<Product>> get ownProducts async => [];
 }
 
 class MockNetworkService extends Mock implements NetworkService {
   @override
-  String getAbsoluteFilePath(String? relative) => relative!;
+  String? getAbsoluteFilePath(String? relative) => relative;
 
   @override
   Future<Uint8List> getImage(String path, {bool useOurServer = true}) =>

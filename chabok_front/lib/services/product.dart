@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/services/network.dart';
@@ -24,6 +26,14 @@ class ProductService {
   Future<List<Product>> get homePageProducts =>
       searchProducts(sortCreatedAt: 'asc');
 
+  Future<List<Product>> get ownProducts async {
+    final response = await _networkService.get('/product/product_list');
+    if (!response.isOk) return [];
+    final products =
+        (response.bodyJson['products'] as List).cast<Map<String, dynamic>>();
+    return getProductsSellers(products);
+  }
+
   Future<Product?> getProductById(int id) async {
     final response = await _networkService
         .get('/product/get_product_by_id', query: {'product_id': '$id'});
@@ -41,7 +51,7 @@ class ProductService {
       '/product/create',
       fields,
       files: {
-        'picture': images?.map((k, v) => MapEntry(k, v!)) ?? {},
+        'pictures': images?.map((k, v) => MapEntry(k, v!)) ?? {},
       },
     );
   }
@@ -52,17 +62,29 @@ class ProductService {
     Map<String, Uint8List?>? images,
   ) {
     images?.removeWhere((path, bytes) => bytes == null);
-    return _networkService.postFormData(
+    return _networkService.putFormData(
       '/product/edit_product',
-      fields..putIfAbsent('id', () => productId),
+      query: {'product_id': ['$productId']},
+      fields,
       files: {
-        'picture': images?.map((k, v) => MapEntry(k, v!)) ?? {},
+        'pictures': images?.map((k, v) => MapEntry(k, v!)) ?? {},
       },
     );
   }
 
-  Future<ServerResponse> deleteProduct(int id) =>
-      _networkService.delete('/product/delete', query: {'id': id});
+  Future<ServerResponse> deleteProduct(int id) async {
+    final response = await _networkService.delete(
+      '/product/delete',
+      query: {
+        'product_id': ['$id']
+      },
+    );
+    if (response.isOk) {
+      return ServerResponse.visualize(
+          jsonEncode({'message': 'Product deleted successfully'}), 200);
+    }
+    return response;
+  }
 
   Future<List<Product>> searchProducts({
     String? name,

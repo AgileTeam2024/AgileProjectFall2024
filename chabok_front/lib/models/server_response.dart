@@ -9,7 +9,7 @@ class ServerResponse extends http.Response {
   ServerResponse(super.body, super.statusCode);
 
   ServerResponse.visualize(super.body, super.statusCode) {
-    if (isOk || is401 || is400) return;
+    if (isOk || is401 || is400 || is403) return;
     RouterService.go('/error/${super.statusCode}');
   }
 
@@ -22,6 +22,8 @@ class ServerResponse extends http.Response {
   bool get is401 => super.statusCode == 401;
 
   bool get is400 => super.statusCode == 400;
+
+  bool get is403 => super.statusCode == 403;
 
   Map<String, dynamic> get bodyJson => jsonDecode(super.body);
 

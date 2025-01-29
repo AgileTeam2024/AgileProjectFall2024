@@ -28,6 +28,7 @@ void main() {
           phoneNumber: '1234567890',
           email: 'test@example.com');
       await tester.pumpWidget(MaterialApp(home: SellerWidget(user)));
+      await tester.pumpAndSettle();
 
       expect(find.byType(CircleAvatar), findsOneWidget);
     });

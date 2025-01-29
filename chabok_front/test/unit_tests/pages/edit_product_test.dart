@@ -36,6 +36,8 @@ void main() {
 
   testWidgets('displays initial values correctly', (tester) async {
     setUpWidgetTest(tester);
+    when(mockNetworkService.getAbsoluteFilePath(any))
+        .thenAnswer((inv) => inv.positionalArguments[0]);
     final product = Product.fromJson({
       'id': 1,
       'name': 'Test Product',
@@ -63,6 +65,8 @@ void main() {
 
   testWidgets('submits edited product successfully', (tester) async {
     setUpWidgetTest(tester);
+    when(mockNetworkService.getAbsoluteFilePath(any))
+        .thenAnswer((inv) => inv.positionalArguments[0]);
     final product = Product.fromJson({
       'id': 1,
       'name': 'Test Product',

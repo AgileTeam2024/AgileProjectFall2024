@@ -55,7 +55,8 @@ void main() {
 
   test('edits product successfully', () async {
     final responseJson = {'success': true};
-    when(mockNetworkService.postFormData(any, any, files: anyNamed('files')))
+    when(mockNetworkService.putFormData(any, any,
+            query: anyNamed('query'), files: anyNamed('files')))
         .thenAnswer(
       (_) async => ServerResponse(jsonEncode(responseJson), 200),
     );
@@ -68,13 +69,12 @@ void main() {
 
   test('deletes product successfully', () async {
     final responseJson = {'success': true};
-    when(mockNetworkService.delete(any, query: anyNamed('query'))).thenAnswer(
-      (_) async => ServerResponse(jsonEncode(responseJson), 204),
-    );
+    when(mockNetworkService.delete(any, query: anyNamed('query')))
+        .thenAnswer((_) async => ServerResponse('', 204));
 
     final response = await productService.deleteProduct(1);
 
-    expect(response.bodyJson['success'], true);
+    expect(response.bodyJson['message'], 'Product deleted successfully');
   });
 
   test('searches products with filters', () async {
@@ -132,7 +132,8 @@ void main() {
 
   test('fails to edit non-existent product', () async {
     final responseJson = {'success': false, 'error': 'Product not found'};
-    when(mockNetworkService.postFormData(any, any, files: anyNamed('files')))
+    when(mockNetworkService.putFormData(any, any,
+            query: anyNamed('query'), files: anyNamed('files')))
         .thenAnswer(
       (_) async => ServerResponse(jsonEncode(responseJson), 404),
     );

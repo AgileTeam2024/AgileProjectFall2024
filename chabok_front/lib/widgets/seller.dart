@@ -1,5 +1,6 @@
 import 'package:chabok_front/extensions/string.dart';
 import 'package:chabok_front/models/user.dart';
+import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/widgets/button.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +19,7 @@ class SellerWidget extends StatelessWidget {
     return Row(
       spacing: 5,
       children: [
-        _SellerPfpWidget(seller.profilePicture),
+        _SellerPfpWidget(seller.profilePictureAbsolute),
         Expanded(child: _SellerUsernameWidget(seller.username)),
         if (showContactInfo) ...[
           Spacer(),
@@ -46,7 +47,7 @@ class _SellerPfpWidget extends StatelessWidget {
     return CircleAvatar(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100),
-        child: pfp == null ? Container() : Image(image: AssetImage(pfp!)),
+        child: pfp == null ? Container() : Image(image: NetworkImage(pfp!)),
       ),
     );
   }

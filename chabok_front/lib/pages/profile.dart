@@ -2,6 +2,7 @@ import 'package:chabok_front/dialogs/report.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/user.dart';
 import 'package:chabok_front/services/auth.dart';
+import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/services/router.dart';
 import 'package:chabok_front/services/user.dart';
 import 'package:chabok_front/widgets/card.dart';
@@ -19,6 +20,7 @@ class UserProfilePage extends StatelessWidget {
 
   final _authService = AuthService.instance;
   final _userService = UserService.instance;
+  final _productService = ProductService.instance;
 
   bool get isOwnProfile => username == null;
 
@@ -40,7 +42,7 @@ class UserProfilePage extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: FutureBuilder<User?>(
                     future: username == null
-                        ? Future.value(null)
+                        ? _userService.ownProfile
                         : _userService.getProfile(username!),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) return Container();
@@ -54,7 +56,7 @@ class UserProfilePage extends StatelessWidget {
               ),
               if (isOwnProfile)
                 FutureBuilder<List<Product>>(
-                  future: _userService.ownProducts,
+                  future: _productService.ownProducts,
                   builder: (context, snapshot) {
                     return ProductsListWidget(
                       title: 'Your Products',
@@ -78,12 +80,6 @@ class UserProfilePage extends StatelessWidget {
                 child: Column(
                   children: [
                     if (isOwnProfile) ...[
-                      ListTile(
-                        leading: Icon(Icons.logout, color: Colors.blueAccent),
-                        title: Text('Log Out'),
-                        onTap: () => _logout(context),
-                      ),
-                      Divider(),
                       ListTile(
                         leading: Icon(Icons.logout, color: Colors.blueAccent),
                         title: Text('Log Out'),
