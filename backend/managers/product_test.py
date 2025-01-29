@@ -284,6 +284,7 @@ class ProductManagerTest(absltest.TestCase):
         self.mock_product_report_query.filter_by(product_id=product.id).delete.assert_called_once()
         self.mock_product_query.filter_by(id=product.id).delete.assert_called_once()
 
+
 if __name__ == "__main__":
     backend.initializers.test_util.pass_flags_as_parsed()
     absltest.main()
