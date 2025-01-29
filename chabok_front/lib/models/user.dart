@@ -1,3 +1,4 @@
+import 'package:chabok_front/services/network.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user.g.dart';
@@ -7,9 +8,12 @@ class User {
   final String username;
   final String? firstName, lastName, phoneNumber;
   final String email;
-  final String? profilePicture;
+  final String? _profilePicture;
   final String? address;
   final bool isAdmin;
+
+  String? get profilePicture =>
+      NetworkService.instance.getAbsoluteFilePath(_profilePicture);
 
   User({
     required this.username,
@@ -17,10 +21,10 @@ class User {
     this.lastName,
     required this.email,
     required this.phoneNumber,
-    this.profilePicture,
+    String? profilePicture,
     this.address,
     this.isAdmin = false,
-  });
+  }) : _profilePicture = profilePicture;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 

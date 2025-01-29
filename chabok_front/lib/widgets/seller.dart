@@ -46,7 +46,7 @@ class _SellerPfpWidget extends StatelessWidget {
     return CircleAvatar(
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100),
-        child: pfp == null ? Container() : Image(image: AssetImage(pfp!)),
+        child: pfp == null ? Container() : Image(image: NetworkImage(pfp!)),
       ),
     );
   }

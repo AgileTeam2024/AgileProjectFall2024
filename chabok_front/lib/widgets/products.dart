@@ -27,7 +27,7 @@ class ProductsWidget extends StatelessWidget {
         final product = products[index];
         final seller = product.seller;
 
-        final displayImage = product.imageUrls.firstOrNull;
+        final displayImage = product.absoluteImages.firstOrNull;
 
         return MaterialButton(
           onPressed: () => RouterService.go('/product/${product.id}'),

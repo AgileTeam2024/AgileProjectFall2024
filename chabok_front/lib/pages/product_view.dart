@@ -68,7 +68,7 @@ class _ProductViewPageState extends State<ProductViewPage> {
             direction: isBigScreen ? Axis.horizontal : Axis.vertical,
             children: [
               Expanded(
-                child: ImagesDisplayWidget(product.imageUrls),
+                child: ImagesDisplayWidget(product.absoluteImages),
               ),
               Padding(
                 padding: EdgeInsets.all(15),

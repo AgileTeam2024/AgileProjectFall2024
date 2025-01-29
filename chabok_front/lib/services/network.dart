@@ -19,12 +19,6 @@ class NetworkService {
     _instance = value;
   }
 
-  // static const host = '127.0.0.1';
-  // static const port = 8000;
-  // static const scheme = 'http';
-  // static const host = '185.231.59.87';
-  // static const port = 80;
-
   static const scheme = 'https';
   static const host = 'pre-loved.ir';
   static const port = 443;
@@ -100,7 +94,7 @@ class NetworkService {
     files?.forEach(
       (key, values) => values.forEach(
         (path, bytes) => request.files.add(
-          http.MultipartFile.fromBytes(key, bytes),
+          http.MultipartFile.fromBytes(key, bytes, filename: path),
         ),
       ),
     );
@@ -150,17 +144,18 @@ class NetworkService {
     return ServerResponse.visualize(response.body, response.statusCode);
   }
 
-  String getAbsoluteFilePath(String? relative) => Uri(
-          scheme: scheme,
-          host: host,
-          port: port,
-          path: 'backend/uploads/$relative')
-      .toString();
+  String? getAbsoluteFilePath(String? relative) => relative == null
+      ? relative
+      : Uri(
+              scheme: scheme,
+              host: host,
+              port: port,
+              path: 'backend/uploads/$relative')
+          .toString();
 
-  Future<Uint8List> getImage(String path, {bool useOurServer = true}) async {
-    final url = useOurServer ? _buildUrl(path, {}, '') : Uri.parse(path);
+  Future<Uint8List> getImage(String url) async {
     final response = await http.get(
-      url,
+      Uri.parse(url),
       headers: {'Accept': 'image/*', ...?authHeaderAccess},
     );
     return response.bodyBytes;

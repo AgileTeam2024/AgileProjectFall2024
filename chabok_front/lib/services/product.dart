@@ -64,7 +64,8 @@ class ProductService {
     images?.removeWhere((path, bytes) => bytes == null);
     return _networkService.putFormData(
       '/product/edit_product',
-      fields..putIfAbsent('product_id', () => productId),
+      query: {'product_id': ['$productId']},
+      fields,
       files: {
         'pictures': images?.map((k, v) => MapEntry(k, v!)) ?? {},
       },
