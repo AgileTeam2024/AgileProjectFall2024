@@ -268,18 +268,18 @@ class UserManager:
         products_to_delete = backend.models.product.Product.query.filter_by(user_username=username).all()
 
         for product in products_to_delete:
-            pictures_to_delete = backend.models.product.Picture.query.filter_by(product_id=product.id).all()
-            for picture in pictures_to_delete:
-                backend.initializers.database.DB.session.delete(picture)
-                os.remove(picture.filename)
-            backend.initializers.database.DB.session.delete(product)
+            backend.managers.product.ProductManager.instance.delete_product(product.id)
 
-        user = backend.models.user.User.query.filter_by(username=username).first()
-        backend.initializers.database.DB.session.delete(user)
+        backend.models.user.ProfilePicture.query.filter_by(user_username=username).delete()
+
+        backend.models.report.UserReport.query.filter_by(reported_user=username).delete()
+        backend.models.report.UserReport.query.filter_by(reporter_user=username).delete()
+
+        backend.models.user.User.query.filter_by(username=username).delete()
         backend.initializers.database.DB.session.commit()
         return (
             flask.jsonify({"message": "User deleted successfully."}),
-            backend.initializers.settings.HTTPStatus.OK.value
+            backend.initializers.settings.HTTPStatus.NO_CONTENT.value
         )
 
     def get_profile(self, username: str) -> (flask.Flask, int):

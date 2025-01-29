@@ -235,7 +235,7 @@ def delete_user() -> (flask.Flask, int):
     security:
       - BearerAuth: []
     responses:
-      200:
+      204:
         description: Successfully deleted the user
     """
     return backend.managers.user.UserManager.instance.delete_account(flask_jwt_extended.get_jwt_identity())
