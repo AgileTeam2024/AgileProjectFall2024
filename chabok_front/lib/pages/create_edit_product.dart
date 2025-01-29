@@ -252,9 +252,6 @@ class EditProductPage extends CreateEditProductPage {
     required Map<String, TextFieldViewModel> fields,
     Map<String, Uint8List?>? images,
   }) {
-    print(product.absoluteImages);
-    print(images?.keys.toList() ?? []);
-    print(listEquals(product.absoluteImages, images?.keys.toList() ?? []));
     ProductService.instance.editProduct(
       product.id,
       fields.map((k, vm) {
