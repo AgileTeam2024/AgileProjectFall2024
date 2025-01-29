@@ -487,7 +487,7 @@ def edit_product() -> (flask.Flask, int):
     """
     user_username = flask_jwt_extended.get_jwt_identity()
     data = {}
-    product_id = flask.request.form.get('product_id')
+    product_id = flask.request.args.get('product_id')
     if not product_id:
         return (
             flask.jsonify({'message': 'Product id is required'}),
@@ -519,7 +519,7 @@ def edit_product() -> (flask.Flask, int):
     if product_category:
         data['category'] = product_category
 
-    image_files = flask.request.files.getlist('picture')
+    image_files = flask.request.files.getlist('pictures')
     images = []
     images_path = []
     # Validate files and create path for storing them.

@@ -209,9 +209,9 @@ class ProductRouteTest(absltest.TestCase):
         self.assertEqual(response.status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
 
         response = self.client.put(
-            "/api/product/edit_product",
+            "/api/product/edit_product?product_id=1",
             headers={"Authorization": f"Bearer {self.admin_token}"},
-            data={"product_id": 1, "name": "name", "price": 1, "city_name": "city", "description": "description",
+            data={"name": "name", "price": 1, "city_name": "city", "description": "description",
                   "status": "sold", "category": "Automobile"}
         )  # Success
         self.assertEqual(response.status_code, backend.initializers.settings.HTTPStatus.OK.value)
