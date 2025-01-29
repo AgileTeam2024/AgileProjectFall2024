@@ -383,7 +383,7 @@ def delete_product() -> (flask.Flask, int):
         required: true
         description: The ID of the product to delete.
     responses:
-      200:
+      204:
         description: successful delete
       400:
         description: bad request
