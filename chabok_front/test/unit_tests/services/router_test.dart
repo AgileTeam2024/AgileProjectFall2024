@@ -36,7 +36,7 @@ class MockProductService extends Mock implements ProductService {
           {String? name,
           double? minPrice,
           double? maxPrice,
-          String? status,
+          List<String>? statuses,
           List<String>? categories,
           String? sortCreatedAt,
           String? sortPrice}) async =>

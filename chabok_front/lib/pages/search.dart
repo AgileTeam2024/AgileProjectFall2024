@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:chabok_front/enums/button_type.dart';
 import 'package:chabok_front/enums/product_category.dart';
 import 'package:chabok_front/enums/sort_type.dart';
+import 'package:chabok_front/extensions/num.dart';
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/services/product.dart';
 import 'package:chabok_front/view_models/search_filter.dart';
@@ -41,31 +42,18 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<List<Product>> get searchResults async {
-    final available = filter.showAvailableProducts
-        ? _productService.searchProducts(
-            name: filter.query,
-            minPrice: filter.priceRange?.start,
-            maxPrice: filter.priceRange?.end,
-            status: 'for sale',
-            categories: filter.categories.map((cat) => '$cat').toList(),
-            sortCreatedAt: filter.sortType.createdSort,
-            sortPrice: filter.sortType.priceSort,
-          )
-        : Future.value([]);
-    final reserved = filter.showReservedProducts
-        ? _productService.searchProducts(
-            name: filter.query,
-            minPrice: filter.priceRange?.start,
-            maxPrice: filter.priceRange?.end,
-            status: 'reserved',
-            categories: filter.categories.map((cat) => '$cat').toList(),
-            sortCreatedAt: filter.sortType.createdSort,
-            sortPrice: filter.sortType.priceSort,
-          )
-        : Future.value([]);
-    final resultsFuture = await Future.wait([available, reserved]);
-    return Future.delayed(
-        Duration(seconds: 1), () => [...resultsFuture[0], ...resultsFuture[1]]);
+    return _productService.searchProducts(
+      name: filter.query,
+      minPrice: filter.priceRange?.start,
+      maxPrice: filter.priceRange?.end,
+      statuses: [
+        if (filter.showAvailableProducts) 'for sale',
+        if (filter.showReservedProducts) 'reserved',
+      ],
+      categories: filter.categories.map((cat) => '$cat').toList(),
+      sortCreatedAt: filter.sortType.createdSort,
+      sortPrice: filter.sortType.priceSort,
+    );
   }
 
   @override
@@ -104,7 +92,9 @@ class _SearchPageState extends State<SearchPage> {
                   child: FutureBuilder(
                     future: searchResults,
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
+                      print(snapshot.error);
+                      if (snapshot.connectionState == ConnectionState.waiting ||
+                          !snapshot.hasData) {
                         return Center(
                           child: CircularProgressIndicator(),
                         );
@@ -222,7 +212,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   TextSpan(
-                    text: formatPrice(minPrice),
+                    text: minPrice.priceFormat,
                     style: textTheme.labelSmall,
                   ),
                   TextSpan(
@@ -231,7 +221,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   TextSpan(
-                    text: formatPrice(maxPrice),
+                    text: maxPrice.priceFormat,
                     style: textTheme.labelSmall,
                   ),
                 ]),
@@ -241,8 +231,8 @@ class _FilterWidgetState extends State<FilterWidget> {
                 max: priceRangeMinMax.end,
                 values: priceRange,
                 labels: RangeLabels(
-                  formatPrice(priceRange.start),
-                  formatPrice(priceRange.end),
+                  priceRange.start.priceFormat,
+                  priceRange.end.priceFormat,
                 ),
                 onChanged: (newRange) => priceRange = newRange,
               ),
@@ -274,10 +264,5 @@ class _FilterWidgetState extends State<FilterWidget> {
         ),
       ],
     );
-  }
-
-  String formatPrice(double price) {
-    if (widget.priceRangeMinMax == null) return '';
-    return '${price.toStringAsFixed(0).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ",")} ᴵᴿᴿ';
   }
 }

@@ -153,6 +153,10 @@ class NetworkService {
               path: 'backend/uploads/$relative')
           .toString();
 
+  String? getRelativeFilePath(String? absolute) => absolute == null
+      ? absolute
+      : Uri.parse(absolute).path.replaceAll('/backend/uploads/', '');
+
   Future<Uint8List> getImage(String url) async {
     final response = await http.get(
       Uri.parse(url),

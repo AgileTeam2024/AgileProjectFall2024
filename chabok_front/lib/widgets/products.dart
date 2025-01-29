@@ -98,7 +98,7 @@ class _ProductPriceWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return Text(
-      '${price.compact} ᴵᴿᴿ',
+      price.priceFormat,
       style: textTheme.labelMedium?.copyWith(
         fontWeight: FontWeight.bold,
         color: Colors.black87,

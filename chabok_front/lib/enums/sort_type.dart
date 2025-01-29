@@ -16,9 +16,9 @@ enum SortType {
   String toString() => super.toString().split('.')[1];
 
   String toStringDisplay() => [
-        'Price - Cheap first',
+        'Price - Cheapest first',
         'Price - Most Expensive first',
+        'Create Date - Oldest first',
         'Create Date - Newest first',
-        'Create Date - Oldest first'
       ][index];
 }

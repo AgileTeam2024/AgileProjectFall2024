@@ -24,7 +24,7 @@ class ProductService {
   UserService get _userService => UserService.instance;
 
   Future<List<Product>> get homePageProducts =>
-      searchProducts(sortCreatedAt: 'asc');
+      searchProducts(sortCreatedAt: 'dsc');
 
   Future<List<Product>> get ownProducts async {
     final response = await _networkService.get('/product/product_list');
@@ -64,7 +64,9 @@ class ProductService {
     images?.removeWhere((path, bytes) => bytes == null);
     return _networkService.putFormData(
       '/product/edit_product',
-      query: {'product_id': ['$productId']},
+      query: {
+        'product_id': ['$productId']
+      },
       fields,
       files: {
         'pictures': images?.map((k, v) => MapEntry(k, v!)) ?? {},
@@ -90,7 +92,7 @@ class ProductService {
     String? name,
     double? minPrice,
     double? maxPrice,
-    String? status,
+    List<String>? statuses,
     List<String>? categories,
     String? sortCreatedAt,
     String? sortPrice,
@@ -98,13 +100,13 @@ class ProductService {
     final response = await _networkService.get(
       '/product/search',
       query: {
-        if (name != null) 'name': name,
-        if (minPrice != null) 'min_price': minPrice,
-        if (maxPrice != null) 'max_price': maxPrice,
-        if (status != null) 'status': status,
+        if (name != null) 'name': [name],
+        if (minPrice != null) 'min_price': ['${minPrice.toInt()}'],
+        if (maxPrice != null) 'max_price': ['${maxPrice.toInt()}'],
+        if (statuses != null) 'status': statuses,
         if (sortCreatedAt != null) 'sort_created_at': sortCreatedAt,
         if (sortPrice != null) 'sort_price': sortPrice,
-        if (categories != null) 'categories': categories,
+        if (categories != null) 'category': categories,
       },
     );
     if (!response.isOk) return [];
@@ -114,9 +116,11 @@ class ProductService {
   }
 
   Future<List<Product>> getProductsSellers(
-      List<Map<String, dynamic>> products) {
+    List<Map<String, dynamic>> products,
+  ) async {
+    if (products.isEmpty) return [];
     final users = {};
-    return Future.wait(
+    return await Future.wait(
       products.map((product) async {
         final sellerUsername = product['user_username'];
         if (product.containsKey('seller')) return Product.fromJson(product);
