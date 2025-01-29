@@ -15,6 +15,7 @@ class UserProfilePage extends StatelessWidget {
   final String? username;
 
   late final User user;
+  late final String ownUsername;
 
   UserProfilePage({super.key, this.username});
 
@@ -26,91 +27,99 @@ class UserProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        child: CardWidget(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 20,
-            children: [
-              Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: FutureBuilder<User?>(
-                    future: username == null
-                        ? _userService.ownProfile
-                        : _userService.getProfile(username!),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) return Container();
-                      try {
-                        user = snapshot.data!;
-                      } catch (LateInitializationError) {}
-                      return UserInfoWidget(user: user);
-                    },
-                  ),
-                ),
-              ),
-              if (isOwnProfile)
-                FutureBuilder<List<Product>>(
-                  future: _productService.ownProducts,
-                  builder: (context, snapshot) {
-                    return ProductsListWidget(
-                      title: 'Your Products',
-                      products: snapshot.data ?? [],
-                    );
-                  },
-                ),
-              Text(
-                'Account Actions',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.redAccent,
-                ),
-              ),
-              Card(
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+    return FutureBuilder<User?>(
+        future: _userService.ownProfile,
+        builder: (context, snapshot) {
+          final isLoggedIn = snapshot.data != null;
+
+          return Center(
+            child: SingleChildScrollView(
+              child: CardWidget(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 20,
                   children: [
-                    if (isOwnProfile) ...[
-                      ListTile(
-                        leading: Icon(Icons.logout, color: Colors.blueAccent),
-                        title: Text('Log Out'),
-                        onTap: () => _logout(context),
+                    Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      Divider(),
-                      ListTile(
-                        leading: Icon(Icons.edit, color: Colors.orange),
-                        title: Text('Edit Profile'),
-                        onTap: _goToEditProfile,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: FutureBuilder<User?>(
+                          future: username == null
+                              ? _userService.ownProfile
+                              : _userService.getProfile(username!),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) return Container();
+                            try {
+                              user = snapshot.data!;
+                            } catch (LateInitializationError) {}
+                            return UserInfoWidget(user: user);
+                          },
+                        ),
                       ),
-                      Divider(),
-                      ListTile(
-                        leading: Icon(Icons.delete, color: Colors.red),
-                        title: Text('Delete Account'),
-                        onTap: () => _deleteAccount(context),
+                    ),
+                    if (isOwnProfile)
+                      FutureBuilder<List<Product>>(
+                        future: _productService.ownProducts,
+                        builder: (context, snapshot) {
+                          return ProductsListWidget(
+                            title: 'Your Products',
+                            products: snapshot.data ?? [],
+                          );
+                        },
                       ),
-                    ] else
-                      ListTile(
-                        leading: Icon(Icons.report, color: Colors.red),
-                        title: Text('Report Account'),
-                        onTap: () => _report(context),
+                    if (isLoggedIn)
+                      Text(
+                        'Account Actions',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.redAccent,
+                        ),
                       ),
+                    Card(
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        children: [
+                          if (isOwnProfile) ...[
+                            ListTile(
+                              leading:
+                                  Icon(Icons.logout, color: Colors.blueAccent),
+                              title: Text('Log Out'),
+                              onTap: () => _logout(context),
+                            ),
+                            Divider(),
+                            ListTile(
+                              leading: Icon(Icons.edit, color: Colors.orange),
+                              title: Text('Edit Profile'),
+                              onTap: _goToEditProfile,
+                            ),
+                            Divider(),
+                            ListTile(
+                              leading: Icon(Icons.delete, color: Colors.red),
+                              title: Text('Delete Account'),
+                              onTap: () => _deleteAccount(context),
+                            ),
+                          ] else if (isLoggedIn)
+                            ListTile(
+                              leading: Icon(Icons.report, color: Colors.red),
+                              title: Text('Report Account'),
+                              onTap: () => _report(context),
+                            ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        });
   }
 
   Future<void> _deleteAccount(BuildContext context) async {
