@@ -25,9 +25,12 @@ jobs:
 
       - name: Run tests
         run: |
-          # Find all test files except those in the backend/integration_test directory
-          find backend -name '*_test.py' ! -path 'backend/integration_test/*' -exec python -m unittest {} +
-          
+          find backend -name '*_test.py' ! -path 'backend/integration_test/*' ! -path 'backend/routes/*' -exec python -m unittest {} +
+
+      - name: Run Route tests
+        run: |
+            find backend/routes -name '*_test.py' -exec python -m unittest {} +
+
   front_ci:
     runs-on: ubuntu-latest
 
