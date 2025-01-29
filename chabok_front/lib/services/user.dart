@@ -38,7 +38,7 @@ class UserService {
     Map<String, String> fields,
     Pair<String, Uint8List>? profilePicture,
   ) async {
-    final response = await _networkService.postFormData(
+    final response = await _networkService.putFormData(
       '/user/edit_profile',
       fields,
       files: profilePicture == null
