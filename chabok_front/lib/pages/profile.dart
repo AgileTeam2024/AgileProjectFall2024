@@ -42,7 +42,7 @@ class UserProfilePage extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: FutureBuilder<User?>(
                     future: username == null
-                        ? Future.value(null)
+                        ? _userService.ownProfile
                         : _userService.getProfile(username!),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) return Container();
