@@ -1,5 +1,4 @@
 from unittest import mock
-from unittest.mock import patch
 
 import flask
 import flask_jwt_extended
@@ -13,7 +12,7 @@ import backend.initializers.settings
 import backend.initializers.test_util
 
 
-class UserManagerTest(absltest.TestCase):
+class AdminRouteTest(absltest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.flask_app = flask.Flask(__name__)
