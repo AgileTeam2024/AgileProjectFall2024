@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:chabok_front/models/product.dart';
 import 'package:chabok_front/models/server_response.dart';
 import 'package:chabok_front/services/network.dart';
@@ -69,8 +71,19 @@ class ProductService {
     );
   }
 
-  Future<ServerResponse> deleteProduct(int id) =>
-      _networkService.delete('/product/delete', query: {'product_id': '$id'});
+  Future<ServerResponse> deleteProduct(int id) async {
+    final response = await _networkService.delete(
+      '/product/delete',
+      query: {
+        'product_id': ['$id']
+      },
+    );
+    if (response.isOk) {
+      return ServerResponse.visualize(
+          jsonEncode({'message': 'Product deleted successfully'}), 200);
+    }
+    return response;
+  }
 
   Future<List<Product>> searchProducts({
     String? name,
