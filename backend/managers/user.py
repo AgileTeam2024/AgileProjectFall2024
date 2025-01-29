@@ -323,8 +323,9 @@ class UserManager:
             # Remove the previous profile picture if exists.
             old_picture = backend.models.user.ProfilePicture.query.filter_by(user_username=user.username).first()
             if old_picture:
-                backend.initializers.database.DB.session.delete(old_picture)
+                # backend.initializers.database.DB.session.delete(old_picture)
                 os.remove(f"./backend/uploads/{old_picture.filename}")
+            backend.models.user.ProfilePicture.query.filter_by(user_username=user.username).delete()
             # Save if new profile picture is uploaded.
             filename = info['image_filename']
             base, extension = os.path.splitext(filename)
@@ -337,6 +338,8 @@ class UserManager:
                 filename=new_filename,
                 user_username=username
             )
+            user.profile_picture = new_filename
+            backend.initializers.database.DB.session.add(user)
             backend.initializers.database.DB.session.add(new_profile_picture)
 
         backend.initializers.database.DB.session.commit()

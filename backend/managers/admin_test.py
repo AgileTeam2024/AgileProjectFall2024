@@ -195,9 +195,9 @@ class UserManagerTest(absltest.TestCase):
         self.mock_user_query.filter_by.return_value.all.return_value = users
         response, status_code = self.admin_manager.get_banned_user_list()
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
-        self.assertEqual(response.json, {'banned_users': [{'email': None, 'first_name': None, 'is_admin': None, 'is_banned': True, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user1'},
-                                                                  {'email': None, 'first_name': None, 'is_admin': None, 'is_banned': True, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user2'},
-                                                                  {'email': None, 'first_name': None, 'is_admin': None, 'is_banned': True, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user3'}]})
+        self.assertEqual(response.json, {'banned_users': [{'email': None, 'first_name': None, 'is_admin': None, 'is_banned': True, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user1', 'address': None},
+                                                                  {'email': None, 'first_name': None, 'is_admin': None, 'is_banned': True, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user2', 'address': None},
+                                                                  {'email': None, 'first_name': None, 'is_admin': None, 'is_banned': True, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user3', 'address': None}]})
 
 
 if __name__ == "__main__":

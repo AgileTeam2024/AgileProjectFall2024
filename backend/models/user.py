@@ -74,6 +74,7 @@ class User(backend.initializers.database.DB.Model):
             'username': self.username,
             'first_name': self.first_name,
             'last_name': self.last_name,
+            'address': self.address,
             'phone_number': self.phone_number,
             'profile_picture': self.profile_picture,
             'is_banned': self.is_banned,
