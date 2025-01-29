@@ -7,9 +7,9 @@ initializers/settings.py           23      0   100%
 initializers/test_util.py          11      8    27%
 managers/__init__.py                0      0   100%
 managers/admin.py                  61      4    93%
-managers/product.py               123     41    67%
+managers/product.py               125     31    75%
 managers/token.py                  13      3    77%
-managers/user.py                  131     50    62%
+managers/user.py                  129     39    70%
 models/__init__.py                  0      0   100%
 models/product.py                  30      2    93%
 models/report.py                   19      0   100%
@@ -20,4 +20,4 @@ routes/authorization_utils.py      25      3    88%
 routes/product.py                 171     18    89%
 routes/user.py                    104      3    97%
 ---------------------------------------------------
-TOTAL                             806    143    82%
+TOTAL                             806    122    85%
