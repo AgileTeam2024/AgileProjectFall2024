@@ -11,11 +11,11 @@ managers/admin_test.py        101      2    98%
 managers/product.py           123     48    61%
 managers/product_test.py      140      2    99%
 managers/token.py              13      3    77%
-managers/user.py              129     56    57%
+managers/user.py              131     58    56%
 managers/user_test.py          93      2    98%
 models/__init__.py              0      0   100%
 models/product.py              30      2    93%
 models/report.py               19      0   100%
 models/user.py                 34      3    91%
 -----------------------------------------------
-TOTAL                         779    130    83%
+TOTAL                         781    132    83%
