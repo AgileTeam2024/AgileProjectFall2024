@@ -81,6 +81,58 @@ class ProductManagerTest(absltest.TestCase):
         self.assertIn(3, result_product_ids)
         self.assertNotIn(1, result_product_ids)
 
+    def test_search_product_sort_price_asc(self) -> None:
+        """Test applying filter on sorting price asc."""
+        self.mock_product_query.filter.return_value.all.return_value = [self.product2, self.product3]
+        self.mock_product_query.order_by.return_value.all.return_value = [self.product2, self.product3]
+        self.mock_user_query.get.return_value = self.user1
+        filters = {'sort_price': 'asc'}
+        result_products, result_product_ids, status = self.extract_product_info_for_filters(filters)
+
+        self.assertEqual(status, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(len(result_products), 2)
+        self.assertEqual(result_products[0]['id'], 2)
+        self.assertEqual(result_products[1]['id'], 3)
+
+    def test_search_product_sort_price_dsc(self) -> None:
+        """Test applying filter on sorting price dsc."""
+        self.mock_product_query.filter.return_value.all.return_value = [self.product3, self.product2]
+        self.mock_product_query.order_by.return_value.all.return_value = [self.product3, self.product2]
+        self.mock_user_query.get.return_value = self.user1
+        filters = {'sort_price': 'asc'}
+        result_products, result_product_ids, status = self.extract_product_info_for_filters(filters)
+
+        self.assertEqual(status, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(len(result_products), 2)
+        self.assertEqual(result_products[0]['id'], 3)
+        self.assertEqual(result_products[1]['id'], 2)
+
+    def test_search_product_sort_created_time_asc(self) -> None:
+        """Test applying filter on created time asc."""
+        self.mock_product_query.filter.return_value.all.return_value = [self.product1, self.product2]
+        self.mock_product_query.order_by.return_value.all.return_value = [self.product1, self.product2]
+        self.mock_user_query.get.return_value = self.user1
+        filters = {'sort_created_at': 'asc'}
+        result_products, result_product_ids, status = self.extract_product_info_for_filters(filters)
+
+        self.assertEqual(status, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(len(result_products), 2)
+        self.assertEqual(result_products[0]['id'], 1)
+        self.assertEqual(result_products[1]['id'], 2)
+
+    def test_search_product_sort_created_time_dsc(self) -> None:
+        """Test applying filter on created time dsc."""
+        self.mock_product_query.filter.return_value.all.return_value = [self.product2, self.product1]
+        self.mock_product_query.order_by.return_value.all.return_value = [self.product2, self.product1]
+        self.mock_user_query.get.return_value = self.user1
+        filters = {'sort_created_at': 'dsc'}
+        result_products, result_product_ids, status = self.extract_product_info_for_filters(filters)
+
+        self.assertEqual(status, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(len(result_products), 2)
+        self.assertEqual(result_products[0]['id'], 2)
+        self.assertEqual(result_products[1]['id'], 1)
+
     def test_search_product_status_filter(self) -> None:
         """Test applying filter on product status."""
         self.mock_product_query.filter.return_value.all.return_value = [self.product3]
@@ -161,7 +213,8 @@ class ProductManagerTest(absltest.TestCase):
             'category': 'Digital & Electronics',
         }
         with mock.patch("flask_jwt_extended.get_jwt_identity", return_value='current_user'):
-            response, status_code = self.product_manager.edit_product(self.user2.username, self.product1.id, product_data)
+            response, status_code = self.product_manager.edit_product(self.user2.username, self.product1.id,
+                                                                      product_data)
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.UNAUTHORIZED.value)
         self.assertEqual(response.json, {'message': 'You do not have access to edit this product.'})
 

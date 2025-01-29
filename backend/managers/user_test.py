@@ -80,6 +80,17 @@ class UserManagerTest(absltest.TestCase):
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.BAD_REQUEST.value)
         self.assertEqual(response.json, {'message': 'Username and password do not match.'})
 
+    def test_edit_profile(self):
+        """Test that user can edit their profile."""
+        self.mock_user_query.filter_by.return_value.first.return_value = backend.models.user.User(
+            username="user",
+            password="password123",
+            is_verified=True
+        )
+        response, status_code = self.user_manager.edit_profile("user", {"phone_number": 1234})
+        self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
+        self.assertEqual(response.json, {'message': 'User edited successfully.'})
+
     def test_login_incorrect_password(self) -> None:
         """Test that login fails when the password is incorrect."""
         self.mock_user_query.filter_by.return_value.first.return_value = backend.models.user.User(
@@ -136,7 +147,10 @@ class UserManagerTest(absltest.TestCase):
         )
         response, status_code = self.user_manager.get_profile("user1")
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.OK.value)
-        self.assertEqual(response.json, {'profile': {'email': None, 'first_name': None, 'is_admin': None, 'is_banned': None, 'is_verified': None, 'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user1', 'address': None}})
+        self.assertEqual(response.json, {
+            'profile': {'email': None, 'first_name': None, 'is_admin': None, 'is_banned': None, 'is_verified': None,
+                        'last_name': None, 'phone_number': None, 'profile_picture': None, 'username': 'user1',
+                        'address': None}})
 
     def test_get_profile_does_not_exist(self):
         """Test non-existent get_profile_by_username."""
