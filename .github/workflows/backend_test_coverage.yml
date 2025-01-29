@@ -20,7 +20,7 @@ jobs:
         run: pip install -r backend/requirements.txt
 
       - name: Run test coverage
-        run: cd backend && coverage run --omit="/usr/lib/*" --omit="*_test.py" -m pytest --ignore=integration_test
+        run: cd backend && coverage run --omit="/usr/lib/*,*_test.py" -m pytest --ignore=integration_test
 
       - name: Generate test coverage report
         run: cd backend && coverage report > backend_coverage_report.txt
