@@ -12,6 +12,7 @@ import backend.initializers.database
 import backend.initializers.settings
 import backend.models.product
 import backend.models.report
+import backend.managers.product
 
 
 class UserManager:
@@ -272,7 +273,7 @@ class UserManager:
         backend.models.user.ProfilePicture.query.filter_by(user_username=username).delete()
 
         backend.models.report.UserReport.query.filter_by(reported_user=username).delete()
-        backend.models.report.UserReport.query.filter_by(reporter_user=username).delete()
+        backend.models.report.UserReport.query.filter_by(reporter_username=username).delete()
 
         backend.models.user.User.query.filter_by(username=username).delete()
         backend.initializers.database.DB.session.commit()

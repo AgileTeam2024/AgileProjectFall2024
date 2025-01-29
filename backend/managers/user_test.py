@@ -3,13 +3,13 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 import flask
-import flask_mail
 import flask_jwt_extended
 from absl.testing import absltest
 
 import backend.initializers.settings
 import backend.initializers.test_util
 import backend.managers.user
+import backend.managers.product
 import backend.models.user
 
 
@@ -165,9 +165,6 @@ class UserManagerTest(absltest.TestCase):
         self.assertEqual(status_code, backend.initializers.settings.HTTPStatus.NOT_FOUND.value)
         self.assertEqual(response.json, {'message': 'User does not exist.'})
 
-
-    def test_delete_account_deletes_other_items_too(self):
-        """Test that deleting a user account removes all associated items."""
     def test_delete_account_deletes_other_items_too(self):
         user1 = backend.models.user.User(username='user1', password='pass', email='user1@gmail.com', is_verified=True)
         user2 = backend.models.user.User(username='user2', password='pass', email='user2@gmail.com', is_verified=True, profile_picture='picture.jpg')
