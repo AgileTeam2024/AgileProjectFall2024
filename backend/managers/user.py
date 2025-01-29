@@ -266,9 +266,8 @@ class UserManager:
             status_code (int): HTTP status code indicating success (200).
         """
         products_to_delete = backend.models.product.Product.query.filter_by(user_username=username).all()
-
         for product in products_to_delete:
-            backend.managers.product.ProductManager.instance.delete_product(product.id)
+            print(backend.managers.product.ProductManager.instance.delete_product(username, product.id)[1] == 204)
 
         backend.models.user.ProfilePicture.query.filter_by(user_username=username).delete()
 
